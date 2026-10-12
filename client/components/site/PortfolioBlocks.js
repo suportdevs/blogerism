@@ -27,7 +27,7 @@ function CodeCard({ d }) {
   const S = ({ children }) => <span className="text-emerald-400">{children}</span>;
   const K = ({ children }) => <span className="text-sky-300">{children}</span>;
   return (
-    <div className="relative rounded-2xl border border-white/10 bg-[#0d1117]/90 font-mono text-[13px] leading-relaxed text-slate-300 shadow-2xl backdrop-blur sm:text-sm">
+    <div className="relative min-w-0 overflow-hidden rounded-2xl border border-white/10 bg-[#0d1117]/90 font-mono text-[13px] leading-relaxed text-slate-300 shadow-2xl backdrop-blur sm:text-sm">
       <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
         <span className="h-3 w-3 rounded-full bg-[#ff5f57]" /><span className="h-3 w-3 rounded-full bg-[#febc2e]" /><span className="h-3 w-3 rounded-full bg-[#28c840]" />
         <span className="ml-3 text-xs text-slate-500">developer.ts</span>
@@ -49,12 +49,12 @@ function CodeCard({ d }) {
 function ProfileHero({ d }) {
   const socials = [[d.github, Github, 'GitHub'], [d.linkedin, Linkedin, 'LinkedIn'], [d.email && `mailto:${d.email}`, Mail, 'Email']].filter(([u]) => u);
   return (
-    <div className="relative grid items-center gap-14 py-6 text-left lg:grid-cols-[1.15fr_1fr]">
+    <div className="relative grid items-center gap-14 py-6 text-left lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
       {/* ambient glows */}
       <div aria-hidden className="pointer-events-none absolute -left-40 -top-40 h-[480px] w-[480px] rounded-full bg-primary/25 blur-[140px]" />
       <div aria-hidden className="pointer-events-none absolute -right-20 bottom-0 h-[380px] w-[380px] rounded-full bg-accent/20 blur-[130px]" />
 
-      <div className="relative">
+      <div className="relative min-w-0">
         {d.availability && (
           <span className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5 text-sm font-semibold text-emerald-500">
             <span className="relative flex h-2.5 w-2.5"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" /><span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500" /></span>
@@ -79,7 +79,7 @@ function ProfileHero({ d }) {
         </div>
       </div>
 
-      <div className="relative mx-auto w-full max-w-lg">
+      <div className="relative mx-auto w-full min-w-0 max-w-lg">
         <div aria-hidden className="absolute -inset-6 rounded-[2.5rem] bg-gradient-to-tr from-primary/30 via-transparent to-accent/30 blur-2xl" />
         {d.image ? (
           <div className="relative mx-auto aspect-square w-4/5 rounded-full bg-gradient-to-tr from-primary to-accent p-1.5 shadow-glow">
@@ -94,7 +94,7 @@ function ProfileHero({ d }) {
         {(d.badges || []).slice(0, 3).map((b, i) => (
           <span
             key={b}
-            className={cn('absolute z-10 hidden items-center gap-2 rounded-xl border border-fg/10 bg-bg/90 px-3.5 py-2 text-sm font-bold text-fg shadow-xl backdrop-blur sm:flex', ['-left-8 bottom-10', '-right-6 bottom-28', 'left-10 -bottom-6'][i])}
+            className={cn('absolute z-10 hidden items-center gap-2 rounded-xl border border-fg/10 bg-bg/90 px-3.5 py-2 text-sm font-bold text-fg shadow-xl backdrop-blur sm:flex', ['-top-14 left-0', '-bottom-8 right-0', '-bottom-8 left-0'][i])}
             style={{ animation: `float ${5 + i}s ease-in-out ${i * 0.7}s infinite` }}
           >
             <Sparkles className="h-4 w-4 text-accent" />{b}

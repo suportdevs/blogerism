@@ -67,12 +67,13 @@ The site is one kind of website at a time, chosen under **Admin → Appearance �
 | **Vidora** | Video sharing | Search-first header + sidebar, recommended grid, playlists | Videos, playlists |
 | **Marquee** | Streaming service | Dark cinematic header, billboard, Top 10, poster rows | Videos, shows with seasons |
 | **Waveform** | Podcast network | Warm header, show artwork grid, persistent player | Audio, podcasts |
+| **Folio** | Personal portfolio | Floating pill nav, one-page sections: profile hero, about, skills, timeline, projects, contact | Articles (optional) |
 
 Activating a theme can (each optional): apply its design, create its homepage/pages and menus, and **import its demo content** (replaces posts, pages, series, categories, menus, FAQs and testimonials; keeps users, media, messages and subscribers). The admin then shows only that theme's formats and blocks (with "show all" escape hatches). Themes can be previewed live before activating.
 
-Seed straight into a theme: `node prisma/seed.js herald` (or `nova`, `vidora`, `marquee`, `waveform`).
+Seed straight into a theme: `node prisma/seed.js herald` (or `nova`, `vidora`, `marquee`, `waveform`, `folio`).
 
-Themes live in `server/src/themes/*.js` — copy one to create your own (layout keys: `header` = `default | masthead | video | streaming`, `article` = `blog | news`, `listing` = `cards | news | video | audio`).
+Themes live in `server/src/themes/*.js` — copy one to create your own (layout keys: `header` = `default | masthead | video | streaming | portfolio`, `article` = `blog | news`, `listing` = `cards | news | video | audio`).
 
 ### Content formats
 
