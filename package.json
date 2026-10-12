@@ -1,0 +1,12 @@
+{
+  "name": "nova-cms",
+  "private": true,
+  "scripts": {
+    "db:up": "docker compose up -d",
+    "install:all": "npm --prefix server install && npm --prefix client install && npm --prefix server exec prisma generate",
+    "setup": "npm --prefix server run setup",
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev",
+    "build": "npm --prefix client run build"
+  }
+}

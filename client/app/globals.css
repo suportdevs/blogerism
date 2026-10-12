@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------- Storefront theme tokens (overridden at runtime from settings) ---------- */
+:root {
+  --c-primary: 109 93 252;
+  --c-accent: 22 199 154;
+  --c-bg: 255 255 255;
+  --c-surface: 246 247 251;
+  --c-fg: 15 23 42;
+  --radius: 16px;
+  --container: 1200px;
+  --font-heading: 'Plus Jakarta Sans';
+  --font-body: 'Inter';
+}
+
+@layer base {
+  html { -webkit-tap-highlight-color: transparent; }
+  body { @apply antialiased; }
+  ::selection { background: rgb(var(--c-primary) / 0.2); }
+}
+
+@layer components {
+  /* ---------- Storefront ---------- */
+  .site-container { @apply mx-auto w-full max-w-container px-5 sm:px-8; }
+  .btn-site { @apply inline-flex items-center justify-center gap-2 rounded-theme px-5 py-3 text-sm font-semibold transition duration-200 active:scale-[.98]; }
+  .btn-site-primary { @apply btn-site bg-primary text-white shadow-glow hover:-translate-y-0.5 hover:brightness-110; }
+  .btn-site-ghost { @apply btn-site border border-fg/10 bg-bg/60 text-fg backdrop-blur hover:border-fg/25 hover:bg-fg/5; }
+  .eyebrow { @apply inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary; }
+  .site-input { @apply w-full rounded-theme border border-fg/10 bg-bg px-4 py-3 text-sm text-fg outline-none transition placeholder:text-fg/40 focus:border-primary focus:ring-4 focus:ring-primary/15; }
+  .text-gradient { @apply bg-gradient-to-r from-primary via-primary to-accent bg-clip-text text-transparent; }
+  .bg-grid {
+    background-image: linear-gradient(rgb(var(--c-fg) / 0.05) 1px, transparent 1px), linear-gradient(90deg, rgb(var(--c-fg) / 0.05) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  /* ---------- Admin ---------- */
+  .a-card { @apply rounded-2xl border border-ink-200/70 bg-white shadow-soft dark:border-white/[.06] dark:bg-ink-900; }
+  .a-btn { @apply inline-flex h-9 select-none items-center justify-center gap-2 whitespace-nowrap rounded-xl px-3.5 text-sm font-semibold transition active:scale-[.98] disabled:pointer-events-none disabled:opacity-50; }
+  .a-btn-primary { @apply a-btn bg-brand-500 text-white shadow-brand-glow hover:bg-brand-600; }
+  .a-btn-secondary { @apply a-btn border border-ink-200 bg-white text-ink-700 hover:bg-ink-50 dark:border-white/10 dark:bg-white/5 dark:text-ink-100 dark:hover:bg-white/10; }
+  .a-btn-ghost { @apply a-btn text-ink-600 hover:bg-ink-100 dark:text-ink-300 dark:hover:bg-white/5; }
+  .a-btn-danger { @apply a-btn bg-rose-500 text-white hover:bg-rose-600; }
+  .a-btn-icon { @apply a-btn h-9 w-9 px-0; }
+  .a-input { @apply h-10 w-full rounded-xl border border-ink-200 bg-white px-3.5 text-sm text-ink-900 outline-none transition placeholder:text-ink-400 focus:border-brand-400 focus:ring-4 focus:ring-brand-500/15 dark:border-white/10 dark:bg-ink-950/60 dark:text-ink-50 dark:focus:border-brand-400; }
+  .a-textarea { @apply a-input h-auto min-h-[96px] py-2.5 leading-relaxed; }
+  .a-label { @apply mb-1.5 block text-[13px] font-semibold text-ink-700 dark:text-ink-200; }
+  .a-hint { @apply mt-1 text-xs text-ink-400; }
+  .a-table { @apply w-full text-left text-sm; }
+  .a-table thead th { @apply border-b border-ink-100 bg-ink-50/60 px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-ink-400 dark:border-white/5 dark:bg-white/[.02]; }
+  .a-table tbody td { @apply border-b border-ink-100 px-4 py-3 align-middle text-ink-700 dark:border-white/5 dark:text-ink-200; }
+  .a-table tbody tr { @apply transition hover:bg-ink-50/70 dark:hover:bg-white/[.02]; }
+  .a-table tbody tr:last-child td { @apply border-b-0; }
+  .a-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+  .a-scroll::-webkit-scrollbar-thumb { @apply rounded-full bg-ink-300/60 dark:bg-white/10; }
+}
+
+/* Rich text editor (TipTap) */
+.ProseMirror { outline: none; min-height: 320px; }
+.ProseMirror p.is-editor-empty:first-child::before { content: attr(data-placeholder); float: left; height: 0; pointer-events: none; color: #8e8ea8; }
+.ProseMirror img { border-radius: 12px; }
+.ProseMirror img.ProseMirror-selectednode { outline: 3px solid #6d5dfc; }
+
+/* Content already carries its own quotation marks — drop the typography plugin's auto quotes. */
+.prose blockquote p:first-of-type::before,
+.prose blockquote p:last-of-type::after { content: none; }
+
+@keyframes shine { to { background-position: 200% center; } }
+html { scroll-behavior: smooth; }
+section[id] { scroll-margin-top: 96px; }

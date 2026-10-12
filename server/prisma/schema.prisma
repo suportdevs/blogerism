@@ -1,0 +1,273 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["omitApi"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  SCHEDULED
+}
+
+// What kind of media a post is — drives which single-page layout the site uses.
+enum PostFormat {
+  STANDARD
+  VIDEO
+  AUDIO
+  GALLERY
+}
+
+enum SeriesType {
+  SHOW
+  PLAYLIST
+  PODCAST
+}
+
+enum MessageStatus {
+  UNREAD
+  READ
+  REPLIED
+}
+
+model Role {
+  id          Int      @id @default(autoincrement())
+  name        String
+  slug        String   @unique
+  description String?
+  permissions String[]
+  isSystem    Boolean  @default(false)
+  users       User[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model User {
+  id          Int           @id @default(autoincrement())
+  name        String
+  email       String        @unique
+  password    String
+  avatar      String?
+  bio         String?
+  isActive    Boolean       @default(true)
+  roleId      Int
+  role        Role          @relation(fields: [roleId], references: [id])
+  posts       Post[]
+  activities  ActivityLog[]
+  lastLoginAt DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model Post {
+  id             Int           @id @default(autoincrement())
+  title          String
+  slug           String        @unique
+  excerpt        String?
+  content        String        @default("")
+  coverImage     String?
+  status         ContentStatus @default(DRAFT)
+  format         PostFormat    @default(STANDARD)
+  subtitle       String?
+  videoUrl       String?
+  audioUrl       String?
+  duration       Int?
+  gallery        Json          @default("[]")
+  isBreaking     Boolean       @default(false)
+  seriesId       Int?
+  series         Series?       @relation(fields: [seriesId], references: [id], onDelete: SetNull)
+  season         Int?
+  episode        Int?
+  likes          Int           @default(0)
+  featured       Boolean       @default(false)
+  allowComments  Boolean       @default(true)
+  views          Int           @default(0)
+  readingTime    Int           @default(1)
+  authorId       Int?
+  author         User?         @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  categories     Category[]
+  tags           Tag[]
+  seoTitle       String?
+  seoDescription String?
+  publishedAt    DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([status, publishedAt])
+  @@index([format])
+  @@index([seriesId])
+}
+
+// A show (with seasons/episodes), a video playlist or a podcast. Episodes are posts.
+model Series {
+  id          Int           @id @default(autoincrement())
+  title       String
+  slug        String        @unique
+  type        SeriesType    @default(SHOW)
+  tagline     String?
+  description String?
+  poster      String?
+  backdrop    String?
+  trailerUrl  String?
+  year        Int?
+  maturity    String?
+  genres      String[]
+  featured    Boolean       @default(false)
+  status      ContentStatus @default(PUBLISHED)
+  order       Int           @default(0)
+  posts       Post[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model Category {
+  id          Int        @id @default(autoincrement())
+  name        String
+  slug        String     @unique
+  description String?
+  color       String     @default("#6366f1")
+  order       Int        @default(0)
+  parentId    Int?
+  parent      Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children    Category[] @relation("CategoryTree")
+  posts       Post[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Tag {
+  id        Int      @id @default(autoincrement())
+  name      String
+  slug      String   @unique
+  posts     Post[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Page {
+  id             Int           @id @default(autoincrement())
+  title          String
+  slug           String        @unique
+  template       String        @default("default")
+  blocks         Json          @default("[]")
+  status         ContentStatus @default(DRAFT)
+  seoTitle       String?
+  seoDescription String?
+  ogImage        String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model MediaFolder {
+  id        Int           @id @default(autoincrement())
+  name      String
+  parentId  Int?
+  parent    MediaFolder?  @relation("FolderTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children  MediaFolder[] @relation("FolderTree")
+  files     Media[]
+  createdAt DateTime      @default(now())
+}
+
+model Media {
+  id           Int          @id @default(autoincrement())
+  filename     String
+  originalName String
+  url          String
+  mime         String
+  size         Int
+  alt          String?
+  folderId     Int?
+  folder       MediaFolder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  createdAt    DateTime     @default(now())
+}
+
+model Menu {
+  id        Int        @id @default(autoincrement())
+  name      String
+  location  String     @unique
+  items     MenuItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model MenuItem {
+  id       Int        @id @default(autoincrement())
+  menuId   Int
+  menu     Menu       @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  label    String
+  url      String
+  target   String     @default("_self")
+  order    Int        @default(0)
+  parentId Int?
+  parent   MenuItem?  @relation("MenuTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children MenuItem[] @relation("MenuTree")
+}
+
+model Setting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}
+
+model ContactMessage {
+  id        Int           @id @default(autoincrement())
+  name      String
+  email     String
+  phone     String?
+  subject   String?
+  message   String
+  status    MessageStatus @default(UNREAD)
+  ip        String?
+  createdAt DateTime      @default(now())
+}
+
+model Subscriber {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model Faq {
+  id        Int      @id @default(autoincrement())
+  question  String
+  answer    String
+  category  String?
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Testimonial {
+  id        Int      @id @default(autoincrement())
+  name      String
+  position  String?
+  company   String?
+  avatar    String?
+  content   String
+  rating    Int      @default(5)
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ActivityLog {
+  id          Int      @id @default(autoincrement())
+  userId      Int?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action      String
+  entity      String
+  entityId    String?
+  description String
+  ip          String?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+}
