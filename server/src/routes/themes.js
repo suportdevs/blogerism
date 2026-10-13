@@ -23,7 +23,7 @@ router.get('/', authorize('appearance'), asyncHandler(async (_req, res) => {
       ...publicTheme(t.id),
       variantOf: t.variantOf || null,
       variantName: t.variantName || 'Classic',
-      workspace: workspaces[t.id] || null,
+      workspace: workspaces[t.variantOf || t.id] || null,
       description: t.description,
       general: t.general,
       appearance: t.appearance,

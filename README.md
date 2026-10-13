@@ -72,6 +72,10 @@ The site is one kind of website at a time, chosen under **Admin → Appearance �
 | **Lens** | Photography & studio | Minimal editorial header + full-screen mobile menu, Ken Burns slideshow, giant scrolling type, filterable masonry gallery with lightbox | Articles, galleries |
 | **Folio** | Personal portfolio | Floating pill nav, one-page sections: profile hero, about, skills, timeline, projects, contact | Articles (optional) |
 
+**Luxe versions.** Nova, Herald, Vidora, Marquee, Waveform and Folio each have a *Luxe* version — the same theme and the same content with a different design language: a framed full-screen hero, luxe header with a full-screen numbered menu, serif typography, gold hairlines, magazine article and archive layouts, and luxury blocks (statement, framed split, editorial list with cursor-following images, magazine feature, quote carousel, parallax CTA). Switching Classic ↔ Luxe never touches content; each version remembers its own customised design.
+
+**Every theme keeps its own content.** Content (posts, pages, series, menus, settings) is stored per theme family in a workspace. Switching themes saves the current theme's content and restores the other theme's, so nothing is ever lost. Users, media, messages and subscribers are shared. Seed all themes at once with `node prisma/seed.js nova --all`.
+
 Activating a theme can (each optional): apply its design, create its homepage/pages and menus, and **import its demo content** (replaces posts, pages, series, categories, menus, FAQs and testimonials; keeps users, media, messages and subscribers). The admin then shows only that theme's formats and blocks (with "show all" escape hatches). Themes can be previewed live before activating.
 
 Seed straight into a theme: `node prisma/seed.js herald` (or `nova`, `vidora`, `marquee`, `waveform`, `folio`, `saffron`, `pulse`, `lens`).

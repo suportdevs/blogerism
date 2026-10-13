@@ -22,13 +22,13 @@ const luxeAppearance = (colors) => ({
 
 // Builds a luxe variant from a classic theme.
 function variant(base, overrides) {
-  const { home, ...rest } = overrides;
+  const { home, layout, ...rest } = overrides;
   return {
     ...base,
+    ...rest,
     variantOf: base.id,
     variantName: 'Luxe',
-    layout: { ...base.layout, header: 'luxe', style: 'luxe', ...(overrides.layout || {}) },
-    ...rest,
+    layout: { ...base.layout, header: 'luxe', style: 'luxe', ...(layout || {}) },
     pages: () => [home(), ...base.pages().filter((p) => !p.home)],
     demo: base.demo,
   };

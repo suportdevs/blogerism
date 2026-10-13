@@ -32,11 +32,20 @@ const secret = (bytes = 32) => crypto.randomBytes(bytes).toString('hex');
 
 /* ------------------------------ generated files ------------------------------ */
 
-function themeIndex(themeId) {
+// Luxe versions live in luxe.js, which builds on the classic theme files it requires.
+function themeSourceFiles(theme) {
+  if (!theme.variantOf) return ['helpers.js', `${theme.id}.js`];
+  const luxe = fs.readFileSync(path.join(PROJECT_ROOT, 'server/src/themes/luxe.js'), 'utf8');
+  const required = [...luxe.matchAll(/require\('\.\/([a-z-]+)'\)/g)].map((m) => `${m[1]}.js`);
+  return ['luxe.js', ...new Set(required)];
+}
+
+function themeIndex(theme) {
+  const entry = theme.variantOf ? `...require('./luxe').filter((t) => t.id === '${theme.id}')` : `require('./${theme.id}')`;
   const src = fs.readFileSync(path.join(PROJECT_ROOT, 'server/src/themes/index.js'), 'utf8');
   return src
-    .replace(/const THEMES = Object\.fromEntries\(\[[\s\S]*?\]\.map/, `const THEMES = Object.fromEntries([\n  require('./${themeId}'),\n].map`)
-    .replace(/const DEFAULT_THEME = '[^']*';/, `const DEFAULT_THEME = '${themeId}';`);
+    .replace(/const THEMES = Object\.fromEntries\(\[[\s\S]*?\]\.map/, `const THEMES = Object.fromEntries([\n  ${entry},\n].map`)
+    .replace(/const DEFAULT_THEME = '[^']*';/, `const DEFAULT_THEME = '${theme.id}';`);
 }
 
 const seedFile = (c) => `/* eslint-disable no-console */
@@ -374,7 +383,7 @@ async function buildExportContext(opts) {
 async function streamExport(res, opts) {
   const { snapshot, uploads, ctx } = await buildExportContext(opts);
   const root = ctx.slug;
-  const themeFiles = new Set(['helpers.js', `${ctx.theme.id}.js`]);
+  const themeFiles = new Set(themeSourceFiles(ctx.theme));
 
   const archive = archiver('zip', { zlib: { level: 9 } });
   archive.on('warning', (e) => console.warn('export warning', e.message));
@@ -405,7 +414,7 @@ async function streamExport(res, opts) {
 
   add('server/package.json', pkg('server', 'server'));
   add('client/package.json', pkg('client', 'client'));
-  add('server/src/themes/index.js', themeIndex(ctx.theme.id));
+  add('server/src/themes/index.js', themeIndex(ctx.theme));
   add('server/prisma/seed.js', seedFile(ctx));
   add('server/prisma/data/snapshot.json', JSON.stringify(snapshot, null, 2));
   add('server/.env', serverEnv(ctx));

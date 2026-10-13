@@ -36,10 +36,37 @@ async function activeThemeId() {
   return THEMES[theme?.active] ? theme.active : DEFAULT_THEME;
 }
 
+// A classic theme and its luxe version form one family and share the same content.
+const family = (id) => THEMES[id]?.variantOf || id;
+
+async function upsertSetting(key, value) {
+  await prisma.setting.upsert({ where: { key }, update: { value }, create: { key, value } });
+}
+
+/*
+ * Switches between versions of the same theme (e.g. Nova → Nova Luxe): content stays, only the
+ * design, homepage layout and menus change. Each version keeps its own customised design.
+ */
+async function applyVariant(fromId, toId, { appearance = true } = {}) {
+  const theme = THEMES[toId];
+  const current = await prisma.setting.findUnique({ where: { key: 'appearance' } });
+  if (current && fromId) await upsertSetting(`variant-appearance:${fromId}`, current.value);
+  const saved = await prisma.setting.findUnique({ where: { key: `variant-appearance:${toId}` } });
+  if (saved) {
+    await upsertSetting('appearance', saved.value);
+  } else if (appearance) {
+    await prisma.setting.deleteMany({ where: { key: 'appearance' } });
+    await saveGroup('appearance', theme.appearance);
+  }
+  const homepageId = await applyPages(theme.pages());
+  await applyMenus(theme.menus);
+  await saveGroup('general', { homepageId });
+}
+
 /**
- * Activates a theme. The outgoing theme's content is always saved to its workspace first.
- * opts.demo       — (re)install this theme's demo content (only this theme's content is replaced)
- * opts.restore    — when switching, bring back this theme's saved content if it has any (default)
+ * Activates a theme. When the theme family changes, the outgoing family's content is saved first.
+ * opts.demo       — (re)install this theme's demo content (only this family's content is replaced)
+ * opts.restore    — when switching family, bring back its saved content if there is any (default)
  * opts.appearance — apply the theme's design preset (skipped when saved content was restored)
  * opts.setup      — create the theme's pages & menus (skipped when saved content was restored)
  */
@@ -48,17 +75,24 @@ async function activateTheme(id, { appearance = true, setup = true, demo = false
   if (!theme) throw new HttpError(404, `Unknown theme "${id}"`);
   const current = await activeThemeId();
   const switching = current !== id;
+  const sameFamily = family(current) === family(id);
 
-  if (switching) await saveWorkspace(current);
+  if (switching && !sameFamily) await saveWorkspace(family(current), current);
 
   let restored = false;
   if (demo) {
     await clearContent();
     const authors = await prisma.user.findMany({ orderBy: { id: 'asc' }, take: 3 });
     await theme.demo(prisma, { authors });
-  } else if (switching) {
-    restored = restore && (await loadWorkspace(id));
+  } else if (switching && !sameFamily) {
+    const restoredVariant = restore ? await loadWorkspace(family(id)) : false;
+    restored = !!restoredVariant;
     if (!restored) await clearContent(); // a never-used theme starts with a clean slate
+    else if (restoredVariant !== id) await applyVariant(restoredVariant, id, { appearance }); // saved under the other version
+  } else if (switching && sameFamily) {
+    await applyVariant(current, id, { appearance });
+    await saveGroup('theme', { active: id });
+    return { settings: await getSettings(), restored: true };
   }
 
   if (appearance && !restored) {

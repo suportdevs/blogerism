@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { AlertTriangle, Check, ExternalLink, Eye, Loader2, Monitor, Palette, Smartphone, Sparkles } from 'lucide-react';
+import { AlertTriangle, Check, Crown, ExternalLink, Eye, Loader2, Monitor, Palette, Smartphone, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { useApi } from '@/lib/hooks';
@@ -70,6 +70,27 @@ function Mockup({ theme, className }) {
           <div className="absolute inset-x-4 bottom-3 space-y-1.5">
             {line(50, 0.6)}
             <div className="flex gap-1.5">{Array.from({ length: 7 }).map((_, i) => <div key={i} className="flex-1 rounded-sm" style={{ aspectRatio: '2/3', background: `hsl(${i * 47} 45% 35%)` }} />)}</div>
+          </div>
+        </div>
+      )}
+      {header === 'luxe' && (
+        <div className="relative h-full" style={{ color: fg }}>
+          <div className="absolute inset-2 border" style={{ borderColor: `${a.primaryColor}55` }} />
+          <div className="relative grid grid-cols-[1fr_auto_1fr] items-center px-5 pt-4">
+            <div className="flex flex-col gap-[3px]"><span className="h-px w-4" style={{ background: fg }} /><span className="h-px w-2.5" style={{ background: fg }} /></div>
+            <span className="text-[9px] uppercase tracking-[0.35em]" style={{ fontFamily: a.headingFont }}>{theme.general.siteName}</span>
+            <span className="justify-self-end border-b text-[6px] uppercase tracking-[0.3em]" style={{ borderColor: fg }}>{a.headerCta?.label || 'Enquire'}</span>
+          </div>
+          <div className="relative mx-5 mt-2 flex justify-center gap-3 border-t pt-1.5" style={{ borderColor: `${fg}20` }}>{[0, 1, 2, 3].map((i) => <span key={i} className="h-px w-5" style={{ background: `${fg}55` }} />)}</div>
+          <div className="relative mt-5 text-center">
+            <div className="flex items-center justify-center gap-2 text-[6px] uppercase tracking-[0.4em]" style={{ color: a.primaryColor }}><span className="h-px w-4" style={{ background: a.primaryColor }} />Est. 2019<span className="h-px w-4" style={{ background: a.primaryColor }} /></div>
+            <div className="mt-1.5 text-xl leading-none" style={{ fontFamily: a.headingFont }}>Timeless</div>
+            <div className="text-xl italic leading-tight" style={{ fontFamily: a.headingFont, color: a.primaryColor }}>by design</div>
+            <span className="mx-auto mt-3 block h-3.5 w-16 border" style={{ borderColor: `${fg}60` }} />
+          </div>
+          <div className="absolute inset-x-6 bottom-4 grid grid-cols-[1.4fr_1fr] gap-3">
+            {box({ height: 34 })}
+            <div className="space-y-1.5 pt-1">{[0, 1, 2].map((i) => <div key={i} className="flex items-center gap-1.5"><span className="text-[7px] italic" style={{ color: a.primaryColor }}>0{i + 1}</span>{line('80%', 0.3, 2)}</div>)}</div>
           </div>
         </div>
       )}
@@ -200,32 +221,57 @@ function PreviewModal({ theme, onClose, onActivate }) {
   );
 }
 
-function ActivateModal({ theme, onClose, onDone }) {
+const familyOf = (t) => t.variantOf || t.id;
+
+function ActivateModal({ theme, activeId, activeFamily, onClose, onDone }) {
   const { can } = useAuth();
-  const [opts, setOpts] = useState({ appearance: true, setup: true, demo: false });
+  const isCurrent = theme.id === activeId;
+  const sameFamily = !isCurrent && familyOf(theme) === activeFamily;
+  const ws = theme.workspace;
+  const [opts, setOpts] = useState({ appearance: true, setup: true, demo: !isCurrent && !sameFamily && !ws, restore: true });
   const [loading, setLoading] = useState(false);
   const activate = async () => {
     setLoading(true);
     try {
-      await api.post(`/admin/themes/${theme.id}/activate`, opts);
-      toast.success(`${theme.name} is now your active theme`);
+      const r = await api.post(`/admin/themes/${theme.id}/activate`, opts);
+      toast.success(sameFamily ? `Switched to ${theme.name} — same content, new design` : r.restored ? `${theme.name} is active — its saved content was restored` : `${theme.name} is now your active theme`);
       onDone();
     } catch (e) {
       toast.error(e.message);
       setLoading(false);
     }
   };
+  const label = sameFamily ? `Switch to ${theme.variantName}` : opts.demo ? 'Install demo & activate' : isCurrent ? 'Re-apply' : 'Activate theme';
+
   return (
-    <Modal open onClose={onClose} title={`Activate ${theme.name}`} description={theme.category} footer={<><button className="a-btn-secondary" onClick={onClose}>Cancel</button><button className={opts.demo ? 'a-btn-danger' : 'a-btn-primary'} onClick={activate} disabled={loading}>{loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}{opts.demo ? 'Replace content & activate' : 'Activate theme'}</button></>}>
+    <Modal open onClose={onClose} title={isCurrent ? `Re-apply ${theme.name}` : `Activate ${theme.name}`} description={theme.category} footer={<><button className="a-btn-secondary" onClick={onClose}>Cancel</button><button className="a-btn-primary" onClick={activate} disabled={loading}>{loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}{label}</button></>}>
       <div className="space-y-4">
         <div className="overflow-hidden rounded-xl border border-ink-200 dark:border-white/10"><Mockup theme={theme} /></div>
-        <Toggle label="Apply theme design" description="Colors, fonts, corner radius, header & footer style. Your current customizations are replaced." checked={opts.appearance} onChange={(v) => setOpts({ ...opts, appearance: v })} />
-        <Toggle label="Set up homepage, pages & menus" description={`Creates: ${theme.pages.map((p) => p.title).join(', ')} (existing pages with the same URL are kept) and replaces the header & footer menus.`} checked={opts.setup || opts.demo} onChange={(v) => setOpts({ ...opts, setup: v })} />
-        {can('settings') && (
-          <div className={cn('rounded-xl border p-4 transition', opts.demo ? 'border-rose-300 bg-rose-50 dark:border-rose-500/30 dark:bg-rose-500/10' : 'border-ink-200 dark:border-white/10')}>
-            <Toggle label="Import demo content" description="Deletes ALL posts, pages, series, categories, tags, menus, FAQs and testimonials, then installs this theme’s demo content. Users, media, messages and subscribers are kept." checked={opts.demo} onChange={(v) => setOpts({ ...opts, demo: v })} />
-            {opts.demo && <p className="mt-3 flex items-center gap-2 text-xs font-semibold text-rose-600"><AlertTriangle className="h-4 w-4" />This cannot be undone.</p>}
+        {sameFamily ? (
+          <div className="rounded-xl bg-brand-50 p-4 text-sm text-brand-800 dark:bg-brand-500/10 dark:text-brand-200">
+            <b>Same theme, new design.</b> All posts, pages, series, categories and settings stay exactly as they are — only the design, homepage layout, structure and menus change. You can switch back any time; each version remembers its own customised design.
           </div>
+        ) : (
+          <>
+            {!isCurrent && ws && !opts.demo && (
+              <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-500/20 dark:bg-emerald-500/10">
+                <Toggle label="Restore this theme's saved content" description={`${ws.posts} posts · ${ws.pages} pages${ws.series ? ` · ${ws.series} series` : ''} — saved ${new Date(ws.savedAt).toLocaleString()}`} checked={opts.restore} onChange={(v) => setOpts({ ...opts, restore: v })} />
+              </div>
+            )}
+            {(isCurrent || !ws || !opts.restore) && !opts.demo && (
+              <>
+                <Toggle label="Apply theme design" description="Colors, fonts, corner radius, header & footer style." checked={opts.appearance} onChange={(v) => setOpts({ ...opts, appearance: v })} />
+                <Toggle label="Set up homepage, pages & menus" description={`Creates: ${theme.pages.map((p) => p.title).join(', ')} (existing pages with the same URL are kept).`} checked={opts.setup} onChange={(v) => setOpts({ ...opts, setup: v })} />
+              </>
+            )}
+            {can('settings') && (
+              <div className={cn('rounded-xl border p-4 transition', opts.demo ? 'border-amber-300 bg-amber-50 dark:border-amber-500/30 dark:bg-amber-500/10' : 'border-ink-200 dark:border-white/10')}>
+                <Toggle label="Install demo content" description={ws || isCurrent ? "Replaces this theme's content with fresh demo content. Other themes keep their own saved content." : 'This theme has no content yet — start from its demo content.'} checked={opts.demo} onChange={(v) => setOpts({ ...opts, demo: v })} />
+                {opts.demo && (ws || isCurrent) && <p className="mt-3 flex items-center gap-2 text-xs font-semibold text-amber-600"><AlertTriangle className="h-4 w-4" />This theme's current content will be replaced.</p>}
+              </div>
+            )}
+            {!isCurrent && <p className="text-xs text-ink-400">The current theme's content is saved automatically before switching — nothing is lost.</p>}
+          </>
         )}
       </div>
     </Modal>
@@ -237,59 +283,84 @@ export default function ThemesPage() {
   const { reload: reloadActive } = useSiteTheme();
   const [preview, setPreview] = useState(null);
   const [activating, setActivating] = useState(null);
+  const [picked, setPicked] = useState({});
   if (!data) return <PageLoader />;
-  const active = data.items.find((t) => t.id === data.active);
-  const others = data.items.filter((t) => t.id !== data.active);
 
+  const active = data.items.find((t) => t.id === data.active);
+  const activeFamily = active ? familyOf(active) : null;
+  const families = data.items.filter((t) => !t.variantOf).map((base) => [base, ...data.items.filter((v) => v.variantOf === base.id)]);
   const features = (t) => [...t.features.formats.map((f) => FORMAT_LABELS[f]), ...t.features.series.map((s) => SERIES_LABELS[s])];
+  const sibling = active && data.items.find((t) => t.id !== active.id && familyOf(t) === activeFamily);
 
   return (
     <>
-      <PageHeader title="Themes" description="Each theme turns the site into a different kind of website — with its own layout, homepage, menus, design and content types." />
+      <PageHeader title="Themes" description="Each theme turns the site into a different kind of website. Themes with a Luxe version can switch to a luxury design — same content, different layout." />
 
       {active && (
         <div className="a-card mb-8 grid overflow-hidden lg:grid-cols-[1.2fr_1fr]">
           <Mockup theme={active} />
           <div className="flex flex-col justify-center p-6 sm:p-8">
-            <div className="mb-2 flex items-center gap-2"><Badge color="green" dot>Active theme</Badge><Badge>{active.category}</Badge></div>
+            <div className="mb-2 flex flex-wrap items-center gap-2"><Badge color="green" dot>Active theme</Badge><Badge>{active.category}</Badge>{active.variantOf && <Badge color="amber"><Crown className="h-3 w-3" />Luxe</Badge>}</div>
             <h2 className="text-3xl font-extrabold tracking-tight text-ink-900 dark:text-white">{active.name}</h2>
             <p className="mt-2 text-ink-500">{active.description}</p>
             <div className="mt-4 flex flex-wrap gap-1.5">{features(active).map((f) => <Badge key={f} color="brand">{f}</Badge>)}</div>
             <div className="mt-6 flex flex-wrap gap-2">
               <Link href="/admin/appearance" className="a-btn-primary"><Palette className="h-4 w-4" />Customize</Link>
-              <a href="/" target="_blank" rel="noreferrer" className="a-btn-secondary"><ExternalLink className="h-4 w-4" />View site</a>
-              <button onClick={() => setActivating(active)} className="a-btn-ghost">Re-apply / import demo</button>
+              {sibling && <button onClick={() => setActivating(sibling)} className="a-btn-secondary">{sibling.variantOf ? <Crown className="h-4 w-4 text-amber-500" /> : <Sparkles className="h-4 w-4" />}Switch to {sibling.variantName} design</button>}
+              <a href="/" target="_blank" rel="noreferrer" className="a-btn-ghost"><ExternalLink className="h-4 w-4" />View site</a>
+              <button onClick={() => setActivating(active)} className="a-btn-ghost">Re-apply / demo</button>
             </div>
           </div>
         </div>
       )}
 
-      <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-ink-400">Available themes</h3>
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-        {others.map((t) => (
-          <div key={t.id} className="a-card group flex flex-col overflow-hidden">
-            <div className="relative">
-              <Mockup theme={t} className="transition duration-500 group-hover:scale-[1.03]" />
-              <div className="absolute inset-0 flex items-center justify-center gap-2 bg-ink-950/50 opacity-0 backdrop-blur-[2px] transition group-hover:opacity-100">
-                <button onClick={() => setPreview(t)} className="a-btn bg-white text-ink-900 hover:bg-ink-50"><Eye className="h-4 w-4" />Preview</button>
+      <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-ink-400">All themes</h3>
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+        {families.map((versions) => {
+          const base = versions[0];
+          const t = versions.find((v) => v.id === picked[base.id]) || (activeFamily === base.id ? active : base);
+          const isActive = t.id === data.active;
+          return (
+            <div key={base.id} className={cn('a-card group flex flex-col overflow-hidden', familyOf(t) === activeFamily && 'ring-2 ring-emerald-400/60')}>
+              <div className="relative overflow-hidden">
+                <Mockup theme={t} className="transition duration-500 group-hover:scale-[1.03]" />
+                <div className="absolute inset-0 flex items-center justify-center bg-ink-950/50 opacity-0 backdrop-blur-[2px] transition group-hover:opacity-100">
+                  <button onClick={() => setPreview(t)} className="a-btn bg-white text-ink-900 hover:bg-ink-50"><Eye className="h-4 w-4" />Preview</button>
+                </div>
+                {t.workspace && <span className="absolute left-3 top-3 rounded-full bg-black/60 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur">{t.workspace.posts ? `${t.workspace.posts} posts` : `${t.workspace.pages} pages`} saved</span>}
+              </div>
+              <div className="flex flex-1 flex-col p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="text-xs font-bold uppercase tracking-wider text-brand-600">{t.category}</div>
+                    <h3 className="mt-1 text-lg font-extrabold text-ink-900 dark:text-white">{t.name}</h3>
+                  </div>
+                  {versions.length > 1 && (
+                    <div className="flex shrink-0 rounded-lg bg-ink-100 p-0.5 dark:bg-white/5">
+                      {versions.map((v) => (
+                        <button key={v.id} onClick={() => setPicked((p) => ({ ...p, [base.id]: v.id }))} className={cn('flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-bold transition', v.id === t.id ? 'bg-white text-ink-900 shadow-sm dark:bg-ink-800 dark:text-white' : 'text-ink-400 hover:text-ink-700')}>
+                          {v.variantOf && <Crown className="h-3 w-3 text-amber-500" />}{v.variantName}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <p className="mt-1 flex-1 text-sm text-ink-500">{t.description}</p>
+                <div className="mt-3 flex flex-wrap gap-1">{features(t).map((f) => <Badge key={f}>{f}</Badge>)}</div>
+                <div className="mt-4 flex gap-2">
+                  <button onClick={() => setPreview(t)} className="a-btn-secondary flex-1"><Eye className="h-4 w-4" />Preview</button>
+                  {isActive ? <span className="a-btn flex-1 bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300"><Check className="h-4 w-4" />Active</span> : (
+                    <button onClick={() => setActivating(t)} className="a-btn-primary flex-1">{familyOf(t) === activeFamily ? `Use ${t.variantName}` : 'Activate'}</button>
+                  )}
+                </div>
               </div>
             </div>
-            <div className="flex flex-1 flex-col p-5">
-              <div className="text-xs font-bold uppercase tracking-wider text-brand-600">{t.category}</div>
-              <h3 className="mt-1 text-lg font-extrabold text-ink-900 dark:text-white">{t.name}</h3>
-              <p className="mt-1 flex-1 text-sm text-ink-500">{t.description}</p>
-              <div className="mt-3 flex flex-wrap gap-1">{features(t).map((f) => <Badge key={f}>{f}</Badge>)}</div>
-              <div className="mt-4 flex gap-2">
-                <button onClick={() => setPreview(t)} className="a-btn-secondary flex-1"><Eye className="h-4 w-4" />Preview</button>
-                <button onClick={() => setActivating(t)} className="a-btn-primary flex-1">Activate</button>
-              </div>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {preview && <PreviewModal theme={preview} onClose={() => setPreview(null)} onActivate={() => { setActivating(preview); setPreview(null); }} />}
-      {activating && <ActivateModal theme={activating} onClose={() => setActivating(null)} onDone={() => { setActivating(null); reload(); reloadActive(); }} />}
+      {activating && <ActivateModal theme={activating} activeId={data.active} activeFamily={activeFamily} onClose={() => setActivating(null)} onDone={() => { setActivating(null); reload(); reloadActive(); }} />}
     </>
   );
 }

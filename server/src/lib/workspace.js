@@ -64,17 +64,20 @@ async function restoreContent(d) {
   await resetSequences(CONTENT_TABLES);
 }
 
-async function saveWorkspace(themeId) {
-  const data = await captureContent();
+// Workspaces are keyed by theme family (a classic theme and its luxe version share content);
+// `variant` remembers which version was active when it was saved.
+async function saveWorkspace(themeId, variant = themeId) {
+  const data = { ...(await captureContent()), variant };
   if (!data.pages.length && !data.posts.length) return; // nothing worth keeping (e.g. a fresh install)
   await prisma.themeWorkspace.upsert({ where: { themeId }, update: { data }, create: { themeId, data } });
 }
 
+// Restores a family's saved content. Returns the variant it was saved with, or false.
 async function loadWorkspace(themeId) {
   const ws = await prisma.themeWorkspace.findUnique({ where: { themeId } });
   if (!ws) return false;
   await restoreContent(ws.data);
-  return true;
+  return ws.data.variant || themeId;
 }
 
 // { themeId: { savedAt, posts, pages, series } } for the Themes screen.
