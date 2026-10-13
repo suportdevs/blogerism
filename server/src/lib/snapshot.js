@@ -58,6 +58,15 @@ function referencedUploads(snapshot) {
 
 const TABLES = ['Role', 'User', 'Category', 'Tag', 'Series', 'Post', 'Page', 'MediaFolder', 'Media', 'Menu', 'MenuItem', 'Faq', 'Testimonial', 'Subscriber', 'ContactMessage', 'ActivityLog'];
 
+// Keep autoincrement sequences ahead of explicitly inserted ids.
+async function resetSequences(tables) {
+  for (const table of tables) {
+    await prisma.$executeRawUnsafe(
+      `SELECT setval(pg_get_serial_sequence('"${table}"', 'id'), COALESCE((SELECT MAX(id) FROM "${table}"), 1), (SELECT COUNT(*) > 0 FROM "${table}"))`,
+    );
+  }
+}
+
 // Inserts rows whose self-referencing parent may come later: create without parent, then link.
 async function insertTree(model, rows, parentKey) {
   for (const r of rows) await prisma[model].create({ data: { ...r, [parentKey]: null } });
@@ -101,12 +110,7 @@ async function restoreSnapshot(snapshot, { admin } = {}) {
   for (const s of d.subscribers || []) await prisma.subscriber.create({ data: s });
   for (const c of d.contactMessages || []) await prisma.contactMessage.create({ data: c });
 
-  // Keep autoincrement sequences ahead of the explicit ids we just inserted.
-  for (const table of TABLES) {
-    await prisma.$executeRawUnsafe(
-      `SELECT setval(pg_get_serial_sequence('"${table}"', 'id'), COALESCE((SELECT MAX(id) FROM "${table}"), 1), (SELECT COUNT(*) > 0 FROM "${table}"))`,
-    );
-  }
+  await resetSequences(TABLES);
 
   if (admin?.email && admin?.password) {
     let role = await prisma.role.findFirst({ where: { OR: [{ slug: 'super-admin' }, { permissions: { has: '*' } }] } });
@@ -122,4 +126,4 @@ async function restoreSnapshot(snapshot, { admin } = {}) {
   }
 }
 
-module.exports = { createSnapshot, restoreSnapshot, referencedUploads, SNAPSHOT_VERSION };
+module.exports = { createSnapshot, restoreSnapshot, referencedUploads, insertTree, resetSequences, SNAPSHOT_VERSION };

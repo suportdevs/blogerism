@@ -10,6 +10,7 @@ const THEMES = Object.fromEntries([
   require('./saffron'),
   require('./pulse'),
   require('./lens'),
+  ...require('./luxe'),
 ].map((t) => [t.id, t]));
 
 const DEFAULT_THEME = 'nova';

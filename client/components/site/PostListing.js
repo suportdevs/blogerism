@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { cn } from '@/lib/utils';
+import { cn, formatDate, postUrl } from '@/lib/utils';
 import PostCard from './PostCard';
 import Pagination from './Pagination';
 import { AudioRow, NewsCard, VideoCard, postsToTracks } from './MediaCards';
@@ -35,6 +35,22 @@ export default function PostListing({ featured, title, subtitle, eyebrow, data, 
         )}
       </div>
     );
+  } else if (mode === 'luxe') {
+    body = (
+      <div className="grid gap-x-10 gap-y-16 md:grid-cols-2 lg:grid-cols-3">
+        {items.map((p, i) => (
+          <Link key={p.id} href={postUrl(p)} className={cn('group block text-left', i === 0 && data.meta?.page <= 1 && 'md:col-span-2')}>
+            <div className="overflow-hidden">
+              {p.coverImage && <img src={p.coverImage} alt="" className={cn('w-full object-cover transition duration-[1500ms] group-hover:scale-105', i === 0 && data.meta?.page <= 1 ? 'aspect-[16/9]' : 'aspect-[4/5]')} />}
+            </div>
+            <div className="mt-6 text-[10.5px] font-medium uppercase tracking-[0.3em] text-primary">{p.categories?.[0]?.name}<span className="text-fg/40"> · {formatDate(p.publishedAt)}</span></div>
+            <h3 className={cn('mt-3 font-heading leading-tight text-fg transition group-hover:text-primary', i === 0 && data.meta?.page <= 1 ? 'text-3xl sm:text-4xl' : 'text-2xl')}>{p.title}</h3>
+            {p.excerpt && <p className="mt-3 line-clamp-2 text-fg/60">{p.excerpt}</p>}
+            <span className="mt-5 inline-block border-b border-fg/40 pb-1 text-[10.5px] font-medium uppercase tracking-[0.3em] text-fg transition group-hover:border-primary group-hover:text-primary">Read the story</span>
+          </Link>
+        ))}
+      </div>
+    );
   } else if (mode === 'video') {
     body = <div className="grid gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{items.map((p) => <VideoCard key={p.id} post={p} />)}</div>;
   } else if (mode === 'audio') {
@@ -52,7 +68,21 @@ export default function PostListing({ featured, title, subtitle, eyebrow, data, 
   const compactHeader = mode === 'news' || mode === 'video';
   return (
     <>
-      {compactHeader ? (
+      {mode === 'luxe' ? (
+        <section className="site-container pb-4 pt-16 text-center sm:pt-24">
+          {eyebrow && <div className="mb-5 flex items-center justify-center gap-4 text-[11px] font-medium uppercase tracking-[0.38em] text-primary"><span className="h-px w-8 bg-current opacity-60" />{eyebrow}<span className="h-px w-8 bg-current opacity-60" /></div>}
+          <h1 className="font-heading text-5xl leading-tight text-fg sm:text-7xl">{title}</h1>
+          {subtitle && <p className="mx-auto mt-5 max-w-xl font-heading text-xl italic text-fg/60">{subtitle}</p>}
+          {categories && (
+            <nav className="mt-10 flex flex-wrap justify-center gap-x-8 gap-y-3 border-y border-fg/10 py-4">
+              <Link href="/blog" className={cn('text-[10.5px] font-medium uppercase tracking-[0.3em]', !activeCategory ? 'text-primary' : 'text-fg/60 hover:text-fg')}>All</Link>
+              {categories.filter((c) => c._count?.posts).map((c) => (
+                <Link key={c.id} href={`/category/${c.slug}`} className={cn('text-[10.5px] font-medium uppercase tracking-[0.3em]', activeCategory === c.slug ? 'text-primary' : 'text-fg/60 hover:text-fg')}>{c.name}</Link>
+              ))}
+            </nav>
+          )}
+        </section>
+      ) : compactHeader ? (
         <section className="site-container pt-10">
           {eyebrow && <div className="mb-1 text-xs font-bold uppercase tracking-widest text-primary">{eyebrow}</div>}
           <h1 className="border-b-2 border-fg pb-3 font-heading text-3xl font-black tracking-tight sm:text-4xl">{title}</h1>

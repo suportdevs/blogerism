@@ -5,7 +5,7 @@ import { compact, formatDate, slugify, stripHtml } from '@/lib/utils';
 import PostCard, { CategoryPill } from '@/components/site/PostCard';
 import { ReadingProgress } from '@/components/site/Extras';
 import { NewsletterForm } from '@/components/site/forms';
-import { ListenView, NewsArticleView, WatchView } from '@/components/site/PostViews';
+import { ListenView, LuxeArticleView, NewsArticleView, WatchView } from '@/components/site/PostViews';
 import { Kicker } from '@/components/site/MediaCards';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
@@ -43,6 +43,7 @@ export default async function PostPage({ params }) {
   ]);
   if (post.format === 'VIDEO') return <WatchView post={post} episodes={episodes} upNext={upNext} />;
   if (post.format === 'AUDIO') return <ListenView post={post} episodes={episodes} upNext={upNext} />;
+  if (theme?.layout?.article === 'luxe') return <LuxeArticleView post={post} related={related} />;
   if (theme?.layout?.article === 'news') {
     const popular = await fetchPublic(`/posts?sort=popular&limit=5&format=STANDARD&exclude=${post.id}`);
     return <NewsArticleView post={post} related={related.slice(0, 4)} more={popular.items} />;

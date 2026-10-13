@@ -9,6 +9,61 @@ const Prose = ({ html }) => (
   <div className="prose max-w-none prose-headings:font-heading prose-headings:text-fg prose-p:text-fg/80 prose-a:text-primary prose-strong:text-fg prose-li:text-fg/80" dangerouslySetInnerHTML={{ __html: html || '' }} />
 );
 
+/* Luxe magazine article: centered serif headline, italic standfirst, drop cap, gold hairlines. */
+export function LuxeArticleView({ post, related }) {
+  const cat = post.categories?.[0];
+  const small = 'text-[10.5px] font-medium uppercase tracking-[0.3em]';
+  return (
+    <article>
+      <header className="site-container max-w-4xl pb-12 pt-16 text-center sm:pt-24">
+        {cat && <Link href={`/category/${cat.slug}`} className={`${small} text-primary`}>{cat.name}</Link>}
+        <h1 className="mt-6 font-heading text-4xl leading-[1.1] text-fg sm:text-6xl">{post.title}</h1>
+        {post.excerpt && <p className="mx-auto mt-7 max-w-2xl font-heading text-xl italic leading-relaxed text-fg/60 sm:text-2xl">{post.excerpt}</p>}
+        <div className={`mt-10 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-fg/55 ${small}`}>
+          {post.author && <span>By {post.author.name}</span>}<span className="text-primary">✦</span><span>{formatDate(post.publishedAt, { dateStyle: 'long' })}</span><span className="text-primary">✦</span><span>{post.readingTime} min read</span>
+        </div>
+      </header>
+      {post.coverImage && post.format !== 'GALLERY' && (
+        <figure className="mx-auto max-w-[1400px] px-5 sm:px-10">
+          <img src={post.coverImage} alt={post.title} className="aspect-[21/9] w-full object-cover" />
+        </figure>
+      )}
+      {post.format === 'GALLERY' && post.gallery?.length > 0 && (
+        <div className="mx-auto grid max-w-[1400px] gap-4 px-5 sm:grid-cols-2 sm:px-10">
+          {post.gallery.map((g, i) => <img key={i} src={g.src} alt={g.caption || ''} className={i === 0 ? 'aspect-[16/9] w-full object-cover sm:col-span-2' : 'aspect-[4/3] w-full object-cover'} />)}
+        </div>
+      )}
+      <div className="site-container max-w-2xl py-16">
+        <div className="dropcap prose prose-lg max-w-none prose-headings:font-heading prose-headings:font-medium prose-headings:text-fg prose-p:leading-[1.9] prose-p:text-fg/80 prose-a:text-primary prose-strong:text-fg prose-blockquote:border-primary prose-blockquote:font-heading prose-blockquote:text-2xl prose-blockquote:italic prose-blockquote:text-fg prose-li:text-fg/80" dangerouslySetInnerHTML={{ __html: post.content || '' }} />
+        <div className="my-14 flex items-center justify-center gap-4 text-primary"><span className="h-px w-16 bg-primary/50" />✦<span className="h-px w-16 bg-primary/50" /></div>
+        {post.author && (
+          <div className="text-center">
+            {post.author.avatar && <img src={post.author.avatar} alt="" className="mx-auto h-16 w-16 rounded-full object-cover grayscale" />}
+            <div className={`mt-4 text-fg ${small}`}>{post.author.name}</div>
+            {post.author.bio && <p className="mx-auto mt-2 max-w-md font-heading italic text-fg/60">{post.author.bio}</p>}
+          </div>
+        )}
+      </div>
+      {related.length > 0 && (
+        <section className="border-t border-fg/10 bg-surface py-20">
+          <div className="site-container">
+            <div className={`mb-12 text-center text-primary ${small}`}>Continue reading</div>
+            <div className="grid gap-10 md:grid-cols-3">
+              {related.slice(0, 3).map((p) => (
+                <Link key={p.id} href={postUrl(p)} className="group block text-center">
+                  <div className="overflow-hidden">{p.coverImage && <img src={p.coverImage} alt="" className="aspect-[4/5] w-full object-cover transition duration-[1500ms] group-hover:scale-105" />}</div>
+                  <div className={`mt-5 text-primary ${small}`}>{p.categories?.[0]?.name}</div>
+                  <h3 className="mt-2 font-heading text-2xl leading-snug text-fg group-hover:text-primary">{p.title}</h3>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+    </article>
+  );
+}
+
 /* Newspaper-style article: left-aligned headline, standfirst, byline bar, sidebar with more stories. */
 export function NewsArticleView({ post, related, more }) {
   const cat = post.categories?.[0];

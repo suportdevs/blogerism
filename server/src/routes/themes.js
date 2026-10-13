@@ -5,6 +5,7 @@ const { asyncHandler, HttpError, logActivity } = require('../lib/utils');
 const { hasPermission } = require('../lib/permissions');
 const { THEMES, publicTheme } = require('../themes');
 const { activateTheme, activeThemeId } = require('../lib/themeManager');
+const { workspaceSummary } = require('../lib/workspace');
 
 const router = express.Router();
 router.use(authenticate);
@@ -15,11 +16,14 @@ router.get('/active', asyncHandler(async (_req, res) => {
 }));
 
 router.get('/', authorize('appearance'), asyncHandler(async (_req, res) => {
-  const active = await activeThemeId();
+  const [active, workspaces] = await Promise.all([activeThemeId(), workspaceSummary()]);
   const items = Object.values(THEMES).map((t) => {
     const pages = t.pages();
     return {
       ...publicTheme(t.id),
+      variantOf: t.variantOf || null,
+      variantName: t.variantName || 'Classic',
+      workspace: workspaces[t.id] || null,
       description: t.description,
       general: t.general,
       appearance: t.appearance,
@@ -32,12 +36,12 @@ router.get('/', authorize('appearance'), asyncHandler(async (_req, res) => {
 }));
 
 router.post('/:id/activate', authorize('appearance'), asyncHandler(async (req, res) => {
-  const opts = z.object({ appearance: z.boolean().default(true), setup: z.boolean().default(true), demo: z.boolean().default(false) }).parse(req.body || {});
+  const opts = z.object({ appearance: z.boolean().default(true), setup: z.boolean().default(true), demo: z.boolean().default(false), restore: z.boolean().default(true) }).parse(req.body || {});
   if (opts.demo && !hasPermission(req.user, 'settings')) throw new HttpError(403, 'Importing demo content requires the Settings permission');
   if (!THEMES[req.params.id]) throw new HttpError(404, 'Theme not found');
-  const settings = await activateTheme(req.params.id, opts);
-  await logActivity(req, 'updated', 'Theme', req.params.id, `Activated theme "${THEMES[req.params.id].name}"${opts.demo ? ' with demo content' : ''}`);
-  res.json({ theme: publicTheme(req.params.id), settings });
+  const { settings, restored } = await activateTheme(req.params.id, opts);
+  await logActivity(req, 'updated', 'Theme', req.params.id, `Activated theme "${THEMES[req.params.id].name}"${opts.demo ? ' with demo content' : restored ? ' (restored its saved content)' : ''}`);
+  res.json({ theme: publicTheme(req.params.id), settings, restored });
 }));
 
 module.exports = router;

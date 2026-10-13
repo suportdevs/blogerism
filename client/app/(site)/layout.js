@@ -50,7 +50,7 @@ export default async function SiteLayout({ children }) {
           </>
         )}
       </head>
-      <body data-theme={theme?.id} className="flex min-h-screen flex-col bg-bg font-body text-fg transition-colors duration-300">
+      <body data-theme={theme?.id} data-style={theme?.layout?.style || 'modern'} className="flex min-h-screen flex-col bg-bg font-body text-fg transition-colors duration-300">
         {general.maintenanceMode ? (
           <main className="grid min-h-screen place-items-center p-8 text-center">
             <div>

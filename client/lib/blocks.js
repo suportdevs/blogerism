@@ -333,6 +333,75 @@ export const BLOCKS = {
     ],
   },
 
+  /* ---------------------------- Luxury ---------------------------- */
+  luxeHero: {
+    label: 'Luxe hero', category: 'Luxury', icon: 'Crown', description: 'Framed full-screen image or video, serif title',
+    defaults: { image: '', video: '', overline: 'Since 2019', title: 'Timeless by', italic: 'design', subtitle: '', buttonLabel: 'Discover', buttonUrl: '#', height: 'full', align: 'center', overlay: 40 },
+    fields: [
+      { name: 'image', label: 'Image (also video poster)', type: 'image' },
+      { name: 'video', label: 'Background video (MP4, optional)', type: 'url' },
+      { name: 'overline', label: 'Overline', type: 'text' },
+      { name: 'title', label: 'Title', type: 'text', half: true }, { name: 'italic', label: 'Italic gold line', type: 'text', half: true },
+      { name: 'subtitle', label: 'Subtitle', type: 'textarea' },
+      { name: 'buttonLabel', label: 'Button', type: 'text', half: true }, { name: 'buttonUrl', label: 'Button link', type: 'url', half: true },
+      { name: 'height', label: 'Height', type: 'select', options: [['full', 'Full screen'], ['tall', 'Tall']], half: true },
+      { name: 'align', label: 'Alignment', type: 'select', options: [['center', 'Center'], ['left', 'Left']], half: true },
+      { name: 'overlay', label: 'Darken image (%)', type: 'number' },
+    ],
+  },
+  luxeStatement: {
+    label: 'Statement', category: 'Luxury', icon: 'ScrollText', description: 'Large centered serif statement',
+    defaults: { overline: 'Our philosophy', text: 'A short, confident statement about what you stand for.', signature: '' },
+    fields: [{ name: 'overline', label: 'Overline', type: 'text' }, { name: 'text', label: 'Statement', type: 'textarea', rows: 4 }, { name: 'signature', label: 'Signature', type: 'text' }],
+  },
+  luxeSplit: {
+    label: 'Framed split', category: 'Luxury', icon: 'Frame', description: 'Numbered image + text with offset frame',
+    defaults: { number: '01', overline: 'Craft', title: 'Made with care', text: 'Tell the story behind this section.', image: '', imagePosition: 'left', buttonLabel: 'Discover', buttonUrl: '#' },
+    fields: [
+      { name: 'number', label: 'Number', type: 'text', half: true }, { name: 'imagePosition', label: 'Image side', type: 'select', options: [['left', 'Left'], ['right', 'Right']], half: true },
+      { name: 'overline', label: 'Overline', type: 'text' }, { name: 'title', label: 'Title', type: 'text' },
+      { name: 'text', label: 'Text (blank line = new paragraph)', type: 'textarea', rows: 5 }, { name: 'image', label: 'Image', type: 'image' },
+      { name: 'buttonLabel', label: 'Link label', type: 'text', half: true }, { name: 'buttonUrl', label: 'Link', type: 'url', half: true },
+    ],
+  },
+  luxeList: {
+    label: 'Editorial list', category: 'Luxury', icon: 'ListOrdered', description: 'Numbered rows, image follows the cursor',
+    defaults: { overline: 'Selected', title: 'The collection', source: 'posts', format: '', category: '', series: '', seriesType: '', sort: 'latest', count: 6, linkLabel: '', linkUrl: '' },
+    fields: [
+      { name: 'overline', label: 'Overline', type: 'text', half: true }, { name: 'title', label: 'Title', type: 'text', half: true },
+      { name: 'source', label: 'Show', type: 'select', options: [['posts', 'Posts / episodes'], ['series', 'Series']] },
+      { name: 'format', label: 'Format', type: 'select', options: FORMAT_OPTIONS, half: true, showIf: (d) => d.source !== 'series' },
+      { name: 'category', label: 'Category', type: 'category', half: true, showIf: (d) => d.source !== 'series' },
+      { name: 'series', label: 'Series', type: 'series', showIf: (d) => d.source !== 'series' },
+      { name: 'seriesType', label: 'Series type', type: 'select', options: SERIES_TYPE_OPTIONS, showIf: (d) => d.source === 'series' },
+      SORT, COUNT,
+      { name: 'linkLabel', label: 'Link label', type: 'text', half: true }, { name: 'linkUrl', label: 'Link URL', type: 'url', half: true },
+    ],
+  },
+  luxeFeatured: {
+    label: 'Magazine feature', category: 'Luxury', icon: 'BookOpen', description: 'Cover story + numbered side stories',
+    defaults: { overline: 'The journal', title: 'Featured stories', category: '', format: 'STANDARD', sort: 'latest', count: 5, linkLabel: 'View all', linkUrl: '/blog' },
+    fields: [
+      { name: 'overline', label: 'Overline', type: 'text', half: true }, { name: 'title', label: 'Title', type: 'text', half: true },
+      ...QUERY, COUNT,
+      { name: 'linkLabel', label: 'Link label', type: 'text', half: true }, { name: 'linkUrl', label: 'Link URL', type: 'url', half: true },
+    ],
+  },
+  luxeQuote: {
+    label: 'Quote carousel', category: 'Luxury', icon: 'MessageSquareQuote', description: 'One testimonial at a time (from Testimonials)',
+    defaults: { overline: 'Kind words', title: '' },
+    fields: [{ name: 'overline', label: 'Overline', type: 'text', half: true }, { name: 'title', label: 'Title', type: 'text', half: true }],
+  },
+  luxeCta: {
+    label: 'Parallax CTA', category: 'Luxury', icon: 'Gem', description: 'Fixed-background image call to action',
+    defaults: { image: '', overline: 'Begin', title: 'Let us create something timeless', text: '', buttonLabel: 'Enquire', buttonUrl: '/contact' },
+    fields: [
+      { name: 'image', label: 'Background image', type: 'image' }, { name: 'overline', label: 'Overline', type: 'text' }, { name: 'title', label: 'Title', type: 'text' },
+      { name: 'text', label: 'Text', type: 'textarea' },
+      { name: 'buttonLabel', label: 'Button', type: 'text', half: true }, { name: 'buttonUrl', label: 'Button link', type: 'url', half: true },
+    ],
+  },
+
   /* ---------------------------- Showcase ---------------------------- */
   heroSlideshow: {
     label: 'Hero slideshow', category: 'Headers', icon: 'GalleryThumbnails', description: 'Full-screen crossfading slides with zoom',
@@ -480,7 +549,7 @@ export const STYLE_FIELDS = [
 
 export const DEFAULT_STYLE = { background: 'none', paddingY: 'lg', width: 'normal', align: '', animate: true };
 
-export const BLOCK_CATEGORIES = ['Headers', 'Content', 'Media', 'Portfolio', 'Restaurant', 'News', 'Video', 'Audio', 'Dynamic', 'Conversion', 'Layout'];
+export const BLOCK_CATEGORIES = ['Headers', 'Luxury', 'Content', 'Media', 'Portfolio', 'Restaurant', 'News', 'Video', 'Audio', 'Dynamic', 'Conversion', 'Layout'];
 
 // Ready-made page templates for "New page".
 export const PAGE_TEMPLATES = {
@@ -493,6 +562,7 @@ export const PAGE_TEMPLATES = {
   video: { label: 'Video platform', blocks: ['videoFeature', 'videoGrid', 'mediaRail'] },
   streaming: { label: 'Streaming service', blocks: ['billboard', 'top10', 'mediaRail', 'mediaRail'], style: { background: 'dark' } },
   portfolio: { label: 'Personal portfolio', blocks: ['profileHero', 'stats', 'aboutMe', 'skills', 'timeline', 'projects', 'contactForm'] },
+  luxury: { label: 'Luxury landing', blocks: ['luxeHero', 'luxeStatement', 'luxeSplit', 'luxeFeatured', 'luxeQuote', 'luxeCta'] },
   restaurant: { label: 'Restaurant', blocks: ['heroSlideshow', 'imageText', 'menuList', 'reservation', 'hours'] },
   saas: { label: 'SaaS landing', blocks: ['spotlightHero', 'logos', 'bentoGrid', 'stats', 'testimonials', 'pricingToggle', 'faq', 'cta'] },
   photography: { label: 'Photography', blocks: ['heroSlideshow', 'textMarquee', 'masonryGallery', 'contactForm'] },

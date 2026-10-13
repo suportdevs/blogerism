@@ -2,14 +2,7 @@ const prisma = require('./prisma');
 const { getSettings, saveGroup } = require('./settings');
 const { THEMES, DEFAULT_THEME } = require('../themes');
 const { HttpError } = require('./utils');
-
-// Removes site content (keeps users, roles, media, settings, subscribers and messages).
-async function wipeContent() {
-  await prisma.$transaction([
-    prisma.menuItem.deleteMany(), prisma.menu.deleteMany(), prisma.post.deleteMany(), prisma.series.deleteMany(),
-    prisma.tag.deleteMany(), prisma.category.deleteMany(), prisma.page.deleteMany(), prisma.faq.deleteMany(), prisma.testimonial.deleteMany(),
-  ]);
-}
+const { saveWorkspace, loadWorkspace, clearContent } = require('./workspace');
 
 async function applyMenus(menus) {
   for (const [location, def] of Object.entries(menus)) {
@@ -38,39 +31,49 @@ async function applyPages(pages) {
   return homeId;
 }
 
-/**
- * Activates a theme.
- * opts.appearance — replace colors/fonts/header/footer settings with the theme's preset
- * opts.setup      — create the theme's homepage + pages and replace menus
- * opts.demo       — wipe content and import the theme's demo content (implies setup)
- */
-async function activateTheme(id, { appearance = true, setup = true, demo = false } = {}) {
-  const theme = THEMES[id];
-  if (!theme) throw new HttpError(404, `Unknown theme "${id}"`);
-
-  if (demo) {
-    await wipeContent();
-    const authors = await prisma.user.findMany({ orderBy: { id: 'asc' }, take: 3 });
-    await theme.demo(prisma, { authors });
-  }
-  if (appearance) {
-    await prisma.setting.deleteMany({ where: { key: 'appearance' } });
-    await saveGroup('appearance', theme.appearance);
-  }
-  if (setup || demo) {
-    const homepageId = await applyPages(theme.pages());
-    await applyMenus(theme.menus);
-    await saveGroup('general', { ...(demo ? theme.general : {}), homepageId });
-    // Optional per-theme defaults for contact details, social links and SEO (applied with demo content).
-    if (demo) for (const group of ['contact', 'social', 'seo']) if (theme[group]) await saveGroup(group, theme[group]);
-  }
-  await saveGroup('theme', { active: id });
-  return getSettings();
-}
-
 async function activeThemeId() {
   const { theme } = await getSettings();
   return THEMES[theme?.active] ? theme.active : DEFAULT_THEME;
 }
 
-module.exports = { activateTheme, activeThemeId, wipeContent };
+/**
+ * Activates a theme. The outgoing theme's content is always saved to its workspace first.
+ * opts.demo       — (re)install this theme's demo content (only this theme's content is replaced)
+ * opts.restore    — when switching, bring back this theme's saved content if it has any (default)
+ * opts.appearance — apply the theme's design preset (skipped when saved content was restored)
+ * opts.setup      — create the theme's pages & menus (skipped when saved content was restored)
+ */
+async function activateTheme(id, { appearance = true, setup = true, demo = false, restore = true } = {}) {
+  const theme = THEMES[id];
+  if (!theme) throw new HttpError(404, `Unknown theme "${id}"`);
+  const current = await activeThemeId();
+  const switching = current !== id;
+
+  if (switching) await saveWorkspace(current);
+
+  let restored = false;
+  if (demo) {
+    await clearContent();
+    const authors = await prisma.user.findMany({ orderBy: { id: 'asc' }, take: 3 });
+    await theme.demo(prisma, { authors });
+  } else if (switching) {
+    restored = restore && (await loadWorkspace(id));
+    if (!restored) await clearContent(); // a never-used theme starts with a clean slate
+  }
+
+  if (appearance && !restored) {
+    await prisma.setting.deleteMany({ where: { key: 'appearance' } });
+    await saveGroup('appearance', theme.appearance);
+  }
+  if ((setup && !restored) || demo) {
+    const homepageId = await applyPages(theme.pages());
+    await applyMenus(theme.menus);
+    await saveGroup('general', { ...(demo || switching ? theme.general : {}), homepageId });
+    // Optional per-theme defaults for contact details, social links and SEO.
+    if (demo) for (const group of ['contact', 'social', 'seo']) if (theme[group]) await saveGroup(group, theme[group]);
+  }
+  await saveGroup('theme', { active: id });
+  return { settings: await getSettings(), restored };
+}
+
+module.exports = { activateTheme, activeThemeId };

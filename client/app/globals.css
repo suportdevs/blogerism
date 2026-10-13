@@ -87,3 +87,21 @@ section[id] { scroll-margin-top: 96px; }
   .reveal { opacity: 1; transform: none; transition: none; }
   * { animation-duration: .001ms !important; animation-iteration-count: 1 !important; }
 }
+
+/* ---------- Luxe design language (themes with layout.style = 'luxe') ---------- */
+@keyframes scroll-dot { 0% { transform: translateY(0); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(46px); opacity: 0; } }
+body[data-style='luxe'] .font-heading { font-weight: 500 !important; letter-spacing: -0.005em; }
+body[data-style='luxe'] .eyebrow { background: none; border: 0; padding: 0; border-radius: 0; gap: .9rem; letter-spacing: .34em; font-weight: 500; font-size: .7rem; color: rgb(var(--c-primary)); }
+body[data-style='luxe'] .eyebrow::before, body[data-style='luxe'] .eyebrow::after { content: ''; width: 28px; height: 1px; background: currentColor; opacity: .55; }
+body[data-style='luxe'] .btn-site { border-radius: 0; text-transform: uppercase; letter-spacing: .22em; font-size: .7rem; font-weight: 500; padding: 1.05rem 2.1rem; }
+body[data-style='luxe'] .btn-site-primary { background: rgb(var(--c-fg)); color: rgb(var(--c-bg)); box-shadow: none; }
+body[data-style='luxe'] .btn-site-primary:hover { background: rgb(var(--c-primary)); color: #fff; transform: none; filter: none; }
+body[data-style='luxe'] .btn-site-ghost { background: transparent; border-color: rgb(var(--c-fg) / .3); backdrop-filter: none; }
+body[data-style='luxe'] .btn-site-ghost:hover { border-color: rgb(var(--c-fg)); background: transparent; }
+body[data-style='luxe'] .shadow-glow { box-shadow: none !important; }
+body[data-style='luxe'] .text-gradient { background: none; -webkit-text-fill-color: currentColor; color: rgb(var(--c-primary)); }
+body[data-style='luxe'] .site-input { border-radius: 0; border-width: 0 0 1px; background: transparent; padding-left: 0; padding-right: 0; }
+body[data-style='luxe'] .site-input:focus { box-shadow: none; }
+body[data-style='luxe'] .prose { --tw-prose-quotes: rgb(var(--c-fg)); }
+/* Magazine drop cap */
+.dropcap > p:first-of-type::first-letter { float: left; font-family: var(--font-heading); font-size: 4.6em; line-height: .8; padding: .08em .12em 0 0; color: rgb(var(--c-primary)); }

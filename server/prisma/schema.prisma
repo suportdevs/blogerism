@@ -271,3 +271,11 @@ model ActivityLog {
 
   @@index([createdAt])
 }
+
+// Saved content per theme: switching themes stores the outgoing theme's content here and
+// restores the incoming theme's, so each theme keeps its own posts, pages, menus and settings.
+model ThemeWorkspace {
+  themeId   String   @id
+  data      Json
+  updatedAt DateTime @updatedAt
+}

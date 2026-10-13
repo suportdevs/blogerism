@@ -42,6 +42,10 @@ export function blockQueries(block) {
       return [[id, d.source === 'series' ? seriesPath(d) : postsPath(d)]];
     case 'seriesGrid':
       return [[id, seriesPath(d)]];
+    case 'luxeList':
+      return [[id, d.source === 'series' ? seriesPath(d) : postsPath(d)]];
+    case 'luxeFeatured':
+      return [[id, postsPath({ ...d, count: Number(d.count) || 5 })]];
     case 'billboard':
       return [[id, seriesPath({ seriesType: d.series ? '' : d.seriesType, count: 50 })]];
     case 'top10':

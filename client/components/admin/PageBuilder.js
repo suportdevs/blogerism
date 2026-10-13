@@ -8,6 +8,7 @@ import {
   ArrowLeft, BarChart3, Building2, Code2, Columns2, Copy, CreditCard, Eye, EyeOff, ExternalLink, GripVertical, HelpCircle, Images,
   LayoutGrid, Layers, Loader2, Mail, Megaphone, Monitor, MoveVertical, Newspaper, PanelTop, PlayCircle, Plus, Quote, Redo2, Save,
   Send, Settings2, Smartphone, Sparkles, Tablet, Trash2, Type, Undo2, X, Paintbrush, FileText,
+  Crown, ScrollText, Frame, ListOrdered, BookOpen, MessageSquareQuote, Gem,
   UserRound, IdCard, Wrench, Milestone, FolderKanban, GalleryThumbnails, MousePointerClick, LayoutDashboard, ToggleRight, UtensilsCrossed, Clock, CalendarCheck, MoveHorizontal,
   Zap, LayoutList, Columns3, PanelRight, MonitorPlay, GalleryHorizontal, Clapperboard, Trophy, Library, ListMusic,
 } from 'lucide-react';
@@ -21,7 +22,7 @@ import { ImageField } from './Media';
 import { Field, PageLoader, Tabs } from './ui';
 import { useSiteTheme } from './SiteTheme';
 
-const BLOCK_ICONS = { MoveHorizontal, GalleryThumbnails, MousePointerClick, LayoutDashboard, ToggleRight, UtensilsCrossed, Clock, CalendarCheck, UserRound, IdCard, Wrench, Milestone, FolderKanban, Zap, LayoutList, Columns3, PanelRight, MonitorPlay, GalleryHorizontal, Clapperboard, Trophy, Library, ListMusic, Sparkles, PanelTop, LayoutGrid, Columns2, Type, BarChart3, Building2, Images, PlayCircle, Newspaper, Quote, HelpCircle, CreditCard, Megaphone, Mail, Send, MoveVertical, Code2 };
+const BLOCK_ICONS = { Crown, ScrollText, Frame, ListOrdered, BookOpen, MessageSquareQuote, Gem, MoveHorizontal, GalleryThumbnails, MousePointerClick, LayoutDashboard, ToggleRight, UtensilsCrossed, Clock, CalendarCheck, UserRound, IdCard, Wrench, Milestone, FolderKanban, Zap, LayoutList, Columns3, PanelRight, MonitorPlay, GalleryHorizontal, Clapperboard, Trophy, Library, ListMusic, Sparkles, PanelTop, LayoutGrid, Columns2, Type, BarChart3, Building2, Images, PlayCircle, Newspaper, Quote, HelpCircle, CreditCard, Megaphone, Mail, Send, MoveVertical, Code2 };
 const DEVICES = { desktop: { icon: Monitor, width: '100%' }, tablet: { icon: Tablet, width: '820px' }, mobile: { icon: Smartphone, width: '390px' } };
 
 export const newBlock = (type, style = {}) => ({ id: uid(), type, data: structuredClone(BLOCKS[type].defaults), style: { ...DEFAULT_STYLE, ...style } });

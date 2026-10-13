@@ -30,7 +30,7 @@ export async function getBlockContext(blocks = []) {
   const needPosts = blocks.filter((b) => b.type === 'latestPosts').reduce((m, b) => Math.max(m, Number(b.data?.count) || 3), 0);
   const [posts, testimonials, faqs, feeds, categories] = await Promise.all([
     needPosts ? fetchPublic(`/posts?limit=${needPosts}`).then((r) => r.items) : [],
-    types.has('testimonials') ? fetchPublic('/testimonials').then((r) => r.items) : [],
+    types.has('testimonials') || types.has('luxeQuote') ? fetchPublic('/testimonials').then((r) => r.items) : [],
     types.has('faq') ? fetchPublic('/faqs').then((r) => r.items) : [],
     loadFeeds(blocks, (path) => fetchPublic(path, { allow404: true })),
     types.has('videoGrid') ? fetchPublic('/categories').then((r) => r.items) : [],

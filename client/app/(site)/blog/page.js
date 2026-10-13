@@ -22,7 +22,7 @@ export default async function BlogPage({ searchParams }) {
 
   return (
     <PostListing
-      eyebrow={mode === 'cards' ? 'Our blog' : null}
+      eyebrow={mode === 'cards' ? 'Our blog' : mode === 'luxe' ? 'The journal' : null}
       title={{ news: 'Latest news', video: 'All videos', audio: 'All episodes' }[mode] || 'Insights, stories & guides'}
       subtitle={mode === 'cards' ? 'Deep dives on design, engineering and building products people love.' : null}
       data={data}

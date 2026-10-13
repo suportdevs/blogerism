@@ -7,6 +7,7 @@ import { ContactForm, NewsletterForm } from './forms';
 import { MEDIA_RENDERERS } from './MediaBlocks';
 import { PORTFOLIO_RENDERERS } from './PortfolioBlocks';
 import { SHOWCASE_RENDERERS } from './ShowcaseBlocks';
+import { LUXE_RENDERERS } from './LuxeBlocks';
 import { CountUp } from './ShowcaseClient';
 
 /* ---------------------------------------------------------------------------
@@ -387,6 +388,7 @@ const RENDERERS = {
   ...MEDIA_RENDERERS,
   ...PORTFOLIO_RENDERERS,
   ...SHOWCASE_RENDERERS,
+  ...LUXE_RENDERERS,
 };
 
 export default function Blocks({ blocks = [], ctx = {}, settings }) {

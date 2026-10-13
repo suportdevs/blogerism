@@ -22,6 +22,32 @@ export default function Footer({ settings, menus }) {
   const columns = [menus.footer, menus['footer-2']].filter(Boolean);
   const year = new Date().getFullYear();
 
+  if (appearance.footerStyle === 'luxe') {
+    const links = columns.flatMap((m) => m.items);
+    return (
+      <footer className="border-t border-fg/10 bg-surface">
+        <div className="site-container py-20 text-center">
+          <Link href="/" className="font-heading text-4xl uppercase tracking-[0.3em] text-fg sm:text-5xl">{general.siteName}</Link>
+          {general.tagline && <p className="mt-4 font-heading text-lg italic text-fg/60">{general.tagline}</p>}
+          <div className="mx-auto my-10 flex items-center justify-center gap-4 text-primary"><span className="h-px w-16 bg-primary/50" />✦<span className="h-px w-16 bg-primary/50" /></div>
+          <nav className="flex flex-wrap justify-center gap-x-10 gap-y-3">
+            {links.map((i) => <Link key={i.id} href={i.url} className="text-[11px] font-medium uppercase tracking-[0.3em] text-fg/70 transition hover:text-primary">{i.label}</Link>)}
+          </nav>
+          {advanced.enableNewsletter && (
+            <div className="mx-auto mt-14 max-w-md">
+              <div className="mb-4 text-[11px] font-medium uppercase tracking-[0.3em] text-fg/60">Join the private list</div>
+              <NewsletterForm compact />
+            </div>
+          )}
+          <div className="mt-12 flex justify-center"><SocialLinks social={social} /></div>
+        </div>
+        <div className="border-t border-fg/10 py-6 text-center text-[10.5px] uppercase tracking-[0.3em] text-fg/45">
+          © {year} {general.siteName}{appearance.footerText && <span> · {appearance.footerText}</span>}
+        </div>
+      </footer>
+    );
+  }
+
   if (appearance.footerStyle === 'simple') {
     return (
       <footer className="border-t border-fg/10 bg-bg">

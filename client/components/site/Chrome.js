@@ -248,6 +248,84 @@ function MinimalHeader({ general, items, social }) {
   );
 }
 
+/* ----------------------------- Luxe ----------------------------- */
+function LuxeHeader({ general, appearance, items, social, contact, heroOverlay }) {
+  const pathname = usePathname();
+  const scrolled = useScrolled(40);
+  const overlay = heroOverlay && pathname === '/' && !scrolled;
+  const [open, setOpen] = useState(false);
+  const cta = appearance.headerCta || {};
+  useEffect(() => { setOpen(false); }, [pathname]);
+  useEffect(() => { document.body.style.overflow = open ? 'hidden' : ''; return () => { document.body.style.overflow = ''; }; }, [open]);
+  const small = 'text-[11px] font-medium uppercase tracking-[0.3em]';
+
+  return (
+    <>
+      <header className={cn('fixed inset-x-0 top-0 z-50 transition-all duration-700', overlay ? 'text-white' : 'border-b border-fg/10 bg-bg/95 text-fg backdrop-blur-xl')}>
+        <div className="mx-auto grid h-20 max-w-[1440px] grid-cols-[1fr_auto_1fr] items-center px-5 sm:px-10">
+          <button onClick={() => setOpen(true)} className={cn('flex items-center gap-3 justify-self-start', small)} aria-label="Open menu">
+            <span className="flex w-7 flex-col gap-1.5"><span className="h-px w-7 bg-current" /><span className="h-px w-4 bg-current" /></span>
+            <span className="hidden sm:inline">Menu</span>
+          </button>
+          <Link href="/" className="text-center">
+            {general.logo ? <img src={general.logo} alt={general.siteName} className="mx-auto h-9" /> : (
+              <span className="block font-heading text-xl uppercase tracking-[0.32em] sm:text-2xl">{general.siteName}</span>
+            )}
+          </Link>
+          <div className="justify-self-end">
+            {cta.enabled && cta.label && (
+              <Link href={cta.url || '#'} className={cn('group relative hidden pb-1 sm:inline-block', small)}>
+                {cta.label}<span className="absolute inset-x-0 bottom-0 h-px origin-right bg-current transition-transform duration-500 group-hover:scale-x-0" />
+              </Link>
+            )}
+          </div>
+        </div>
+        <nav className={cn('hidden justify-center gap-10 overflow-hidden border-t transition-all duration-700 lg:flex', scrolled ? 'h-0 border-transparent opacity-0' : 'h-11 items-center opacity-100', overlay ? 'border-white/15' : 'border-fg/10')}>
+          {items.map((item) => (
+            <Link key={item.id} href={item.url} className={cn('relative py-1 text-[10.5px] font-medium uppercase tracking-[0.3em] transition', isActive(pathname, item.url) ? 'opacity-100' : 'opacity-70 hover:opacity-100')}>
+              {item.label}
+              {isActive(pathname, item.url) && <span className="absolute -bottom-0.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-primary" />}
+            </Link>
+          ))}
+        </nav>
+      </header>
+
+      {/* Full-screen menu */}
+      <div className={cn('fixed inset-0 z-[70] grid bg-[#0c0b09] text-[#efe9df] transition-all duration-700 lg:grid-cols-[1.3fr_1fr]', open ? 'visible opacity-100' : 'invisible opacity-0')}>
+        <button onClick={() => setOpen(false)} className={cn('absolute right-6 top-7 z-10 flex items-center gap-3 sm:right-10', small)}>Close <X className="h-4 w-4" /></button>
+        <div className="flex flex-col justify-center px-8 py-24 sm:px-20">
+          <div className={cn('mb-10 text-[#c9a66b]', small)}>{general.siteName}</div>
+          <nav className="space-y-2">
+            {items.map((item, i) => (
+              <Link
+                key={item.id}
+                href={item.url}
+                className={cn('group flex items-baseline gap-6 transition-all duration-700', open ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0')}
+                style={{ transitionDelay: open ? `${150 + i * 70}ms` : '0ms' }}
+              >
+                <span className="font-mono text-xs text-[#efe9df]/40">{String(i + 1).padStart(2, '0')}</span>
+                <span className="font-heading text-4xl leading-tight transition duration-500 group-hover:translate-x-3 group-hover:italic group-hover:text-[#c9a66b] sm:text-6xl">{item.label}</span>
+              </Link>
+            ))}
+          </nav>
+        </div>
+        <aside className="hidden flex-col justify-between border-l border-white/10 p-16 lg:flex">
+          <div className="font-heading text-[11rem] leading-none text-transparent [-webkit-text-stroke:1px_rgba(201,166,107,.45)]">{general.siteName?.[0]}</div>
+          <div className="space-y-6">
+            {general.tagline && <p className="font-heading text-2xl italic text-[#efe9df]/80">{general.tagline}</p>}
+            <div className={cn('space-y-2 text-[#efe9df]/60', small)}>
+              {contact?.email && <a href={`mailto:${contact.email}`} className="block hover:text-[#c9a66b]">{contact.email}</a>}
+              {contact?.phone && <span className="block">{contact.phone}</span>}
+              {contact?.address && <span className="block normal-case tracking-normal">{contact.address}</span>}
+            </div>
+            <div className="[&_a]:border-white/20 [&_a]:text-white/70"><SocialLinks social={social} /></div>
+          </div>
+        </aside>
+      </div>
+    </>
+  );
+}
+
 /* ----------------------------- Portfolio ----------------------------- */
 function PortfolioHeader({ general, appearance, items }) {
   const scrolled = useScrolled(24);
@@ -292,6 +370,8 @@ export default function SiteChrome({ settings, menus, theme, children }) {
 
   const pathname = usePathname();
   const t = override?.theme || theme;
+  // Design language switch used by the CSS layer (e.g. body[data-style='luxe']).
+  useEffect(() => { document.body.dataset.style = t?.layout?.style || 'modern'; }, [t]);
   const m = override?.menus || menus;
   const s = override ? { ...settings, general: { ...settings.general, ...override.general }, appearance: { ...settings.appearance, ...override.appearance } } : settings;
   const { general, appearance: a, social } = s;
@@ -305,6 +385,7 @@ export default function SiteChrome({ settings, menus, theme, children }) {
       {header === 'streaming' && <StreamingHeader general={general} items={items} />}
       {header === 'portfolio' && <PortfolioHeader general={general} appearance={a} items={items} />}
       {header === 'overlay' && <OverlayHeader general={general} appearance={a} items={items} />}
+      {header === 'luxe' && <LuxeHeader general={general} appearance={a} items={items} social={social} contact={s.contact} heroOverlay={t?.layout?.overlay !== false} />}
       {header === 'minimal' && <MinimalHeader general={general} items={items} social={social} />}
       {header === 'default' && (
         <>
@@ -313,7 +394,7 @@ export default function SiteChrome({ settings, menus, theme, children }) {
         </>
       )}
       <div className={cn('flex flex-1 flex-col', header === 'video' && 'xl:pl-60')}>
-        <main className={cn('flex-1', header === 'portfolio' && 'pt-24', (header === 'overlay' || header === 'minimal') && pathname !== '/' && 'pt-20')}>{children}</main>
+        <main className={cn('flex-1', header === 'portfolio' && 'pt-24', (header === 'overlay' || header === 'minimal') && pathname !== '/' && 'pt-20', header === 'luxe' && (pathname !== '/' || t?.layout?.overlay === false) && 'pt-20 lg:pt-[124px]')}>{children}</main>
         {header !== 'video' && <Footer settings={s} menus={m} />}
         {header === 'video' && <div className="px-6 py-8 text-center text-xs text-fg/40 xl:hidden">© {new Date().getFullYear()} {general.siteName}</div>}
       </div>
