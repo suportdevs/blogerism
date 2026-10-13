@@ -76,7 +76,7 @@ export default function LoginPage() {
           <p className="mt-5 text-lg text-ink-300">Visual page builder, theme customizer, media library and team permissions — all in one beautiful dashboard.</p>
           {DEMO && (
             <div className="mt-10 grid grid-cols-3 gap-3">
-              {[['6', 'Site themes'], ['30+', 'Block types'], ['15', 'Permissions']].map(([v, l]) => (
+              {[['9', 'Site themes'], ['40+', 'Block types'], ['15', 'Permissions']].map(([v, l]) => (
                 <div key={l} className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur"><div className="text-2xl font-extrabold">{v}</div><div className="text-xs text-ink-400">{l}</div></div>
               ))}
             </div>

@@ -333,6 +333,127 @@ export const BLOCKS = {
     ],
   },
 
+  /* ---------------------------- Showcase ---------------------------- */
+  heroSlideshow: {
+    label: 'Hero slideshow', category: 'Headers', icon: 'GalleryThumbnails', description: 'Full-screen crossfading slides with zoom',
+    defaults: { height: 'full', align: 'left', interval: 6, slides: [{ image: '', eyebrow: 'Welcome', title: 'Slide title', subtitle: '', buttonLabel: 'Discover', buttonUrl: '#' }] },
+    fields: [
+      { name: 'height', label: 'Height', type: 'select', options: [['full', 'Full screen'], ['tall', 'Tall']], half: true },
+      { name: 'align', label: 'Text position', type: 'select', options: [['left', 'Bottom left'], ['center', 'Center']], half: true },
+      { name: 'interval', label: 'Seconds per slide', type: 'number' },
+      { name: 'slides', label: 'Slides', type: 'list', itemLabel: 'title', defaults: { image: '', eyebrow: '', title: 'Slide', subtitle: '', buttonLabel: '', buttonUrl: '' }, fields: [
+        { name: 'image', label: 'Image', type: 'image' },
+        { name: 'eyebrow', label: 'Eyebrow', type: 'text', half: true }, { name: 'title', label: 'Title', type: 'text', half: true },
+        { name: 'subtitle', label: 'Subtitle', type: 'textarea' },
+        { name: 'buttonLabel', label: 'Button label', type: 'text', half: true }, { name: 'buttonUrl', label: 'Button link', type: 'url', half: true },
+      ] },
+    ],
+  },
+  spotlightHero: {
+    label: 'Spotlight hero', category: 'Headers', icon: 'MousePointerClick', description: 'Aurora glow + 3D product mockup',
+    defaults: { badge: 'Just launched — v2.0', badgeUrl: '#', title: 'The product your team', highlight: 'will love', subtitle: 'Explain your product in one compelling sentence.', primaryLabel: 'Start free', primaryUrl: '#', secondaryLabel: 'Book a demo', secondaryUrl: '#', note: 'Loved by 2,000+ teams', domain: 'yourapp.com', image: '' },
+    fields: [
+      { name: 'badge', label: 'Badge text', type: 'text', half: true }, { name: 'badgeUrl', label: 'Badge link', type: 'url', half: true },
+      { name: 'title', label: 'Title', type: 'text', half: true }, { name: 'highlight', label: 'Gradient words', type: 'text', half: true },
+      { name: 'subtitle', label: 'Subtitle', type: 'textarea' },
+      { name: 'primaryLabel', label: 'Primary button', type: 'text', half: true }, { name: 'primaryUrl', label: 'Primary link', type: 'url', half: true },
+      { name: 'secondaryLabel', label: 'Secondary button', type: 'text', half: true }, { name: 'secondaryUrl', label: 'Secondary link', type: 'url', half: true },
+      { name: 'note', label: 'Social proof line', type: 'text', half: true }, { name: 'domain', label: 'Mock browser domain', type: 'text', half: true },
+      { name: 'image', label: 'Product screenshot (empty = built-in dashboard)', type: 'image' },
+    ],
+  },
+  masonryGallery: {
+    label: 'Masonry gallery', category: 'Media', icon: 'LayoutDashboard', description: 'Filterable photo grid with lightbox',
+    defaults: { eyebrow: 'Portfolio', title: 'Selected work', subtitle: '', columns: 3, filters: true, items: [] },
+    fields: [
+      ...heading, { name: 'subtitle', label: 'Subtitle', type: 'textarea' },
+      { name: 'columns', label: 'Columns', type: 'select', options: [[2, '2'], [3, '3'], [4, '4']], half: true },
+      { name: 'filters', label: 'Category filter', type: 'toggle', half: true },
+      { name: 'items', label: 'Photos', type: 'list', itemLabel: 'title', defaults: { src: '', title: '', category: '', caption: '' }, fields: [
+        { name: 'src', label: 'Image', type: 'image' },
+        { name: 'title', label: 'Title', type: 'text', half: true }, { name: 'category', label: 'Category', type: 'text', half: true },
+        { name: 'caption', label: 'Caption', type: 'text' },
+      ] },
+    ],
+  },
+  bentoGrid: {
+    label: 'Bento grid', category: 'Content', icon: 'LayoutGrid', description: 'Mixed-size feature tiles with spotlight hover',
+    defaults: { eyebrow: 'Features', title: 'Everything you need', subtitle: '', items: [{ icon: 'Zap', title: 'Fast', text: 'Describe it.', size: 'wide', visual: 'chart', image: '' }] },
+    fields: [
+      ...heading, { name: 'subtitle', label: 'Subtitle', type: 'textarea' },
+      { name: 'items', label: 'Tiles', type: 'list', itemLabel: 'title', defaults: { icon: 'Star', title: 'Feature', text: '', size: 'sm', visual: '', image: '' }, fields: [
+        { name: 'icon', label: 'Icon', type: 'icon', options: ICON_NAMES, half: true }, { name: 'title', label: 'Title', type: 'text', half: true },
+        { name: 'text', label: 'Text', type: 'textarea' },
+        { name: 'size', label: 'Size', type: 'select', options: [['sm', 'Small'], ['wide', 'Wide'], ['tall', 'Tall'], ['lg', 'Large']], half: true },
+        { name: 'visual', label: 'Visual', type: 'select', options: [['', 'None'], ['chart', 'Bar chart'], ['code', 'Code snippet'], ['avatars', 'Avatars'], ['globe', 'Globe'], ['metrics', 'Metrics']], half: true },
+        { name: 'image', label: 'Background image', type: 'image' },
+      ] },
+    ],
+  },
+  pricingToggle: {
+    label: 'Pricing (monthly/yearly)', category: 'Conversion', icon: 'ToggleRight', description: 'Plans with a billing toggle',
+    defaults: { eyebrow: 'Pricing', title: 'Simple pricing', subtitle: '', currency: '$', yearlyNote: '-20%', plans: [{ name: 'Starter', description: '', monthly: '19', yearly: '15', features: ['Feature one'], buttonLabel: 'Get started', buttonUrl: '#', highlighted: false }] },
+    fields: [
+      ...heading, { name: 'subtitle', label: 'Subtitle', type: 'textarea' },
+      { name: 'currency', label: 'Currency symbol', type: 'text', half: true }, { name: 'yearlyNote', label: 'Yearly badge', type: 'text', half: true },
+      { name: 'plans', label: 'Plans', type: 'list', itemLabel: 'name', defaults: { name: 'Plan', description: '', monthly: '0', yearly: '0', features: [], buttonLabel: 'Choose', buttonUrl: '#', highlighted: false }, fields: [
+        { name: 'name', label: 'Name', type: 'text', half: true }, { name: 'highlighted', label: 'Highlight', type: 'toggle', half: true },
+        { name: 'description', label: 'Description', type: 'text' },
+        { name: 'monthly', label: 'Monthly price', type: 'text', half: true }, { name: 'yearly', label: 'Yearly (per month)', type: 'text', half: true },
+        { name: 'features', label: 'Features', type: 'stringList' },
+        { name: 'buttonLabel', label: 'Button label', type: 'text', half: true }, { name: 'buttonUrl', label: 'Button link', type: 'url', half: true },
+      ] },
+    ],
+  },
+  textMarquee: {
+    label: 'Text marquee', category: 'Layout', icon: 'MoveHorizontal', description: 'Giant scrolling words',
+    defaults: { items: ['Design', 'Build', 'Launch'], speed: 40, twoRows: false },
+    fields: [{ name: 'items', label: 'Words', type: 'stringList' }, { name: 'speed', label: 'Duration (s)', type: 'number', half: true }, { name: 'twoRows', label: 'Second row (reverse)', type: 'toggle', half: true }],
+  },
+  menuList: {
+    label: 'Food menu', category: 'Restaurant', icon: 'UtensilsCrossed', description: 'Tabbed menu with prices & tags',
+    defaults: { eyebrow: 'Our menu', title: 'Made fresh daily', subtitle: '', currency: '$', layout: 'tabs', sections: [{ name: 'Starters', note: '', items: [{ name: 'Dish', description: '', price: '9', tags: [], image: '' }] }] },
+    fields: [
+      ...heading, { name: 'subtitle', label: 'Subtitle', type: 'textarea' },
+      { name: 'currency', label: 'Currency', type: 'text', half: true },
+      { name: 'layout', label: 'Layout', type: 'select', options: [['tabs', 'Tabs'], ['list', 'All sections']], half: true },
+      { name: 'sections', label: 'Menu sections', type: 'list', itemLabel: 'name', defaults: { name: 'Section', note: '', items: [] }, fields: [
+        { name: 'name', label: 'Section name', type: 'text', half: true }, { name: 'note', label: 'Note', type: 'text', half: true },
+        { name: 'items', label: 'Dishes', type: 'list', itemLabel: 'name', defaults: { name: 'Dish', description: '', price: '', tags: [], image: '' }, fields: [
+          { name: 'name', label: 'Name', type: 'text', half: true }, { name: 'price', label: 'Price', type: 'text', half: true },
+          { name: 'description', label: 'Description', type: 'textarea', rows: 2 },
+          { name: 'tags', label: 'Tags (Vegan, Spicy…)', type: 'stringList' },
+          { name: 'image', label: 'Photo', type: 'image' },
+        ] },
+      ] },
+    ],
+  },
+  hours: {
+    label: 'Opening hours & location', category: 'Restaurant', icon: 'Clock', description: 'Live “open now” + map',
+    defaults: { eyebrow: 'Visit us', title: 'Hours & location', address: '', phone: '', email: '', mapEmbedUrl: '', image: '', rows: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day) => ({ day, open: '11:00', close: '22:00', closed: false })) },
+    fields: [
+      ...heading,
+      { name: 'rows', label: 'Opening hours', type: 'list', itemLabel: 'day', defaults: { day: 'Monday', open: '11:00', close: '22:00', closed: false }, fields: [
+        { name: 'day', label: 'Day', type: 'select', options: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((x) => [x, x]) },
+        { name: 'open', label: 'Opens', type: 'text', half: true }, { name: 'close', label: 'Closes', type: 'text', half: true },
+        { name: 'closed', label: 'Closed all day', type: 'toggle' },
+      ] },
+      { name: 'address', label: 'Address (default: Settings → Contact)', type: 'text' },
+      { name: 'phone', label: 'Phone', type: 'text', half: true }, { name: 'email', label: 'Email', type: 'text', half: true },
+      { name: 'mapEmbedUrl', label: 'Google Maps embed URL', type: 'url' },
+      { name: 'image', label: 'Image (when no map)', type: 'image' },
+    ],
+  },
+  reservation: {
+    label: 'Table reservation', category: 'Restaurant', icon: 'CalendarCheck', description: 'Booking form → Messages inbox',
+    defaults: { eyebrow: 'Reservations', title: 'Book a table', text: '', image: '', maxGuests: 10, firstSlot: '12:00', lastSlot: '21:30' },
+    fields: [
+      ...heading, { name: 'text', label: 'Text', type: 'textarea' }, { name: 'image', label: 'Image', type: 'image' },
+      { name: 'maxGuests', label: 'Max guests', type: 'number' },
+      { name: 'firstSlot', label: 'First time slot', type: 'text', half: true }, { name: 'lastSlot', label: 'Last time slot', type: 'text', half: true },
+    ],
+  },
+
   spacer: {
     label: 'Spacer', category: 'Layout', icon: 'MoveVertical', description: 'Vertical whitespace / divider',
     defaults: { size: 64, divider: false },
@@ -359,7 +480,7 @@ export const STYLE_FIELDS = [
 
 export const DEFAULT_STYLE = { background: 'none', paddingY: 'lg', width: 'normal', align: '', animate: true };
 
-export const BLOCK_CATEGORIES = ['Headers', 'Content', 'Media', 'Portfolio', 'News', 'Video', 'Audio', 'Dynamic', 'Conversion', 'Layout'];
+export const BLOCK_CATEGORIES = ['Headers', 'Content', 'Media', 'Portfolio', 'Restaurant', 'News', 'Video', 'Audio', 'Dynamic', 'Conversion', 'Layout'];
 
 // Ready-made page templates for "New page".
 export const PAGE_TEMPLATES = {
@@ -372,5 +493,8 @@ export const PAGE_TEMPLATES = {
   video: { label: 'Video platform', blocks: ['videoFeature', 'videoGrid', 'mediaRail'] },
   streaming: { label: 'Streaming service', blocks: ['billboard', 'top10', 'mediaRail', 'mediaRail'], style: { background: 'dark' } },
   portfolio: { label: 'Personal portfolio', blocks: ['profileHero', 'stats', 'aboutMe', 'skills', 'timeline', 'projects', 'contactForm'] },
+  restaurant: { label: 'Restaurant', blocks: ['heroSlideshow', 'imageText', 'menuList', 'reservation', 'hours'] },
+  saas: { label: 'SaaS landing', blocks: ['spotlightHero', 'logos', 'bentoGrid', 'stats', 'testimonials', 'pricingToggle', 'faq', 'cta'] },
+  photography: { label: 'Photography', blocks: ['heroSlideshow', 'textMarquee', 'masonryGallery', 'contactForm'] },
   podcast: { label: 'Podcast hub', blocks: ['pageHeader', 'seriesGrid', 'audioPlaylist'] },
 };

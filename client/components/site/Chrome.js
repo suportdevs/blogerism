@@ -177,6 +177,77 @@ function StreamingHeader({ general, items }) {
   );
 }
 
+/* ------------------- Overlay (restaurant) & minimal (studio) ------------------- */
+// Transparent with white text over the homepage hero; solid once scrolled or on inner pages.
+function useOverlay() {
+  const pathname = usePathname();
+  const scrolled = useScrolled(40);
+  return pathname === '/' && !scrolled;
+}
+
+function OverlayHeader({ general, appearance, items }) {
+  const overlay = useOverlay();
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+  const cta = appearance.headerCta || {};
+  const half = Math.ceil(items.length / 2);
+  const link = (item) => (
+    <Link key={item.id} href={item.url} className={cn('relative px-3 py-2 text-[13px] font-semibold uppercase tracking-[0.18em] transition after:absolute after:inset-x-3 after:bottom-0.5 after:h-px after:origin-left after:scale-x-0 after:bg-current after:transition-transform hover:after:scale-x-100', isActive(pathname, item.url) && 'after:scale-x-100')}>{item.label}</Link>
+  );
+  return (
+    <header className={cn('fixed inset-x-0 top-0 z-50 transition-all duration-500', overlay ? 'bg-gradient-to-b from-black/50 to-transparent text-white' : 'bg-bg/95 text-fg shadow-[0_1px_0_rgb(var(--c-fg)/0.08)] backdrop-blur-xl')}>
+      <div className={cn('mx-auto grid max-w-container grid-cols-[1fr_auto_1fr] items-center px-5 transition-all duration-500 sm:px-8', overlay ? 'h-24' : 'h-[72px]')}>
+        <nav className="hidden items-center lg:flex">{items.slice(0, half).map(link)}</nav>
+        <button onClick={() => setOpen(true)} aria-label="Menu" className="grid h-10 w-10 place-items-center lg:hidden"><Menu className="h-5 w-5" /></button>
+        <Link href="/" className="text-center">
+          {general.logo ? <img src={general.logo} alt={general.siteName} className="mx-auto h-10" /> : <span className="block font-heading text-2xl font-semibold italic tracking-tight sm:text-3xl">{general.siteName}</span>}
+          {general.tagline && <span className={cn('hidden text-[10px] font-semibold uppercase tracking-[0.35em] opacity-70 transition-all sm:block', !overlay && 'h-0 overflow-hidden opacity-0')}>{general.tagline}</span>}
+        </Link>
+        <div className="flex items-center justify-end">
+          <nav className="hidden items-center lg:flex">{items.slice(half).map(link)}</nav>
+          {cta.enabled && cta.label && <Link href={cta.url || '#'} className={cn('ml-4 rounded-full px-5 py-2.5 text-xs font-bold uppercase tracking-[0.15em] transition', overlay ? 'border border-white/60 hover:bg-white hover:text-black' : 'bg-primary text-white hover:brightness-110')}>{cta.label}</Link>}
+        </div>
+      </div>
+      <MobileMenu open={open} onClose={() => setOpen(false)} items={items} general={general} />
+    </header>
+  );
+}
+
+function MinimalHeader({ general, items, social }) {
+  const overlay = useOverlay();
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+  useEffect(() => { setOpen(false); }, [pathname]);
+  useEffect(() => { document.body.style.overflow = open ? 'hidden' : ''; return () => { document.body.style.overflow = ''; }; }, [open]);
+  return (
+    <>
+      <header className={cn('fixed inset-x-0 top-0 z-50 transition-all duration-500', overlay && !open ? 'text-white' : 'bg-bg/90 text-fg backdrop-blur-xl', open && '!bg-transparent')}>
+        <div className="flex h-20 items-center justify-between px-6 sm:px-10">
+          <Link href="/" className="text-sm font-semibold uppercase tracking-[0.4em]">{general.siteName}</Link>
+          <nav className="hidden items-center gap-9 md:flex">
+            {items.map((item) => (
+              <Link key={item.id} href={item.url} className={cn('text-xs font-medium uppercase tracking-[0.25em] transition hover:opacity-100', isActive(pathname, item.url) ? 'opacity-100' : 'opacity-60')}>{item.label}</Link>
+            ))}
+          </nav>
+          <button onClick={() => setOpen(!open)} aria-label="Menu" className="relative z-[70] flex h-10 w-10 flex-col items-center justify-center gap-1.5 md:hidden">
+            <span className={cn('h-px w-6 bg-current transition', open && 'translate-y-[3.5px] rotate-45')} />
+            <span className={cn('h-px w-6 bg-current transition', open && '-translate-y-[3.5px] -rotate-45')} />
+          </button>
+        </div>
+      </header>
+      {/* Full-screen menu (mobile) */}
+      <div className={cn('fixed inset-0 z-[60] flex flex-col justify-center bg-bg px-8 transition-all duration-500 md:hidden', open ? 'visible opacity-100' : 'invisible opacity-0')}>
+        {items.map((item, i) => (
+          <Link key={item.id} href={item.url} className={cn('font-heading text-5xl leading-tight text-fg transition-all duration-500', open ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0')} style={{ transitionDelay: open ? `${100 + i * 70}ms` : '0ms' }}>
+            {item.label}
+          </Link>
+        ))}
+        <div className="mt-12"><SocialLinks social={social} /></div>
+      </div>
+    </>
+  );
+}
+
 /* ----------------------------- Portfolio ----------------------------- */
 function PortfolioHeader({ general, appearance, items }) {
   const scrolled = useScrolled(24);
@@ -219,6 +290,7 @@ export default function SiteChrome({ settings, menus, theme, children }) {
     return () => window.removeEventListener('message', onMessage);
   }, []);
 
+  const pathname = usePathname();
   const t = override?.theme || theme;
   const m = override?.menus || menus;
   const s = override ? { ...settings, general: { ...settings.general, ...override.general }, appearance: { ...settings.appearance, ...override.appearance } } : settings;
@@ -232,6 +304,8 @@ export default function SiteChrome({ settings, menus, theme, children }) {
       {header === 'video' && <VideoHeader general={general} appearance={a} items={items} footerItems={m.footer?.items} />}
       {header === 'streaming' && <StreamingHeader general={general} items={items} />}
       {header === 'portfolio' && <PortfolioHeader general={general} appearance={a} items={items} />}
+      {header === 'overlay' && <OverlayHeader general={general} appearance={a} items={items} />}
+      {header === 'minimal' && <MinimalHeader general={general} items={items} social={social} />}
       {header === 'default' && (
         <>
           <AnnouncementBar announcement={a.announcement} />
@@ -239,7 +313,7 @@ export default function SiteChrome({ settings, menus, theme, children }) {
         </>
       )}
       <div className={cn('flex flex-1 flex-col', header === 'video' && 'xl:pl-60')}>
-        <main className={cn('flex-1', header === 'portfolio' && 'pt-24')}>{children}</main>
+        <main className={cn('flex-1', header === 'portfolio' && 'pt-24', (header === 'overlay' || header === 'minimal') && pathname !== '/' && 'pt-20')}>{children}</main>
         {header !== 'video' && <Footer settings={s} menus={m} />}
         {header === 'video' && <div className="px-6 py-8 text-center text-xs text-fg/40 xl:hidden">© {new Date().getFullYear()} {general.siteName}</div>}
       </div>

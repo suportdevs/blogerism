@@ -7,6 +7,7 @@ import SiteChrome from '@/components/site/Chrome';
 import { PreviewListener } from '@/components/site/Extras';
 import InjectHtml from '@/components/site/InjectHtml';
 import { AudioProvider } from '@/components/site/AudioPlayer';
+import { RevealObserver } from '@/components/site/ShowcaseClient';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
@@ -64,6 +65,8 @@ export default async function SiteLayout({ children }) {
           </AudioProvider>
         )}
         <PreviewListener />
+        <RevealObserver />
+        <noscript><style>{'.reveal{opacity:1!important;transform:none!important}'}</style></noscript>
         <Toaster position="bottom-center" richColors />
         {advanced.headerScripts && <InjectHtml html={advanced.headerScripts} target="head" />}
         {advanced.footerScripts && <InjectHtml html={advanced.footerScripts} target="body" />}

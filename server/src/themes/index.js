@@ -7,6 +7,9 @@ const THEMES = Object.fromEntries([
   require('./marquee'),
   require('./waveform'),
   require('./folio'),
+  require('./saffron'),
+  require('./pulse'),
+  require('./lens'),
 ].map((t) => [t.id, t]));
 
 const DEFAULT_THEME = 'nova';

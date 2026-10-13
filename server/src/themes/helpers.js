@@ -6,6 +6,8 @@ const pic = (seed, w = 1600, h = 900) => `https://picsum.photos/seed/${seed}/${w
 const hoursAgo = (h) => new Date(Date.now() - h * 3600 * 1000);
 const yt = (id) => ({ videoUrl: `https://www.youtube.com/watch?v=${id}`, coverImage: `https://i.ytimg.com/vi/${id}/hqdefault.jpg` });
 const mp3 = (n) => `https://www.soundhelix.com/examples/mp3/SoundHelix-Song-${n}.mp3`;
+// Unsplash CDN photo (ids verified to exist).
+const un = (id, w = 1600) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=80`;
 const MDN_VIDEO = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos';
 
 // Page-builder block.
@@ -62,4 +64,4 @@ async function seedFaqs(prisma, faqs) {
   await prisma.faq.createMany({ data: faqs.map(([question, answer], order) => ({ question, answer, order, category: 'General' })) });
 }
 
-module.exports = { uid, slug, pic, hoursAgo, yt, mp3, MDN_VIDEO, B, m, FILMS, createCategories, rand, commonPages, seedFaqs };
+module.exports = { un, uid, slug, pic, hoursAgo, yt, mp3, MDN_VIDEO, B, m, FILMS, createCategories, rand, commonPages, seedFaqs };

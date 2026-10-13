@@ -73,6 +73,46 @@ function Mockup({ theme, className }) {
           </div>
         </div>
       )}
+      {header === 'overlay' && (
+        <div className="h-full">
+          <div className="relative h-[58%] overflow-hidden" style={{ background: `linear-gradient(135deg, ${a.primaryColor}, ${a.accentColor} 60%, #1f140c)` }}>
+            <div className="absolute inset-0 bg-black/25" />
+            <div className="relative grid grid-cols-[1fr_auto_1fr] items-center px-4 py-2.5 text-white">
+              <div className="flex gap-2">{[0, 1].map((i) => <span key={i} className="h-[3px] w-6 rounded bg-white/70" />)}</div>
+              <span className="text-xs font-semibold italic" style={{ fontFamily: a.headingFont }}>{theme.general.siteName}</span>
+              <div className="flex justify-end gap-2"><span className="h-[3px] w-6 rounded bg-white/70" /><span className="h-3 w-10 rounded-full border border-white/70" /></div>
+            </div>
+            <div className="relative mt-3 text-center text-white">
+              <div className="text-sm font-semibold" style={{ fontFamily: a.headingFont }}>A taste of the season</div>
+              <span className="mx-auto mt-2 block h-3 w-14 rounded-full border border-white/70" />
+            </div>
+          </div>
+          <div className="mx-5 mt-3 grid grid-cols-2 gap-x-4 gap-y-2">
+            {[0, 1, 2, 3].map((i) => (
+              <div key={i} className="flex items-center gap-1.5">
+                <span className="h-4 w-4 shrink-0 rounded-full" style={{ background: `${a.primaryColor}55` }} />
+                {line('40%', 0.5, 3)}<span className="h-px flex-1 border-b border-dotted" style={{ borderColor: `${fg}40` }} /><span className="h-[3px] w-4 rounded" style={{ background: a.primaryColor }} />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {header === 'minimal' && (
+        <div className="relative h-full">
+          <div className="absolute inset-0 grid grid-cols-3 gap-1 p-1 opacity-90">
+            {['#3b3a36', '#5c544a', '#2a2f35', '#6b5e4e', '#23272b', '#4a4640'].map((c, i) => <div key={i} className={cn('rounded-sm', i === 0 && 'row-span-2')} style={{ background: `linear-gradient(160deg, ${c}, #111)` }} />)}
+          </div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/40" />
+          <div className="relative flex items-center justify-between px-4 py-2.5 text-white">
+            <span className="text-[8px] font-semibold uppercase tracking-[0.3em]">{theme.general.siteName}</span>
+            <div className="flex gap-2.5">{[0, 1, 2].map((i) => <span key={i} className="h-[2px] w-5 bg-white/60" />)}</div>
+          </div>
+          <div className="absolute bottom-4 left-4 text-white">
+            <div className="text-lg leading-none" style={{ fontFamily: a.headingFont }}>Light, story & feeling</div>
+            <div className="mt-2 flex gap-1">{[0, 1, 2].map((i) => <span key={i} className={cn('h-[2px] w-6', i ? 'bg-white/30' : 'bg-white')} />)}</div>
+          </div>
+        </div>
+      )}
       {header === 'portfolio' && (
         <div className="relative h-full px-5 pt-3">
           <div className="absolute -left-6 top-6 h-24 w-24 rounded-full blur-2xl" style={{ background: `${a.primaryColor}66` }} />

@@ -6,6 +6,8 @@ import PostCard from './PostCard';
 import { ContactForm, NewsletterForm } from './forms';
 import { MEDIA_RENDERERS } from './MediaBlocks';
 import { PORTFOLIO_RENDERERS } from './PortfolioBlocks';
+import { SHOWCASE_RENDERERS } from './ShowcaseBlocks';
+import { CountUp } from './ShowcaseClient';
 
 /* ---------------------------------------------------------------------------
  * Section wrapper: applies the per-block style options from the page builder.
@@ -30,7 +32,7 @@ function Section({ style = {}, children, className }) {
         onColor && '[--c-fg:255_255_255]',
         bg === 'dark' && '[--c-bg:11_11_20] [--c-surface:24_24_36]',
         bg === 'image' && '[--c-bg:22_22_36]',
-        style.animate !== false && 'animate-fade-up',
+        style.animate !== false && 'reveal',
         style.className,
         className,
       )}
@@ -173,7 +175,7 @@ function Stats({ d }) {
     <div className="grid grid-cols-2 gap-8 text-center md:grid-cols-4">
       {(d.items || []).map((s, i) => (
         <div key={i}>
-          <div className="font-heading text-4xl font-extrabold tracking-tight text-fg sm:text-5xl">{s.value}</div>
+          <div className="font-heading text-4xl font-extrabold tracking-tight text-fg sm:text-5xl"><CountUp value={s.value} /></div>
           <div className="mt-2 text-sm font-medium uppercase tracking-wider text-fg/60">{s.label}</div>
         </div>
       ))}
@@ -384,6 +386,7 @@ const RENDERERS = {
   newsletter: Newsletter, contactForm: ContactBlock, spacer: Spacer, html: Html,
   ...MEDIA_RENDERERS,
   ...PORTFOLIO_RENDERERS,
+  ...SHOWCASE_RENDERERS,
 };
 
 export default function Blocks({ blocks = [], ctx = {}, settings }) {
