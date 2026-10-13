@@ -116,7 +116,7 @@ function Input({ field, value, onChange }) {
     case 'textarea':
       return <textarea className={cn('a-textarea', field.mono && 'font-mono text-xs')} rows={field.rows || 3} value={value ?? ''} onChange={(e) => onChange(e.target.value)} spellCheck={!field.mono} />;
     case 'richtext':
-      return <RichEditor value={value} onChange={onChange} minimal className="[&_.ProseMirror]:min-h-[200px]" />;
+      return <RichEditor value={value} onChange={onChange} minimal stickyClass="top-0" className="[&_.ProseMirror]:min-h-[200px]" />;
     case 'image':
       return <ImageField value={value} onChange={onChange} />;
     case 'select':

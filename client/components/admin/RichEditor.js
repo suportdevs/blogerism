@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
@@ -32,9 +32,19 @@ function Btn({ onClick, active, disabled, title, children }) {
 
 const Sep = () => <span className="mx-1 h-5 w-px bg-ink-200 dark:bg-white/10" />;
 
-export default function RichEditor({ value, onChange, placeholder = 'Start writing your story…', minimal, className }) {
+// stickyClass: where the toolbar sticks — below the admin top bar on full pages, at the top inside scrolling panels.
+export default function RichEditor({ value, onChange, placeholder = 'Start writing your story…', minimal, className, stickyClass = 'top-16' }) {
   const [source, setSource] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const sourceRef = useRef(null);
+
+  // The HTML source view grows with its content instead of being a fixed-height box.
+  useEffect(() => {
+    const el = sourceRef.current;
+    if (!source || !el) return;
+    el.style.height = 'auto';
+    el.style.height = `${Math.max(320, el.scrollHeight)}px`;
+  }, [source, value]);
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -67,8 +77,10 @@ export default function RichEditor({ value, onChange, placeholder = 'Start writi
   };
 
   return (
-    <div className={cn('overflow-hidden rounded-xl border border-ink-200 bg-white focus-within:border-brand-400 focus-within:ring-4 focus-within:ring-brand-500/10 dark:border-white/10 dark:bg-ink-950/40', className)}>
-      <div className="sticky top-16 z-10 flex flex-wrap items-center gap-0.5 border-b border-ink-100 bg-white/95 px-2 py-1.5 backdrop-blur dark:border-white/5 dark:bg-ink-900/95">
+    // No overflow clipping on the wrapper: it would turn the editor into a hidden scroll container
+    // (content scrolled out of reach while typing) and stop the toolbar from sticking.
+    <div className={cn('rounded-xl border border-ink-200 bg-white focus-within:border-brand-400 focus-within:ring-4 focus-within:ring-brand-500/10 dark:border-white/10 dark:bg-ink-950/40', className)}>
+      <div className={cn('sticky z-10 flex flex-wrap items-center gap-0.5 rounded-t-xl border-b border-ink-100 bg-white/95 px-2 py-1.5 backdrop-blur dark:border-white/5 dark:bg-ink-900/95', stickyClass)}>
         {!minimal && (
           <>
             <Btn title="Paragraph" active={editor.isActive('paragraph')} onClick={() => editor.chain().focus().setParagraph().run()}><Pilcrow className="h-4 w-4" /></Btn>
@@ -104,9 +116,10 @@ export default function RichEditor({ value, onChange, placeholder = 'Start writi
       </div>
       {source ? (
         <textarea
+          ref={sourceRef}
           value={value || ''}
           onChange={(e) => { onChange(e.target.value); editor.commands.setContent(e.target.value, false); }}
-          className="block min-h-[320px] w-full resize-y bg-ink-950 p-5 font-mono text-[13px] leading-relaxed text-emerald-300 outline-none"
+          className="block min-h-[320px] w-full resize-none overflow-hidden rounded-b-xl bg-ink-950 p-5 font-mono text-[13px] leading-relaxed text-emerald-300 outline-none"
           spellCheck={false}
         />
       ) : (
