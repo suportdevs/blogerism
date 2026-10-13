@@ -1,7 +1,10 @@
 const express = require('express');
 const prisma = require('../lib/prisma');
 const { authenticate, authorize } = require('../middleware/auth');
-const { asyncHandler, paginate, pageMeta } = require('../lib/utils');
+const { z } = require('zod');
+const { asyncHandler, paginate, pageMeta, HttpError, logActivity } = require('../lib/utils');
+const { buildExportContext, streamExport } = require('../lib/exporter');
+const { publicTheme } = require('../themes');
 
 // Dashboard analytics + activity log endpoints.
 const router = express.Router();
@@ -69,6 +72,38 @@ router.get('/logs', authorize('logs'), asyncHandler(async (req, res) => {
 router.delete('/logs', authorize('logs'), asyncHandler(async (_req, res) => {
   const { count } = await prisma.activityLog.deleteMany();
   res.json({ count });
+}));
+
+/* ---------------- Export project (standalone client package) ---------------- */
+const exportEnabled = () => process.env.ENABLE_EXPORT !== 'false';
+
+router.get('/export/summary', authorize('settings'), asyncHandler(async (_req, res) => {
+  const { snapshot, uploads } = await buildExportContext({ name: 'preview', siteUrl: 'https://example.com', apiUrl: 'https://api.example.com', adminEmail: '', adminPassword: '' });
+  const d = snapshot.data;
+  const general = d.settings.find((s) => s.key === 'general')?.value || {};
+  res.json({
+    enabled: exportEnabled(),
+    theme: publicTheme(snapshot.theme),
+    siteName: general.siteName,
+    counts: { posts: d.posts.length, pages: d.pages.length, series: d.series.length, categories: d.categories.length, menus: d.menus.length, users: d.users.length, mediaFiles: uploads.length },
+  });
+}));
+
+router.post('/export', authorize('settings'), asyncHandler(async (req, res) => {
+  if (!exportEnabled()) throw new HttpError(403, 'Project export is disabled on this installation');
+  const url = z.string().url('Enter a full URL, e.g. https://example.com');
+  const opts = z.object({
+    name: z.string().min(2, 'Project name is required').max(60),
+    siteUrl: url,
+    apiUrl: url,
+    adminEmail: z.string().email('Enter the admin email'),
+    adminPassword: z.string().min(8, 'Admin password must be at least 8 characters'),
+    adminName: z.string().max(80).optional(),
+    includeMessages: z.boolean().default(false),
+    includeUsers: z.boolean().default(false),
+  }).parse(req.body);
+  await logActivity(req, 'created', 'Export', null, `Exported project "${opts.name}"`);
+  await streamExport(res, opts);
 }));
 
 // Global admin search across content types (powers the ⌘K command palette).

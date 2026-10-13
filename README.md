@@ -87,6 +87,18 @@ Each post has a **format** (Article, Video, Audio, Gallery) that picks its page 
 
 **Shows & podcasts** (admin → Shows & podcasts) group posts into a *show* (seasons + episodes), *playlist* or *podcast*, each with a page at `/series/:slug`. Every news/video/audio block has its own data source settings (category, format, series, sort, count).
 
+## Exporting a client project
+
+This installation is the **builder**: pick a theme, prepare the client's content, then go to **Admin → System → Export project**. You get a ZIP of a standalone, production-ready project:
+
+- full source code locked to the active theme (other themes removed, theme switcher and exporter disabled, client branding in the admin)
+- the site's content as `server/prisma/data/snapshot.json` — imported automatically on first start
+- only the uploaded media the content uses
+- `docker-compose.yml` (PostgreSQL + API + website), Dockerfiles, PM2 `ecosystem.config.js`, `deploy/nginx.conf`
+- `.env` files with fresh secrets, the client's URLs and admin account, plus a README for the client
+
+The client runs `docker compose up -d --build` (or follows the VPS steps in its README) and can modify the code freely. Passwords are never exported; team members are optional.
+
 ## Project structure
 
 ```

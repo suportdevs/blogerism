@@ -1,5 +1,6 @@
 import '../globals.css';
 import { Toaster } from 'sonner';
+import { headers } from 'next/headers';
 import { getBootstrap } from '@/lib/server';
 import { googleFontsUrl, themeCss } from '@/lib/theme';
 import SiteChrome from '@/components/site/Chrome';
@@ -25,6 +26,9 @@ export async function generateMetadata() {
 }
 
 export default async function SiteLayout({ children }) {
+  // Render per request (data is still cached via fetch revalidation). This also lets the site build
+  // without a running API — required for Docker / CI builds of exported projects.
+  headers();
   const { settings, menus, theme } = await getBootstrap();
   const { appearance: a, general, advanced, seo } = settings;
   const modeScript = `(function(){try{var m=localStorage.getItem('site-theme')||'${a.colorMode}';if(m==='system')m=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';if(m==='dark')document.documentElement.classList.add('dark')}catch(e){}})()`;

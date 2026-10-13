@@ -6,10 +6,11 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   Activity, Bell, ChevronsLeft, ExternalLink, FileText, FolderTree, HelpCircle, Image as ImageIcon, Inbox, LayoutDashboard,
   LogOut, Mail, Menu as MenuIcon, MessageSquareQuote, Moon, Newspaper, Palette, Search, Settings, ShieldCheck, Sun, Tags,
-  UserCircle, Users, X, Command, Plus, CornerDownLeft, Clapperboard, Brush,
+  UserCircle, Users, X, Command, Plus, CornerDownLeft, Clapperboard, Brush, PackageOpen,
 } from 'lucide-react';
 import { useAuth } from './AuthProvider';
 import { useSiteTheme } from './SiteTheme';
+import { EDITION } from '@/lib/edition';
 import { Avatar, Dropdown, DropdownItem } from './ui';
 import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
@@ -25,7 +26,7 @@ export const NAV = [
     { href: '/admin/media', label: 'Media library', icon: ImageIcon, perm: 'media' },
   ] },
   { group: 'Appearance', items: [
-    { href: '/admin/themes', label: 'Themes', icon: Brush, perm: 'appearance' },
+    { href: '/admin/themes', label: 'Themes', icon: Brush, perm: 'appearance', builderOnly: true },
     { href: '/admin/appearance', label: 'Customize', icon: Palette, perm: 'appearance' },
     { href: '/admin/menus', label: 'Menus', icon: MenuIcon, perm: 'menus' },
   ] },
@@ -40,6 +41,7 @@ export const NAV = [
     { href: '/admin/roles', label: 'Roles & permissions', icon: ShieldCheck, perm: 'roles' },
     { href: '/admin/settings', label: 'Settings', icon: Settings, perm: 'settings' },
     { href: '/admin/logs', label: 'Activity logs', icon: Activity, perm: 'logs' },
+    { href: '/admin/export', label: 'Export project', icon: PackageOpen, perm: 'settings', builderOnly: true },
   ] },
 ];
 
@@ -55,7 +57,7 @@ function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen, unread })
   const pathname = usePathname();
   const { can } = useAuth();
   const { theme, usesSeries } = useSiteTheme();
-  const nav = NAV.map((g) => ({ ...g, items: g.items.filter((i) => (!i.perm || can(i.perm)) && (!i.needsSeries || usesSeries)) })).filter((g) => g.items.length);
+  const nav = NAV.map((g) => ({ ...g, items: g.items.filter((i) => (!i.perm || can(i.perm)) && (!i.needsSeries || usesSeries) && !(i.builderOnly && EDITION.singleTheme)) })).filter((g) => g.items.length);
 
   return (
     <>
@@ -71,9 +73,9 @@ function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen, unread })
         {/* glow */}
         <div className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full bg-brand-500/25 blur-[90px]" />
         <div className={cn('relative flex h-16 shrink-0 items-center gap-3 px-5', collapsed && 'lg:justify-center lg:px-0')}>
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand-400 via-brand-500 to-fuchsia-500 font-black text-white shadow-brand-glow">N</span>
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand-400 via-brand-500 to-fuchsia-500 font-black text-white shadow-brand-glow">{EDITION.brand[0]}</span>
           <div className={cn('leading-tight', collapsed && 'lg:hidden')}>
-            <div className="font-extrabold tracking-tight text-white">Nova CMS</div>
+            <div className="truncate font-extrabold tracking-tight text-white">{EDITION.brand}</div>
             <div className="text-[11px] font-medium text-ink-500">{theme ? `${theme.name} theme` : 'Content platform'}</div>
           </div>
           <button onClick={() => setMobileOpen(false)} className="ml-auto rounded-lg p-1.5 hover:bg-white/5 lg:hidden"><X className="h-5 w-5" /></button>
