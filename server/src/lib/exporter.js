@@ -264,7 +264,7 @@ server/uploads/*
 
 const readme = (c) => `# ${c.name}
 
-Website and admin panel built on **Nova CMS** — ${c.theme.name} theme (${c.theme.category}).
+Website and admin panel built on **Themewright** — ${c.theme.name} theme (${c.theme.category}).
 Express + PostgreSQL API (\`server/\`) and a Next.js website + admin panel (\`client/\`).
 
 | | |

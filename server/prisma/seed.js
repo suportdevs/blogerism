@@ -48,7 +48,7 @@ async function main() {
       { name: 'Tom Becker', email: 'tom@example.com', subject: 'Question', message: 'Do you accept guest contributions?', status: 'REPLIED' },
     ],
   });
-  await prisma.activityLog.create({ data: { userId: admin.id, action: 'created', entity: 'System', description: `Installed Nova CMS with the ${THEMES[themeId].name} theme` } });
+  await prisma.activityLog.create({ data: { userId: admin.id, action: 'created', entity: 'System', description: `Installed Themewright with the ${THEMES[themeId].name} theme` } });
 
   console.log('✅ Done. Login: admin@novacms.dev / admin123');
 }

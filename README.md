@@ -1,4 +1,4 @@
-# Nova CMS
+# Themewright
 
 A modern, fully customizable content management system inspired by Botble CMS.
 
@@ -62,7 +62,7 @@ The site is one kind of website at a time, chosen under **Admin → Appearance �
 
 | Theme | Kind of site | Header / layout | Content formats |
 | --- | --- | --- | --- |
-| **Nova** (default) | Business & blog | Glass header, landing page, card blog | Articles, galleries |
+| **Themewright** (default) | Business & blog | Glass header, landing page, card blog | Articles, galleries |
 | **Herald** | News portal | Newspaper masthead + section nav, breaking ticker, newspaper article page | Articles, galleries, videos |
 | **Vidora** | Video sharing | Search-first header + sidebar, recommended grid, playlists | Videos, playlists |
 | **Marquee** | Streaming service | Dark cinematic header, billboard, Top 10, poster rows | Videos, shows with seasons |
@@ -72,7 +72,7 @@ The site is one kind of website at a time, chosen under **Admin → Appearance �
 | **Lens** | Photography & studio | Minimal editorial header + full-screen mobile menu, Ken Burns slideshow, giant scrolling type, filterable masonry gallery with lightbox | Articles, galleries |
 | **Folio** | Personal portfolio | Floating pill nav, one-page sections: profile hero, about, skills, timeline, projects, contact | Articles (optional) |
 
-**Luxe versions.** Nova, Herald, Vidora, Marquee, Waveform and Folio each have a *Luxe* version — the same theme and the same content with a different design language: a framed full-screen hero, luxe header with a full-screen numbered menu, serif typography, gold hairlines, magazine article and archive layouts, and luxury blocks (statement, framed split, editorial list with cursor-following images, magazine feature, quote carousel, parallax CTA). Switching Classic ↔ Luxe never touches content; each version remembers its own customised design.
+**Luxe versions.** Themewright, Herald, Vidora, Marquee, Waveform and Folio each have a *Luxe* version — the same theme and the same content with a different design language: a framed full-screen hero, luxe header with a full-screen numbered menu, serif typography, gold hairlines, magazine article and archive layouts, and luxury blocks (statement, framed split, editorial list with cursor-following images, magazine feature, quote carousel, parallax CTA). Switching Classic ↔ Luxe never touches content; each version remembers its own customised design.
 
 **Every theme keeps its own content.** Content (posts, pages, series, menus, settings) is stored per theme family in a workspace. Switching themes saves the current theme's content and restores the other theme's, so nothing is ever lost. Users, media, messages and subscribers are shared. Seed all themes at once with `node prisma/seed.js nova --all`.
 
@@ -98,7 +98,7 @@ In **Admin → Menus**, drag an item by its handle to reorder it, and drag it le
 - **Mega menu**: switch it on for a top-level item. Its level-2 items become columns (use `#` as the URL for a plain heading), level-3 items become the links inside them, and an optional promo image shows as a feature card.
 - **Mobile**: menus become a three-level accordion.
 
-This works in every theme's header. The Nova and Herald default menus include examples, which are applied when you set up the theme or import its demo.
+This works in every theme's header. The Themewright and Herald default menus include examples, which are applied when you set up the theme or import its demo.
 
 ### Reader engagement
 

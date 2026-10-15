@@ -1,5 +1,5 @@
 {
-  "name": "nova-cms",
+  "name": "themewright",
   "private": true,
   "scripts": {
     "db:up": "docker compose up -d",

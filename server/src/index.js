@@ -86,4 +86,4 @@ app.use('/api', (_req, res) => res.status(404).json({ message: 'Endpoint not fou
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`🚀 Nova CMS API running on http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Themewright API running on http://localhost:${PORT}`));

@@ -5,7 +5,7 @@ import { Toaster } from 'sonner';
 const font = Plus_Jakarta_Sans({ subsets: ['latin'], variable: '--font-admin', display: 'swap' });
 
 export const metadata = {
-  title: { default: 'Nova CMS Admin', template: '%s · Nova CMS' },
+  title: { default: 'Themewright Admin', template: '%s · Themewright' },
   robots: { index: false, follow: false },
 };
 

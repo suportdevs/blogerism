@@ -48,7 +48,7 @@ async function upsertSetting(key, value) {
 }
 
 /*
- * Switches between versions of the same theme (e.g. Nova → Nova Luxe): content stays, only the
+ * Switches between versions of the same theme (e.g. Themewright → Themewright Luxe): content stays, only the
  * design, homepage layout and menus change. Each version keeps its own customised design.
  */
 async function applyVariant(fromId, toId, { appearance = true } = {}) {

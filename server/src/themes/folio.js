@@ -25,7 +25,7 @@ module.exports = {
     preset: 'folio', primaryColor: '#6366f1', accentColor: '#22d3ee', backgroundColor: '#fafafa', surfaceColor: '#f1f2f6', textColor: '#0b0d14',
     darkBackgroundColor: '#07080f', darkSurfaceColor: '#10131f', darkTextColor: '#e8eaf2', headingFont: 'Space Grotesk', bodyFont: 'Inter',
     radius: 18, colorMode: 'dark', footerStyle: 'simple', containerWidth: 1180, backToTop: true,
-    footerText: 'Designed & built with Nova CMS — Express, Next.js & PostgreSQL.',
+    footerText: 'Designed & built with Themewright — Express, Next.js & PostgreSQL.',
     headerCta: { enabled: true, label: 'Hire me', url: '/#contact' },
     announcement: { enabled: false, text: '', linkLabel: '', url: '' },
   },
@@ -106,7 +106,7 @@ module.exports = {
             { title: 'Matribhumi Dairy & Varosha Food', url: 'https://matribhumidairy.com', category: 'Manufacturing ERP', featured: false, image: '', description: 'Large-scale manufacturing ERPs with automated batch processing, stock audits, real-time distribution tracking and accounting.', tags: ['Manufacturing', 'Accounting', 'Real-time'] },
             { title: 'Real-Time Private Chat', url: '', category: 'Personal project', featured: false, image: '', description: 'Event-driven messaging app with low-latency communication, user presence, search filtering and message controls.', tags: ['Node.js', 'Express.js', 'MongoDB', 'Socket.io'] },
             { title: 'Dynamic CMS Platform', url: '', category: 'Personal project', featured: false, image: '', description: 'Lightweight, SEO-optimized CMS with customizable admin panels and page building for non-technical users.', tags: ['Laravel', 'Tailwind CSS', 'MySQL'] },
-            { title: 'Nova CMS', url: '', category: 'Personal project', featured: true, image: '', description: 'This website! A themeable CMS with a visual page builder, news, video, streaming, podcast and portfolio themes, RBAC and a media library.', tags: ['Express.js', 'Next.js', 'PostgreSQL', 'Prisma', 'Tailwind'] },
+            { title: 'Themewright', url: '', category: 'Personal project', featured: true, image: '', description: 'This website! A themeable CMS with a visual page builder, news, video, streaming, podcast and portfolio themes, RBAC and a media library.', tags: ['Express.js', 'Next.js', 'PostgreSQL', 'Prisma', 'Tailwind'] },
           ],
         }, { paddingY: 'xl', width: 'wide', anchor: 'projects' }),
 

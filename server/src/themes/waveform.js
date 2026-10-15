@@ -1,7 +1,7 @@
 const { B, m, pic, slug, mp3, hoursAgo, rand, createCategories, commonPages, seedFaqs } = require('./helpers');
 
 const PODCASTS = [
-  { title: 'The Nova Podcast', tagline: 'Conversations about building on the web.', genre: 'Technology', episodes: ['Why every team needs a design system', 'Shipping fast without breaking things', 'The future of headless CMS', 'Lessons from ten years of open source'] },
+  { title: 'The Themewright Podcast', tagline: 'Conversations about building on the web.', genre: 'Technology', episodes: ['Why every team needs a design system', 'Shipping fast without breaking things', 'The future of headless CMS', 'Lessons from ten years of open source'] },
   { title: 'Design Matters Weekly', tagline: 'Short, sharp episodes on product design.', genre: 'Design', episodes: ['Typography in 15 minutes', 'Color systems for dark mode', 'Designing empty states'] },
   { title: 'Night Owls Radio', tagline: 'Late-night stories, music and calm conversation.', genre: 'Culture', episodes: ['Cities after midnight', 'The art of slow mornings', 'Songs that changed us'] },
 ];
