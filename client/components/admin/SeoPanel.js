@@ -4,8 +4,9 @@ import { Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Field } from './ui';
 
-function Counter({ value = '', max }) {
-  const len = value.length;
+function Counter({ value, max }) {
+  // SEO fields are null in the database when never set.
+  const len = (value ?? '').length;
   return <span className={cn('text-xs font-semibold', len > max ? 'text-rose-500' : len > max * 0.85 ? 'text-amber-500' : 'text-ink-400')}>{len}/{max}</span>;
 }
 

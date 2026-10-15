@@ -334,7 +334,7 @@ export default function PageBuilder({ id }) {
         {/* Left panel */}
         <aside className="hidden w-[300px] shrink-0 flex-col border-r border-ink-200/70 bg-white dark:border-white/5 dark:bg-ink-900 md:flex">
           <div className="p-3 pb-0">
-            <Tabs className="w-full flex-nowrap [&>button]:flex-1 [&>button]:justify-center [&>button]:min-w-0 [&>button]:gap-1 [&>button]:px-1.5 [&>button]:text-[12.5px]" value={leftTab} onChange={setLeftTab} tabs={[{ value: 'layers', label: 'Layers', icon: Layers, count: blocks.length }, { value: 'sections', label: 'Sections', icon: LayoutTemplate }, { value: 'add', label: 'Blocks', icon: Plus }]} />
+            <Tabs className="w-full flex-nowrap [&>button]:flex-1 [&>button]:justify-center [&>button]:gap-1.5 [&>button]:px-2 [&>button>svg]:hidden" value={leftTab} onChange={setLeftTab} tabs={[{ value: 'layers', label: 'Layers', icon: Layers, count: blocks.length }, { value: 'sections', label: 'Sections', icon: LayoutTemplate }, { value: 'add', label: 'Blocks', icon: Plus }]} />
           </div>
           <div className="a-scroll flex-1 overflow-y-auto">
             {leftTab === 'add' ? <BlockLibrary onAdd={add} /> : leftTab === 'sections' ? <SectionLibrary onInsert={(sec) => add({ section: sec.key })} /> : (
