@@ -523,6 +523,198 @@ export const BLOCKS = {
     ],
   },
 
+  /* ---------------------------- Interactive ---------------------------- */
+  team: {
+    label: 'Team', category: 'Interactive', icon: 'Users', description: 'People with hover bios & social links',
+    defaults: { eyebrow: 'Our people', title: 'Meet the team', subtitle: '', variant: 'cards', columns: 4, members: [
+      { name: 'Ava Thompson', role: 'Founder & CEO', image: 'https://i.pravatar.cc/600?img=47', bio: 'Leads strategy and keeps the team pointed at what matters.', linkedin: '#', twitter: '#', email: '' },
+      { name: 'Noah Patel', role: 'Head of Design', image: 'https://i.pravatar.cc/600?img=12', bio: 'Obsessed with typography, motion and the details nobody notices.', linkedin: '#', twitter: '', email: '' },
+      { name: 'Mia Rossi', role: 'Lead Engineer', image: 'https://i.pravatar.cc/600?img=32', bio: 'Builds fast, accessible products that scale.', linkedin: '#', twitter: '#', email: '' },
+      { name: 'Leo Kim', role: 'Customer Success', image: 'https://i.pravatar.cc/600?img=15', bio: 'Makes sure every customer feels looked after.', linkedin: '#', twitter: '', email: '' },
+    ] },
+    fields: [
+      ...heading, { name: 'subtitle', label: 'Subtitle', type: 'textarea' },
+      { name: 'variant', label: 'Design', type: 'select', options: [['cards', 'Cards — bio slides up'], ['portrait', 'Tall portraits — colour on hover'], ['round', 'Round avatars']], half: true },
+      { name: 'columns', label: 'Columns', type: 'select', options: [[3, '3'], [4, '4']], half: true },
+      { name: 'members', label: 'Members', type: 'list', itemLabel: 'name', defaults: { name: 'Name', role: 'Role', image: '', bio: '', linkedin: '', twitter: '', email: '' }, fields: [
+        { name: 'image', label: 'Photo', type: 'image' },
+        { name: 'name', label: 'Name', type: 'text', half: true }, { name: 'role', label: 'Role', type: 'text', half: true },
+        { name: 'bio', label: 'Short bio', type: 'textarea', rows: 2 },
+        { name: 'linkedin', label: 'LinkedIn URL', type: 'url', half: true }, { name: 'twitter', label: 'X / Twitter URL', type: 'url', half: true },
+        { name: 'email', label: 'Email', type: 'text' },
+      ] },
+    ],
+  },
+  steps: {
+    label: 'Process steps', category: 'Interactive', icon: 'Footprints', description: 'Numbered steps with a progress line',
+    defaults: { eyebrow: 'How it works', title: 'From idea to launch in four steps', subtitle: '', variant: 'timeline', items: [
+      { icon: 'MessageCircle', title: 'Discover', text: 'We listen, ask questions and map out what success looks like.' },
+      { icon: 'PenTool', title: 'Design', text: 'Wireframes and visual design, reviewed together every week.' },
+      { icon: 'Code2', title: 'Build', text: 'Clean, fast code with a preview link you can click any time.' },
+      { icon: 'Rocket', title: 'Launch', text: 'We ship, measure and keep improving after go-live.' },
+    ] },
+    fields: [
+      ...heading, { name: 'subtitle', label: 'Subtitle', type: 'textarea' },
+      { name: 'variant', label: 'Design', type: 'select', options: [['timeline', 'Horizontal timeline'], ['cards', 'Gradient cards'], ['vertical', 'Vertical — fills as you scroll']] },
+      { name: 'items', label: 'Steps', type: 'list', itemLabel: 'title', defaults: { icon: 'Star', title: 'Step', text: '' }, fields: [
+        { name: 'icon', label: 'Icon', type: 'icon', options: ICON_NAMES }, { name: 'title', label: 'Title', type: 'text' }, { name: 'text', label: 'Text', type: 'textarea', rows: 2 },
+      ] },
+    ],
+  },
+  featureTabs: {
+    label: 'Feature tabs', category: 'Interactive', icon: 'PanelsTopLeft', description: 'Auto-playing tabs that swap image & copy',
+    defaults: { eyebrow: 'Features', title: 'One platform, every workflow', subtitle: '', variant: 'top', autoplay: true, tabs: [
+      { icon: 'PenTool', label: 'Create', title: 'Write and design visually', text: 'Compose pages from beautiful blocks and see every change live.', bullets: ['Drag & drop builder', 'Live preview'], image: 'https://picsum.photos/seed/tab-create/1200/800', buttonLabel: '', buttonUrl: '' },
+      { icon: 'Users', label: 'Collaborate', title: 'Work together, in real time', text: 'Roles and permissions keep everyone in their lane.', bullets: ['Editors & authors', 'Activity log'], image: 'https://picsum.photos/seed/tab-collab/1200/800', buttonLabel: '', buttonUrl: '' },
+      { icon: 'Rocket', label: 'Publish', title: 'Ship with confidence', text: 'Schedule posts, manage SEO and publish in one click.', bullets: ['Scheduling', 'SEO controls'], image: 'https://picsum.photos/seed/tab-publish/1200/800', buttonLabel: '', buttonUrl: '' },
+    ] },
+    fields: [
+      ...heading, { name: 'subtitle', label: 'Subtitle', type: 'textarea' },
+      { name: 'variant', label: 'Tab position', type: 'select', options: [['top', 'Tabs on top'], ['side', 'Tabs on the side']], half: true },
+      { name: 'autoplay', label: 'Auto-advance', type: 'toggle', half: true },
+      { name: 'tabs', label: 'Tabs', type: 'list', itemLabel: 'label', defaults: { icon: 'Star', label: 'Tab', title: 'Title', text: '', bullets: [], image: '', buttonLabel: '', buttonUrl: '' }, fields: [
+        { name: 'icon', label: 'Icon', type: 'icon', options: ICON_NAMES, half: true }, { name: 'label', label: 'Tab label', type: 'text', half: true },
+        { name: 'title', label: 'Title', type: 'text' }, { name: 'text', label: 'Text', type: 'textarea', rows: 2 },
+        { name: 'bullets', label: 'Bullets', type: 'stringList' }, { name: 'image', label: 'Image', type: 'image' },
+        { name: 'buttonLabel', label: 'Button', type: 'text', half: true }, { name: 'buttonUrl', label: 'Button link', type: 'url', half: true },
+      ] },
+    ],
+  },
+  comparison: {
+    label: 'Comparison table', category: 'Interactive', icon: 'Table2', description: 'Plans / products side by side',
+    defaults: { eyebrow: 'Compare', title: 'Find the right plan', subtitle: '', columns: ['Starter', 'Pro', 'Business'], highlight: 1, highlightLabel: 'Most popular', groups: true, rows: [
+      { group: 'Essentials', feature: 'Pages', values: ['10', 'Unlimited', 'Unlimited'] },
+      { group: 'Essentials', feature: 'Custom domain', values: ['yes', 'yes', 'yes'] },
+      { group: 'Essentials', feature: 'Storage', values: ['1 GB', '50 GB', '1 TB'] },
+      { group: 'Collaboration', feature: 'Team members', values: ['1', '5', 'Unlimited'] },
+      { group: 'Collaboration', feature: 'Roles & permissions', values: ['no', 'yes', 'yes'] },
+      { group: 'Support', feature: 'Priority support', values: ['no', 'no', 'yes'] },
+    ], buttons: [{ label: 'Start free', url: '#' }, { label: 'Go Pro', url: '#' }, { label: 'Contact sales', url: '/contact' }] },
+    fields: [
+      ...heading, { name: 'subtitle', label: 'Subtitle', type: 'textarea' },
+      { name: 'columns', label: 'Columns (plans / products)', type: 'stringList' },
+      { name: 'highlight', label: 'Highlighted column (1 = first, 0 = none)', type: 'number', half: true }, { name: 'highlightLabel', label: 'Highlight badge', type: 'text', half: true },
+      { name: 'groups', label: 'Show group headings', type: 'toggle' },
+      { name: 'rows', label: 'Rows', type: 'list', itemLabel: 'feature', hint: 'Values: “yes”, “no” or any text', defaults: { group: '', feature: 'Feature', values: [] }, fields: [
+        { name: 'group', label: 'Group', type: 'text', half: true }, { name: 'feature', label: 'Feature', type: 'text', half: true },
+        { name: 'values', label: 'Values (one per column: yes / no / text)', type: 'stringList' },
+      ] },
+      { name: 'buttons', label: 'Buttons under each column', type: 'list', itemLabel: 'label', defaults: { label: 'Choose', url: '#' }, fields: [
+        { name: 'label', label: 'Label', type: 'text', half: true }, { name: 'url', label: 'Link', type: 'url', half: true },
+      ] },
+    ],
+  },
+  beforeAfter: {
+    label: 'Before / after', category: 'Interactive', icon: 'SplitSquareHorizontal', description: 'Drag a handle to compare two images',
+    defaults: { eyebrow: 'Transformation', title: 'See the difference', text: 'Drag the handle to compare.', before: 'https://picsum.photos/seed/ba-before/1600/1000?grayscale', after: 'https://picsum.photos/seed/ba-before/1600/1000', beforeLabel: 'Before', afterLabel: 'After', start: 50, layout: 'stacked', ratio: '16/9' },
+    fields: [
+      ...heading, { name: 'text', label: 'Text', type: 'textarea' },
+      { name: 'before', label: 'Before image', type: 'image' }, { name: 'after', label: 'After image', type: 'image' },
+      { name: 'beforeLabel', label: 'Before label', type: 'text', half: true }, { name: 'afterLabel', label: 'After label', type: 'text', half: true },
+      { name: 'start', label: 'Start position (%)', type: 'number', half: true },
+      { name: 'ratio', label: 'Shape', type: 'select', options: [['16/9', 'Wide 16:9'], ['4/3', 'Classic 4:3'], ['1/1', 'Square']], half: true },
+      { name: 'layout', label: 'Layout', type: 'select', options: [['stacked', 'Heading above'], ['split', 'Text beside']] },
+    ],
+  },
+  accordionImage: {
+    label: 'Accordion + image', category: 'Interactive', icon: 'ListCollapse', description: 'Expanding items that swap a large image',
+    defaults: { eyebrow: 'Why us', title: 'Built around how you work', subtitle: '', imagePosition: 'right', autoplay: true, items: [
+      { title: 'Thoughtful by default', text: 'Sensible defaults mean you spend time on content, not configuration.', image: 'https://picsum.photos/seed/acc-1/1200/1000' },
+      { title: 'Fast everywhere', text: 'Optimised images and server rendering keep every page snappy.', image: 'https://picsum.photos/seed/acc-2/1200/1000' },
+      { title: 'Yours to customise', text: 'Colours, fonts, layout and blocks — make it unmistakably yours.', image: 'https://picsum.photos/seed/acc-3/1200/1000' },
+    ] },
+    fields: [
+      ...heading, { name: 'subtitle', label: 'Subtitle', type: 'textarea' },
+      { name: 'imagePosition', label: 'Image side', type: 'select', options: [['right', 'Right'], ['left', 'Left']], half: true },
+      { name: 'autoplay', label: 'Auto-advance', type: 'toggle', half: true },
+      { name: 'items', label: 'Items', type: 'list', itemLabel: 'title', defaults: { title: 'Item', text: '', image: '' }, fields: [
+        { name: 'title', label: 'Title', type: 'text' }, { name: 'text', label: 'Text', type: 'textarea', rows: 3 }, { name: 'image', label: 'Image', type: 'image' },
+      ] },
+    ],
+  },
+  logoWall: {
+    label: 'Logo wall', category: 'Interactive', icon: 'Building2', description: 'Infinite logo marquee or hover grid',
+    defaults: { title: 'Trusted by teams at', variant: 'marquee', speed: 30, logos: ['Northwind', 'Lumen', 'Stackwise', 'Acme', 'Globex', 'Initech', 'Umbrella', 'Hooli'].map((name) => ({ name, image: '', url: '' })) },
+    fields: [
+      { name: 'title', label: 'Title', type: 'text' },
+      { name: 'variant', label: 'Design', type: 'select', options: [['marquee', 'Scrolling marquee'], ['grid', 'Bordered grid']], half: true },
+      { name: 'speed', label: 'Marquee duration (s)', type: 'number', half: true },
+      { name: 'logos', label: 'Logos', type: 'list', itemLabel: 'name', defaults: { name: 'Brand', image: '', url: '' }, fields: [
+        { name: 'name', label: 'Name (shown when no image)', type: 'text' }, { name: 'image', label: 'Logo image', type: 'image' }, { name: 'url', label: 'Link', type: 'url' },
+      ] },
+    ],
+  },
+  videoLightbox: {
+    label: 'Video lightbox', category: 'Interactive', icon: 'Clapperboard', description: 'Cinematic poster that opens a video popup',
+    defaults: { eyebrow: 'Watch', title: 'See it in action', text: 'Two minutes that explain everything.', poster: 'https://picsum.photos/seed/video-poster/1800/1000', videoUrl: 'https://www.youtube.com/watch?v=aqz-KE-bpKQ', layout: 'full', duration: '2:14', stats: [] },
+    fields: [
+      ...heading, { name: 'text', label: 'Text', type: 'textarea' },
+      { name: 'poster', label: 'Poster image', type: 'image' },
+      { name: 'videoUrl', label: 'Video (YouTube, Vimeo or MP4)', type: 'url' },
+      { name: 'layout', label: 'Layout', type: 'select', options: [['full', 'Full-width poster'], ['split', 'Text beside video']], half: true },
+      { name: 'duration', label: 'Duration label', type: 'text', half: true },
+      { name: 'stats', label: 'Stats under the text', type: 'list', itemLabel: 'label', defaults: { value: '10k', label: 'Label' }, fields: [
+        { name: 'value', label: 'Value', type: 'text', half: true }, { name: 'label', label: 'Label', type: 'text', half: true },
+      ] },
+    ],
+  },
+  cardCarousel: {
+    label: 'Card carousel', category: 'Interactive', icon: 'GalleryHorizontalEnd', description: 'Swipeable cards with arrows & progress',
+    defaults: { eyebrow: 'Explore', title: 'Featured collection', subtitle: '', cardStyle: 'overlay', size: 'md', items: [1, 2, 3, 4, 5, 6].map((i) => ({ image: `https://picsum.photos/seed/carousel-${i}/900/1100`, tag: 'Category', title: `Card title ${i}`, text: 'A short description for this card.', url: '#' })) },
+    fields: [
+      ...heading, { name: 'subtitle', label: 'Subtitle', type: 'textarea' },
+      { name: 'cardStyle', label: 'Card design', type: 'select', options: [['overlay', 'Text over image'], ['stacked', 'Text below image'], ['glass', 'Frosted glass caption']], half: true },
+      { name: 'size', label: 'Card size', type: 'select', options: [['sm', 'Small'], ['md', 'Medium'], ['lg', 'Large']], half: true },
+      { name: 'items', label: 'Cards', type: 'list', itemLabel: 'title', defaults: { image: '', tag: '', title: 'Card', text: '', url: '' }, fields: [
+        { name: 'image', label: 'Image', type: 'image' },
+        { name: 'tag', label: 'Tag', type: 'text', half: true }, { name: 'title', label: 'Title', type: 'text', half: true },
+        { name: 'text', label: 'Text', type: 'textarea', rows: 2 }, { name: 'url', label: 'Link', type: 'url' },
+      ] },
+    ],
+  },
+  jobs: {
+    label: 'Careers / jobs', category: 'Interactive', icon: 'Briefcase', description: 'Filterable openings that expand',
+    defaults: { eyebrow: 'Careers', title: 'Join us', subtitle: 'We hire curious, kind people who love their craft.', applyEmail: 'jobs@example.com', items: [
+      { title: 'Senior Frontend Engineer', department: 'Engineering', location: 'Remote', type: 'Full-time', description: 'Own our design system and help ship delightful product experiences.', url: '' },
+      { title: 'Product Designer', department: 'Design', location: 'Dhaka', type: 'Full-time', description: 'Shape flows end to end, from research to polished UI.', url: '' },
+      { title: 'Content Marketer', department: 'Marketing', location: 'Remote', type: 'Contract', description: 'Tell our story through articles, newsletters and video.', url: '' },
+    ] },
+    fields: [
+      ...heading, { name: 'subtitle', label: 'Subtitle', type: 'textarea' },
+      { name: 'applyEmail', label: 'Apply email (used when a job has no link)', type: 'text' },
+      { name: 'items', label: 'Openings', type: 'list', itemLabel: 'title', defaults: { title: 'Role', department: 'Team', location: 'Remote', type: 'Full-time', description: '', url: '' }, fields: [
+        { name: 'title', label: 'Title', type: 'text' },
+        { name: 'department', label: 'Department', type: 'text', half: true }, { name: 'location', label: 'Location', type: 'text', half: true },
+        { name: 'type', label: 'Type', type: 'text', half: true }, { name: 'url', label: 'Apply link', type: 'url', half: true },
+        { name: 'description', label: 'Description', type: 'textarea', rows: 3 },
+      ] },
+    ],
+  },
+  countdown: {
+    label: 'Countdown', category: 'Interactive', icon: 'Timer', description: 'Live timer to a launch or event',
+    defaults: { eyebrow: 'Coming soon', title: 'Something big is on the way', text: '', date: '2027-01-01T10:00', variant: 'cards', image: '', expiredText: 'It’s live!', buttonLabel: 'Notify me', buttonUrl: '#' },
+    fields: [
+      ...heading, { name: 'text', label: 'Text', type: 'textarea' },
+      { name: 'date', label: 'Target date & time (YYYY-MM-DDTHH:MM)', type: 'text', half: true },
+      { name: 'variant', label: 'Design', type: 'select', options: [['cards', 'Glass cards'], ['minimal', 'Big minimal digits'], ['image', 'Over background image']], half: true },
+      { name: 'image', label: 'Background image (image design)', type: 'image' },
+      { name: 'expiredText', label: 'Text when finished', type: 'text' },
+      ...button('button', 'Button'),
+    ],
+  },
+  episodeSpotlight: {
+    label: 'Episode spotlight', category: 'Interactive', icon: 'Disc3', description: 'Featured video/episode with “up next” (dynamic)',
+    defaults: { eyebrow: 'Now playing', title: '', format: 'AUDIO', series: '', category: '', sort: 'latest', count: 4, linkLabel: 'All episodes', linkUrl: '' },
+    fields: [
+      ...heading,
+      { name: 'format', label: 'Content', type: 'select', options: [['AUDIO', 'Audio / podcast'], ['VIDEO', 'Video'], ['STANDARD', 'Articles']], half: true },
+      { name: 'series', label: 'Series', type: 'series', half: true },
+      { name: 'category', label: 'Category', type: 'category', half: true }, SORT,
+      { name: 'count', label: 'Items (1 featured + up next)', type: 'number' },
+      { name: 'linkLabel', label: 'Link label', type: 'text', half: true }, { name: 'linkUrl', label: 'Link URL', type: 'url', half: true },
+    ],
+  },
+
   spacer: {
     label: 'Spacer', category: 'Layout', icon: 'MoveVertical', description: 'Vertical whitespace / divider',
     defaults: { size: 64, divider: false },
@@ -549,7 +741,7 @@ export const STYLE_FIELDS = [
 
 export const DEFAULT_STYLE = { background: 'none', paddingY: 'lg', width: 'normal', align: '', animate: true };
 
-export const BLOCK_CATEGORIES = ['Headers', 'Luxury', 'Content', 'Media', 'Portfolio', 'Restaurant', 'News', 'Video', 'Audio', 'Dynamic', 'Conversion', 'Layout'];
+export const BLOCK_CATEGORIES = ['Headers', 'Luxury', 'Content', 'Interactive', 'Media', 'Portfolio', 'Restaurant', 'News', 'Video', 'Audio', 'Dynamic', 'Conversion', 'Layout'];
 
 // Ready-made page templates for "New page".
 export const PAGE_TEMPLATES = {
@@ -567,4 +759,7 @@ export const PAGE_TEMPLATES = {
   saas: { label: 'SaaS landing', blocks: ['spotlightHero', 'logos', 'bentoGrid', 'stats', 'testimonials', 'pricingToggle', 'faq', 'cta'] },
   photography: { label: 'Photography', blocks: ['heroSlideshow', 'textMarquee', 'masonryGallery', 'contactForm'] },
   podcast: { label: 'Podcast hub', blocks: ['pageHeader', 'seriesGrid', 'audioPlaylist'] },
+  company: { label: 'Company / team', blocks: ['pageHeader', 'accordionImage', 'steps', 'team', 'logoWall', 'jobs'] },
+  productTour: { label: 'Product tour', blocks: ['featureTabs', 'videoLightbox', 'steps', 'comparison', 'logoWall'] },
+  event: { label: 'Event / launch', blocks: ['countdown', 'featureTabs', 'cardCarousel', 'cta'] },
 };

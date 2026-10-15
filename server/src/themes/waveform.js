@@ -11,7 +11,7 @@ module.exports = {
   name: 'Waveform',
   category: 'Podcast & audio',
   description: 'A warm podcast network with show artwork, episode lists and a player that keeps playing while you browse.',
-  features: { formats: ['AUDIO', 'STANDARD'], series: ['PODCAST'], blocks: ['Audio', 'Headers', 'Content', 'Media', 'Conversion', 'Layout'] },
+  features: { formats: ['AUDIO', 'STANDARD'], series: ['PODCAST'], blocks: ['Audio', 'Headers', 'Interactive', 'Content', 'Media', 'Conversion', 'Layout'] },
   layout: { header: 'default', article: 'blog', listing: 'audio' },
   general: { siteName: 'Waveform', tagline: 'Stories worth listening to.' },
   appearance: {

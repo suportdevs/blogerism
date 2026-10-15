@@ -18,7 +18,7 @@ const DEFAULT_THEME = 'nova';
 // What the storefront and admin need at runtime.
 const publicTheme = (id) => {
   const t = THEMES[id] || THEMES[DEFAULT_THEME];
-  return { id: t.id, name: t.name, category: t.category, layout: t.layout, features: t.features };
+  return { id: t.id, name: t.name, category: t.category, layout: t.layout, features: t.features, variantOf: t.variantOf || null };
 };
 
 module.exports = { THEMES, DEFAULT_THEME, publicTheme };

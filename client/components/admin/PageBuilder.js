@@ -11,9 +11,11 @@ import {
   Crown, ScrollText, Frame, ListOrdered, BookOpen, MessageSquareQuote, Gem,
   UserRound, IdCard, Wrench, Milestone, FolderKanban, GalleryThumbnails, MousePointerClick, LayoutDashboard, ToggleRight, UtensilsCrossed, Clock, CalendarCheck, MoveHorizontal,
   Zap, LayoutList, Columns3, PanelRight, MonitorPlay, GalleryHorizontal, Clapperboard, Trophy, Library, ListMusic,
+  Users, Footprints, PanelsTopLeft, Table2, SplitSquareHorizontal, ListCollapse, GalleryHorizontalEnd, Briefcase, Timer, Disc3, LayoutTemplate,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { BLOCKS, BLOCK_CATEGORIES, DEFAULT_STYLE, STYLE_FIELDS } from '@/lib/blocks';
+import { instantiateSection, sectionThumb, sectionsFor, THEME_SECTIONS } from '@/lib/sections';
 import { useSaveShortcut, useUnsavedWarning } from '@/lib/hooks';
 import { cn, slugify, uid } from '@/lib/utils';
 import { SchemaFields } from './FieldRenderer';
@@ -22,7 +24,7 @@ import { ImageField } from './Media';
 import { Field, PageLoader, Tabs } from './ui';
 import { useSiteTheme } from './SiteTheme';
 
-const BLOCK_ICONS = { Crown, ScrollText, Frame, ListOrdered, BookOpen, MessageSquareQuote, Gem, MoveHorizontal, GalleryThumbnails, MousePointerClick, LayoutDashboard, ToggleRight, UtensilsCrossed, Clock, CalendarCheck, UserRound, IdCard, Wrench, Milestone, FolderKanban, Zap, LayoutList, Columns3, PanelRight, MonitorPlay, GalleryHorizontal, Clapperboard, Trophy, Library, ListMusic, Sparkles, PanelTop, LayoutGrid, Columns2, Type, BarChart3, Building2, Images, PlayCircle, Newspaper, Quote, HelpCircle, CreditCard, Megaphone, Mail, Send, MoveVertical, Code2 };
+const BLOCK_ICONS = { Crown, ScrollText, Frame, ListOrdered, BookOpen, MessageSquareQuote, Gem, MoveHorizontal, GalleryThumbnails, MousePointerClick, LayoutDashboard, ToggleRight, UtensilsCrossed, Clock, CalendarCheck, UserRound, IdCard, Wrench, Milestone, FolderKanban, Zap, LayoutList, Columns3, PanelRight, MonitorPlay, GalleryHorizontal, Clapperboard, Trophy, Library, ListMusic, Sparkles, PanelTop, LayoutGrid, Columns2, Type, BarChart3, Building2, Images, PlayCircle, Newspaper, Quote, HelpCircle, CreditCard, Megaphone, Mail, Send, MoveVertical, Code2, Users, Footprints, PanelsTopLeft, Table2, SplitSquareHorizontal, ListCollapse, GalleryHorizontalEnd, Briefcase, Timer, Disc3 };
 const DEVICES = { desktop: { icon: Monitor, width: '100%' }, tablet: { icon: Tablet, width: '820px' }, mobile: { icon: Smartphone, width: '390px' } };
 
 export const newBlock = (type, style = {}) => ({ id: uid(), type, data: structuredClone(BLOCKS[type].defaults), style: { ...DEFAULT_STYLE, ...style } });
@@ -66,6 +68,60 @@ function BlockLibrary({ onAdd }) {
   );
 }
 
+// Pre-designed, theme-specific sections (lib/sections.js).
+function SectionLibrary({ onInsert }) {
+  const { theme } = useSiteTheme();
+  const [other, setOther] = useState('');
+  const groups = other ? [{ label: other, items: THEME_SECTIONS[other] }] : sectionsFor(theme);
+  return (
+    <div className="space-y-5 p-4">
+      <div className="rounded-xl bg-gradient-to-br from-brand-500 to-fuchsia-500 p-3 text-white">
+        <div className="flex items-center gap-2 text-sm font-bold"><LayoutTemplate className="h-4 w-4" />Designed sections</div>
+        <p className="mt-1 text-[11px] leading-snug text-white/80">Ready-made sections for {other ? 'the selected theme' : theme?.name || 'this theme'} — click to insert, then edit any text or image.</p>
+      </div>
+      <select className="a-input h-9 text-xs" value={other} onChange={(e) => setOther(e.target.value)}>
+        <option value="">Active theme{theme ? ` (${theme.name})` : ''}</option>
+        {Object.keys(THEME_SECTIONS).map((k) => <option key={k} value={k}>Browse: {k.replace(/(^|-)(w)/g, (m, d, c) => (d ? ' ' : '') + c.toUpperCase())}</option>)}
+      </select>
+      {!groups.length && <p className="rounded-xl border-2 border-dashed border-ink-200 p-6 text-center text-xs text-ink-400 dark:border-white/10">This theme has no designed sections yet — browse another theme above.</p>}
+      {groups.map((g) => (
+        <div key={g.label}>
+          <div className="mb-2 text-[11px] font-bold uppercase tracking-wider text-ink-400">{g.label}</div>
+          <div className="space-y-2.5">
+            {g.items.map((s) => {
+              const img = sectionThumb(s);
+              const def = BLOCKS[s.blocks[0].type];
+              const Icon = BLOCK_ICONS[def?.icon] || Layers;
+              const dark = s.blocks[0].style?.background === 'dark';
+              return (
+                <button
+                  key={s.key}
+                  type="button"
+                  draggable
+                  onDragStart={(e) => e.dataTransfer.setData('nova/section', s.key)}
+                  onClick={() => onInsert(s)}
+                  className="group block w-full overflow-hidden rounded-xl border border-ink-200 bg-white text-left transition hover:-translate-y-0.5 hover:border-brand-400 hover:shadow-lg dark:border-white/10 dark:bg-white/[.02]"
+                >
+                  <div className={cn('relative h-24 overflow-hidden', dark ? 'bg-ink-950' : 'bg-gradient-to-br from-brand-100 to-fuchsia-100 dark:from-brand-500/20 dark:to-fuchsia-500/20')}>
+                    {img && <img src={img} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <span className="absolute left-2 top-2 grid h-7 w-7 place-items-center rounded-lg bg-white/90 text-brand-600 shadow"><Icon className="h-3.5 w-3.5" /></span>
+                    <span className="absolute bottom-2 right-2 rounded-md bg-brand-500 px-2 py-0.5 text-[10px] font-bold text-white opacity-0 transition group-hover:opacity-100"><Plus className="mr-0.5 inline h-3 w-3" />Insert</span>
+                  </div>
+                  <div className="p-2.5">
+                    <div className="text-[13px] font-bold leading-tight text-ink-800 dark:text-ink-100">{s.name}</div>
+                    <div className="mt-0.5 line-clamp-1 text-[11px] text-ink-400">{s.description}</div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function Outline({ blocks, selected, onSelect, onMove, onDuplicate, onRemove, onToggle, onAddAt }) {
   const [dragIndex, setDragIndex] = useState(null);
   const [overIndex, setOverIndex] = useState(null);
@@ -73,7 +129,9 @@ function Outline({ blocks, selected, onSelect, onMove, onDuplicate, onRemove, on
   const onDrop = (e, index) => {
     e.preventDefault();
     const newType = e.dataTransfer.getData('nova/new-block');
-    if (newType) onAddAt(newType, index);
+    const sectionKey = e.dataTransfer.getData('nova/section');
+    if (sectionKey) onAddAt({ section: sectionKey }, index);
+    else if (newType) onAddAt(newType, index);
     else if (dragIndex !== null) onMove(dragIndex, index > dragIndex ? index - 1 : index);
     setDragIndex(null);
     setOverIndex(null);
@@ -197,10 +255,11 @@ export default function PageBuilder({ id }) {
     frame.current?.contentWindow?.postMessage({ type: 'nova:scroll-to', id: bid }, window.location.origin);
   };
   const addAt = (type, index) => {
-    const b = newBlock(type);
-    setBlocks((list) => [...list.slice(0, index), b, ...list.slice(index)]);
+    // `type` is a block type, or { section } for a designed section (several blocks).
+    const added = type?.section ? instantiateSection(Object.values(THEME_SECTIONS).flat().find((s) => s.key === type.section)) : [newBlock(type)];
+    setBlocks((list) => [...list.slice(0, index), ...added, ...list.slice(index)]);
     setLeftTab('layers');
-    setTimeout(() => select(b.id), 50);
+    setTimeout(() => select(added[0].id), 50);
   };
   const add = (type) => {
     const index = selected ? blocks.findIndex((b) => b.id === selected) + 1 : blocks.length;
@@ -275,10 +334,10 @@ export default function PageBuilder({ id }) {
         {/* Left panel */}
         <aside className="hidden w-[300px] shrink-0 flex-col border-r border-ink-200/70 bg-white dark:border-white/5 dark:bg-ink-900 md:flex">
           <div className="p-3 pb-0">
-            <Tabs className="w-full [&>button]:flex-1 [&>button]:justify-center" value={leftTab} onChange={setLeftTab} tabs={[{ value: 'layers', label: 'Layers', icon: Layers, count: blocks.length }, { value: 'add', label: 'Add', icon: Plus }]} />
+            <Tabs className="w-full flex-nowrap [&>button]:flex-1 [&>button]:justify-center [&>button]:min-w-0 [&>button]:gap-1 [&>button]:px-1.5 [&>button]:text-[12.5px]" value={leftTab} onChange={setLeftTab} tabs={[{ value: 'layers', label: 'Layers', icon: Layers, count: blocks.length }, { value: 'sections', label: 'Sections', icon: LayoutTemplate }, { value: 'add', label: 'Blocks', icon: Plus }]} />
           </div>
           <div className="a-scroll flex-1 overflow-y-auto">
-            {leftTab === 'add' ? <BlockLibrary onAdd={add} /> : (
+            {leftTab === 'add' ? <BlockLibrary onAdd={add} /> : leftTab === 'sections' ? <SectionLibrary onInsert={(sec) => add({ section: sec.key })} /> : (
               <Outline blocks={blocks} selected={selected} onSelect={select} onMove={move} onDuplicate={duplicate} onRemove={remove} onToggle={toggleHidden} onAddAt={addAt} />
             )}
           </div>

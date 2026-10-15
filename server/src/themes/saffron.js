@@ -50,7 +50,7 @@ module.exports = {
   name: 'Saffron',
   category: 'Restaurant & café',
   description: 'An elegant restaurant site: full-screen food slideshow, tabbed menu with prices, table reservations and live opening hours.',
-  features: { formats: ['STANDARD', 'GALLERY'], series: [], blocks: ['Restaurant', 'Headers', 'Content', 'Media', 'Conversion', 'Layout'] },
+  features: { formats: ['STANDARD', 'GALLERY'], series: [], blocks: ['Restaurant', 'Headers', 'Interactive', 'Content', 'Media', 'Conversion', 'Layout'] },
   layout: { header: 'overlay', article: 'blog', listing: 'cards' },
   general: { siteName: 'Saffron', tagline: 'Kitchen & Bar' },
   contact: { email: 'hello@saffron.example', phone: '+880 1700 000000', address: '12 Gulshan Avenue, Dhaka 1212', workingHours: 'Tue – Sun, 11:30 – 22:30' },

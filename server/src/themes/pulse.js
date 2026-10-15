@@ -18,7 +18,7 @@ module.exports = {
   name: 'Pulse',
   category: 'SaaS & startup',
   description: 'A high-conversion product site: interactive spotlight hero with a 3D dashboard, bento features, animated stats and a monthly/yearly pricing toggle.',
-  features: { formats: ['STANDARD'], series: [], blocks: ['Headers', 'Content', 'Conversion', 'Dynamic', 'Media', 'Layout'] },
+  features: { formats: ['STANDARD'], series: [], blocks: ['Headers', 'Interactive', 'Content', 'Conversion', 'Dynamic', 'Media', 'Layout'] },
   layout: { header: 'default', article: 'blog', listing: 'cards' },
   general: { siteName: 'Pulse', tagline: 'Product analytics for modern teams' },
   contact: { email: 'hello@pulse.example', phone: '+1 (415) 555-0199', address: '548 Market St, San Francisco, CA', workingHours: 'Support 24/7' },

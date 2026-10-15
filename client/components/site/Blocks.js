@@ -8,6 +8,7 @@ import { MEDIA_RENDERERS } from './MediaBlocks';
 import { PORTFOLIO_RENDERERS } from './PortfolioBlocks';
 import { SHOWCASE_RENDERERS } from './ShowcaseBlocks';
 import { LUXE_RENDERERS } from './LuxeBlocks';
+import { INTERACTIVE_RENDERERS } from './InteractiveBlocks';
 import { CountUp } from './ShowcaseClient';
 
 /* ---------------------------------------------------------------------------
@@ -389,6 +390,7 @@ const RENDERERS = {
   ...PORTFOLIO_RENDERERS,
   ...SHOWCASE_RENDERERS,
   ...LUXE_RENDERERS,
+  ...INTERACTIVE_RENDERERS,
 };
 
 export default function Blocks({ blocks = [], ctx = {}, settings }) {

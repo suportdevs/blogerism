@@ -4,10 +4,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { ArrowLeft, ArrowRight, Check, Loader2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, LayoutTemplate, Loader2 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { BLOCKS, PAGE_TEMPLATES } from '@/lib/blocks';
 import { newBlock } from '@/components/admin/PageBuilder';
+import { useSiteTheme } from '@/components/admin/SiteTheme';
+import { findSection, instantiateSection, sectionThumb, THEME_PAGE_DESIGNS } from '@/lib/sections';
 import { cn } from '@/lib/utils';
 
 export default function NewPage() {
@@ -15,15 +17,24 @@ export default function NewPage() {
   const [title, setTitle] = useState('');
   const [template, setTemplate] = useState('landing');
   const [loading, setLoading] = useState(false);
+  const { theme } = useSiteTheme();
+  // Page designs made from the active theme's sections (Luxe versions also get the classic family's).
+  const designs = theme ? [...(THEME_PAGE_DESIGNS[theme.id] || []), ...(theme.variantOf ? THEME_PAGE_DESIGNS[theme.variantOf] || [] : [])] : [];
+  const designBlocks = (design, pageTitle) => design.sections.flatMap((key) => {
+    if (key === 'header') { const b = newBlock('pageHeader', design.style); b.data.title = pageTitle; b.data.subtitle = ''; return [b]; }
+    const sec = findSection(key);
+    return sec ? instantiateSection(sec, design.style) : [];
+  });
 
   const create = async (e) => {
     e.preventDefault();
     if (!title.trim()) { toast.error('Give your page a title'); return; }
     setLoading(true);
     try {
+      const design = template.startsWith('design:') && designs.find((x) => `design:${x.key}` === template);
       const t = PAGE_TEMPLATES[template];
-      const blocks = t.blocks.map((type) => newBlock(type, t.style));
-      if (blocks[0]?.type === 'pageHeader') blocks[0].data.title = title;
+      const blocks = design ? designBlocks(design, title) : t.blocks.map((type) => newBlock(type, t.style));
+      if (!design && blocks[0]?.type === 'pageHeader') blocks[0].data.title = title;
       const page = await api.post('/admin/pages', { title, blocks, template: template === 'landing' ? 'landing' : 'default' });
       router.replace(`/admin/pages/${page.id}`);
     } catch (err) {
@@ -41,6 +52,31 @@ export default function NewPage() {
       <form onSubmit={create} className="mt-8 space-y-8">
         <input autoFocus value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Page title, e.g. “Our services”" className="a-input h-14 text-lg font-semibold" />
 
+        {!!designs.length && (
+          <div>
+            <h2 className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-ink-500"><LayoutTemplate className="h-4 w-4 text-brand-500" />Designed for {theme.name}</h2>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {designs.map((x) => {
+                const key = `design:${x.key}`;
+                const secs = x.sections.map((k) => (k === 'header' ? null : findSection(k))).filter(Boolean);
+                const imgs = secs.map(sectionThumb).filter(Boolean).slice(0, 3);
+                return (
+                  <button type="button" key={key} onClick={() => setTemplate(key)} className={cn('group relative overflow-hidden rounded-2xl border-2 bg-white text-left transition hover:-translate-y-0.5 dark:bg-ink-900', template === key ? 'border-brand-500 shadow-brand-glow' : 'border-ink-200 hover:border-brand-300 dark:border-white/10')}>
+                    {template === key && <span className="absolute right-3 top-3 z-10 grid h-6 w-6 place-items-center rounded-full bg-brand-500 text-white"><Check className="h-3.5 w-3.5" /></span>}
+                    <div className="grid h-28 grid-cols-3 grid-rows-1 gap-0.5 overflow-hidden bg-gradient-to-br from-brand-100 to-fuchsia-100 dark:from-brand-500/20 dark:to-fuchsia-500/20">
+                      {imgs.map((src, i) => <img key={i} src={src} alt="" className={cn('h-full min-h-0 w-full object-cover', imgs.length === 1 && 'col-span-3', imgs.length === 2 && i === 0 && 'col-span-2')} />)}
+                    </div>
+                    <div className="p-4">
+                      <div className="font-bold text-ink-900 dark:text-white">{x.label}</div>
+                      <div className="mt-1 line-clamp-2 text-xs text-ink-400">{secs.map((sc) => sc.name).join(' · ')}</div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+            <h2 className="mb-3 mt-8 text-sm font-bold uppercase tracking-wider text-ink-500">General templates</h2>
+          </div>
+        )}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Object.entries(PAGE_TEMPLATES).map(([key, t]) => (
             <button

@@ -16,7 +16,7 @@ module.exports = {
   name: 'Marquee',
   category: 'Streaming service',
   description: 'A cinematic dark streaming experience: billboard hero, Top 10, poster rows, shows with seasons and episodes.',
-  features: { formats: ['VIDEO'], series: ['SHOW'], blocks: ['Video', 'Headers', 'Content', 'Media', 'Layout'] },
+  features: { formats: ['VIDEO'], series: ['SHOW'], blocks: ['Video', 'Headers', 'Interactive', 'Content', 'Media', 'Layout'] },
   layout: { header: 'streaming', article: 'blog', listing: 'video' },
   general: { siteName: 'Marquee', tagline: 'Unlimited originals. Watch anywhere.' },
   appearance: {

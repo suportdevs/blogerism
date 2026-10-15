@@ -23,7 +23,7 @@ module.exports = {
   name: 'Nova',
   category: 'Business & blog',
   description: 'A polished company website with a landing page, pricing, testimonials and a modern blog.',
-  features: { formats: ['STANDARD', 'GALLERY'], series: [], blocks: ['Headers', 'Content', 'Media', 'Dynamic', 'Conversion', 'Layout'] },
+  features: { formats: ['STANDARD', 'GALLERY'], series: [], blocks: ['Headers', 'Interactive', 'Content', 'Media', 'Dynamic', 'Conversion', 'Layout'] },
   layout: { header: 'default', article: 'blog', listing: 'cards' },
   general: { siteName: 'Nova CMS', tagline: 'Build beautiful websites, faster.' },
   appearance: {

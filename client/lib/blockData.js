@@ -46,6 +46,8 @@ export function blockQueries(block) {
       return [[id, d.source === 'series' ? seriesPath(d) : postsPath(d)]];
     case 'luxeFeatured':
       return [[id, postsPath({ ...d, count: Number(d.count) || 5 })]];
+    case 'episodeSpotlight':
+      return [[id, postsPath({ ...d, count: Math.max(1, Number(d.count) || 4) })]];
     case 'billboard':
       return [[id, seriesPath({ seriesType: d.series ? '' : d.seriesType, count: 50 })]];
     case 'top10':

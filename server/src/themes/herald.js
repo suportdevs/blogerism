@@ -28,7 +28,7 @@ module.exports = {
   name: 'Herald',
   category: 'News portal',
   description: 'A newspaper-style portal with a masthead, breaking ticker, section fronts, most-read rankings and video stories.',
-  features: { formats: ['STANDARD', 'GALLERY', 'VIDEO'], series: [], blocks: ['News', 'Headers', 'Content', 'Media', 'Video', 'Conversion', 'Layout'] },
+  features: { formats: ['STANDARD', 'GALLERY', 'VIDEO'], series: [], blocks: ['News', 'Headers', 'Interactive', 'Content', 'Media', 'Video', 'Conversion', 'Layout'] },
   layout: { header: 'masthead', article: 'news', listing: 'news' },
   general: { siteName: 'The Herald', tagline: 'Independent news, every hour.', postsPerPage: 12 },
   appearance: {

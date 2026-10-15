@@ -13,7 +13,7 @@ module.exports = {
   name: 'Vidora',
   category: 'Video sharing',
   description: 'A video-sharing platform with a sidebar, search-first header, recommended grid, trending and playlists.',
-  features: { formats: ['VIDEO'], series: ['PLAYLIST'], blocks: ['Video', 'Headers', 'Content', 'Media', 'Layout'] },
+  features: { formats: ['VIDEO'], series: ['PLAYLIST'], blocks: ['Video', 'Headers', 'Interactive', 'Content', 'Media', 'Layout'] },
   layout: { header: 'video', article: 'blog', listing: 'video' },
   general: { siteName: 'Vidora', tagline: 'Watch, share and discover great videos.', postsPerPage: 16 },
   appearance: {

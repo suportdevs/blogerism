@@ -27,7 +27,7 @@ module.exports = {
   name: 'Lens',
   category: 'Photography & studio',
   description: 'A cinematic, minimal studio site: Ken Burns slideshow, giant scrolling type, filterable masonry gallery with lightbox.',
-  features: { formats: ['STANDARD', 'GALLERY'], series: [], blocks: ['Headers', 'Media', 'Content', 'Conversion', 'Layout'] },
+  features: { formats: ['STANDARD', 'GALLERY'], series: [], blocks: ['Headers', 'Interactive', 'Media', 'Content', 'Conversion', 'Layout'] },
   layout: { header: 'minimal', article: 'blog', listing: 'cards' },
   general: { siteName: 'Lens Studio', tagline: 'Photography by Aria Lens' },
   contact: { email: 'studio@lens.example', phone: '+44 20 7946 0000', address: 'Shoreditch, London', workingHours: 'By appointment' },

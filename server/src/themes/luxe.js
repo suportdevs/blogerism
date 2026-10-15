@@ -28,6 +28,7 @@ function variant(base, overrides) {
     ...rest,
     variantOf: base.id,
     variantName: 'Luxe',
+    features: { ...base.features, blocks: ['Luxury', ...base.features.blocks] },
     layout: { ...base.layout, header: 'luxe', style: 'luxe', ...(layout || {}) },
     pages: () => [home(), ...base.pages().filter((p) => !p.home)],
     demo: base.demo,

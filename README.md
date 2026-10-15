@@ -82,6 +82,14 @@ Seed straight into a theme: `node prisma/seed.js herald` (or `nova`, `vidora`, `
 
 Themes live in `server/src/themes/*.js` — copy one to create your own (layout keys: `header` = `default | masthead | video | streaming | portfolio | overlay | minimal`, `article` = `blog | news`, `listing` = `cards | news | video | audio`).
 
+### Theme sections & page designs
+
+Every theme (and each Luxe version) ships a library of **designed sections**: ready-made, theme-specific sections with their own content, imagery and styling (e.g. Herald: columnists, election countdown, editorial standards; Marquee: coming-soon countdown, cast & crew, plan comparison; Waveform: latest episode, hosts, sponsorship packages). In the page builder open the **Sections** tab and click (or drag) a section in, then edit it like any block. Use the dropdown to browse other themes' sections. **New page** also offers complete page designs built from the active theme's sections.
+
+They are built on twelve interactive blocks (category *Interactive*): team, process steps, feature tabs, comparison table, before/after slider, accordion + image, logo wall, video lightbox, card carousel, careers/jobs, countdown and episode spotlight. Each has several design variants.
+
+Sections are defined in `client/lib/sections.js` (`THEME_SECTIONS`, `THEME_PAGE_DESIGNS`), so adding one means adding an entry there.
+
 ### Content formats
 
 Each post has a **format** (Article, Video, Audio, Gallery) that picks its page layout:

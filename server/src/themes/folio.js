@@ -15,7 +15,7 @@ module.exports = {
   name: 'Folio',
   category: 'Personal portfolio',
   description: 'A bold one-page portfolio for developers & creatives: animated hero, skills, experience timeline, projects and contact.',
-  features: { formats: ['STANDARD'], series: [], blocks: ['Portfolio', 'Headers', 'Content', 'Media', 'Conversion', 'Layout'] },
+  features: { formats: ['STANDARD'], series: [], blocks: ['Portfolio', 'Headers', 'Interactive', 'Content', 'Media', 'Conversion', 'Layout'] },
   layout: { header: 'portfolio', article: 'blog', listing: 'cards' },
   general: { siteName: PROFILE.name, tagline: 'Full Stack Web Developer' },
   contact: { email: PROFILE.email, phone: PROFILE.phone, address: PROFILE.location, workingHours: 'Sun – Thu, 10:00 – 19:00 (GMT+6)' },
