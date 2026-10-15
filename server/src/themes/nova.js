@@ -34,7 +34,38 @@ module.exports = {
     announcement: { enabled: true, text: 'Nova CMS 1.0 is here — fully customizable, blazing fast.', linkLabel: 'Read more', url: '/blog' },
   },
   menus: {
-    header: { name: 'Main menu', items: [m('Home', '/'), m('Blog', '/blog', [m('Design', '/category/design'), m('Engineering', '/category/engineering'), m('Product', '/category/product'), m('Tutorials', '/category/tutorials')]), m('About', '/about'), m('FAQ', '/faq'), m('Contact', '/contact')] },
+    header: {
+      name: 'Main menu',
+      items: [
+        m('Home', '/'),
+        // Mega menu: level 2 = columns, level 3 = links.
+        m('Product', '#', [
+          m('Platform', '#', [
+            m('Page builder', '/about', [], { icon: 'LayoutGrid', description: 'Design pages visually with 60+ blocks' }),
+            m('Media library', '/about', [], { icon: 'Image', description: 'Folders, search and alt text' }),
+            m('SEO tools', '/about', [], { icon: 'Search', description: 'Meta tags, sitemap and RSS built in' }),
+          ]),
+          m('Learn', '#', [
+            m('Tutorials', '/category/tutorials', [], { icon: 'BookOpen', description: 'Step-by-step guides' }),
+            m('Engineering', '/category/engineering', [], { icon: 'Code2', description: 'How Nova is built' }),
+            m('FAQ', '/faq', [], { icon: 'Lightbulb', description: 'Answers to common questions' }),
+          ]),
+          m('Company', '#', [
+            m('About us', '/about', [], { icon: 'Users', description: 'The team behind Nova' }),
+            m('Careers', '/about', [], { icon: 'Briefcase', description: 'Join a remote-first team', badge: 'Hiring' }),
+            m('Contact', '/contact', [], { icon: 'Mail', description: 'We reply within a day' }),
+          ]),
+        ], { mega: true, image: pic('nova-mega', 800, 600), description: 'Everything you need to build and run a modern website.' }),
+        // Classic 3-level dropdown.
+        m('Blog', '/blog', [
+          m('Latest articles', '/blog', [], { icon: 'Newspaper' }),
+          m('Categories', '#', [m('Design', '/category/design'), m('Engineering', '/category/engineering'), m('Product', '/category/product'), m('Tutorials', '/category/tutorials')], { icon: 'Layers' }),
+          m('Reading list', '/saved', [], { icon: 'Heart' }),
+        ]),
+        m('About', '/about'),
+        m('Contact', '/contact'),
+      ],
+    },
     footer: { name: 'Company', items: [m('About', '/about'), m('Blog', '/blog'), m('Contact', '/contact'), m('Privacy', '/privacy-policy')] },
     'footer-2': { name: 'Resources', items: [m('Tutorials', '/category/tutorials'), m('Engineering', '/category/engineering'), m('FAQ', '/faq'), m('Sitemap', '/sitemap.xml')] },
   },

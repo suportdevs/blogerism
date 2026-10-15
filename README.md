@@ -90,6 +90,16 @@ They are built on twelve interactive blocks (category *Interactive*): team, proc
 
 Sections are defined in `client/lib/sections.js` (`THEME_SECTIONS`, `THEME_PAGE_DESIGNS`), so adding one means adding an entry there.
 
+### Menus: 3 levels, mega menus, drag & drop
+
+In **Admin → Menus**, drag an item by its handle to reorder it, and drag it left or right to change its level. A menu can be up to three levels deep, and sub-items move with their parent. You can also drag pages, categories and custom links in from the left panel, or click + to add them. Each item can have a description, icon and badge (for example *New*). These show in dropdowns and mega menus.
+
+- **Dropdowns**: level 2 opens below the top item, and level 3 opens to the side.
+- **Mega menu**: switch it on for a top-level item. Its level-2 items become columns (use `#` as the URL for a plain heading), level-3 items become the links inside them, and an optional promo image shows as a feature card.
+- **Mobile**: menus become a three-level accordion.
+
+This works in every theme's header. The Nova and Herald default menus include examples, which are applied when you set up the theme or import its demo.
+
 ### Reader engagement
 
 Every theme gets likes, comments, sharing, saving and following. Each feature can be switched off in **Settings → Engagement**.

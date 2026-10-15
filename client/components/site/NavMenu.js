@@ -189,7 +189,8 @@ export function MobileNavTree({ items, onNavigate, size = 'md', className }) {
 
 function MobileNode({ item, depth, pathname, onNavigate, size }) {
   const contains = (it) => isActive(pathname, it.url) || (it.children || []).some(contains);
-  const [open, setOpen] = useState(() => depth > 0 || (hasKids(item) && (item.children || []).some(contains)));
+  // Branches start closed unless the current page is inside them.
+  const [open, setOpen] = useState(() => hasKids(item) && (item.children || []).some(contains));
   const kids = hasKids(item);
   const active = isActive(pathname, item.url);
   const text = depth === 0 ? (size === 'lg' ? 'font-heading text-3xl' : 'font-semibold') : depth === 1 ? 'text-[15px] font-medium' : 'text-sm';

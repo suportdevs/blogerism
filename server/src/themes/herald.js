@@ -39,7 +39,24 @@ module.exports = {
     announcement: { enabled: false, text: '', linkLabel: '', url: '' },
   },
   menus: {
-    header: { name: 'Sections', items: [m('Home', '/'), ...sections.map((s) => m(s, `/category/${slug(s)}`)), m('Video', '/category/video')] },
+    header: {
+      name: 'Sections',
+      items: [
+        m('Home', '/'),
+        ...sections.slice(0, 5).map((s) => m(s, `/category/${slug(s)}`)),
+        m('Video', '/category/video'),
+        // News-site style "More" mega menu with every section.
+        m('More', '#', [
+          m('News', '#', ['World', 'Politics', 'Business'].map((s) => m(s, `/category/${slug(s)}`))),
+          m('Life', '#', ['Technology', 'Entertainment', 'Health', 'Sports'].map((s) => m(s, `/category/${slug(s)}`))),
+          m('Watch & read', '#', [
+            m('Video', '/category/video', [], { icon: 'Video', description: 'Reports and explainers' }),
+            m('Saved stories', '/saved', [], { icon: 'Newspaper', description: 'Your reading list' }),
+          ]),
+          m('The Herald', '#', [m('About us', '/about'), m('Contact', '/contact'), m('FAQ', '/faq')]),
+        ], { mega: true, image: pic('herald-mega', 800, 600), description: 'Independent news, every hour.' }),
+      ],
+    },
     footer: { name: 'Sections', items: sections.map((s) => m(s, `/category/${slug(s)}`)) },
     'footer-2': { name: 'The Herald', items: [m('About us', '/about'), m('Contact', '/contact'), m('FAQ', '/faq'), m('Privacy', '/privacy-policy')] },
   },
