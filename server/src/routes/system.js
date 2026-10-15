@@ -15,7 +15,7 @@ router.get('/dashboard', asyncHandler(async (_req, res) => {
   since.setDate(since.getDate() - 29);
   since.setHours(0, 0, 0, 0);
 
-  const [posts, published, pages, users, media, unread, subscribers, views, topPosts, recentPosts, recentMessages, recentActivity, postsByDay, subsByDay, categories] =
+  const [posts, published, pages, users, media, unread, subscribers, views, comments, pendingComments, topPosts, recentPosts, recentMessages, recentActivity, postsByDay, subsByDay, categories] =
     await Promise.all([
       prisma.post.count(),
       prisma.post.count({ where: { status: 'PUBLISHED' } }),
@@ -24,7 +24,9 @@ router.get('/dashboard', asyncHandler(async (_req, res) => {
       prisma.media.count(),
       prisma.contactMessage.count({ where: { status: 'UNREAD' } }),
       prisma.subscriber.count({ where: { isActive: true } }),
-      prisma.post.aggregate({ _sum: { views: true } }),
+      prisma.post.aggregate({ _sum: { views: true, likes: true } }),
+      prisma.comment.count({ where: { status: 'APPROVED' } }),
+      prisma.comment.count({ where: { status: 'PENDING' } }),
       prisma.post.findMany({ where: { status: 'PUBLISHED' }, orderBy: { views: 'desc' }, take: 5, select: { id: true, title: true, slug: true, views: true, coverImage: true } }),
       prisma.post.findMany({ orderBy: { createdAt: 'desc' }, take: 5, select: { id: true, title: true, status: true, createdAt: true, author: { select: { name: true } } } }),
       prisma.contactMessage.findMany({ orderBy: { createdAt: 'desc' }, take: 5 }),
@@ -45,7 +47,7 @@ router.get('/dashboard', asyncHandler(async (_req, res) => {
   });
 
   res.json({
-    stats: { posts, published, drafts: posts - published, pages, users, media, unread, subscribers, views: views._sum.views || 0 },
+    stats: { posts, published, drafts: posts - published, pages, users, media, unread, subscribers, views: views._sum.views || 0, likes: views._sum.likes || 0, comments, pendingComments },
     timeline,
     categories: categories.map((c) => ({ name: c.name, color: c.color, value: c._count.posts })),
     topPosts,

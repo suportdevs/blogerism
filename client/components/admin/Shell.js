@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   Activity, Bell, ChevronsLeft, ExternalLink, FileText, FolderTree, HelpCircle, Image as ImageIcon, Inbox, LayoutDashboard,
   LogOut, Mail, Menu as MenuIcon, MessageSquareQuote, Moon, Newspaper, Palette, Search, Settings, ShieldCheck, Sun, Tags,
-  UserCircle, Users, X, Command, Plus, CornerDownLeft, Clapperboard, Brush, PackageOpen,
+  UserCircle, Users, X, Command, Plus, CornerDownLeft, Clapperboard, Brush, PackageOpen, MessagesSquare,
 } from 'lucide-react';
 import { useAuth } from './AuthProvider';
 import { useSiteTheme } from './SiteTheme';
@@ -32,6 +32,7 @@ export const NAV = [
   ] },
   { group: 'Engagement', items: [
     { href: '/admin/contacts', label: 'Messages', icon: Inbox, perm: 'contacts', badge: 'unread' },
+    { href: '/admin/comments', label: 'Comments', icon: MessagesSquare, perm: 'comments', badge: 'pending' },
     { href: '/admin/newsletter', label: 'Newsletter', icon: Mail, perm: 'newsletter' },
     { href: '/admin/testimonials', label: 'Testimonials', icon: MessageSquareQuote, perm: 'testimonials' },
     { href: '/admin/faqs', label: 'FAQs', icon: HelpCircle, perm: 'faqs' },
@@ -53,7 +54,7 @@ export function toggleAdminTheme() {
   try { localStorage.setItem('admin-theme', dark ? 'dark' : 'light'); } catch {}
 }
 
-function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen, unread }) {
+function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen, unread, pending }) {
   const pathname = usePathname();
   const { can } = useAuth();
   const { theme, usesSeries } = useSiteTheme();
@@ -103,6 +104,9 @@ function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen, unread })
                         {active && <span className="absolute -left-3 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-brand-400 shadow-[0_0_12px_2px_rgb(138_119_255/.6)]" />}
                         <item.icon className={cn('h-[18px] w-[18px] shrink-0', active ? 'text-brand-300' : 'text-ink-500 group-hover:text-ink-300')} />
                         <span className={cn('truncate', collapsed && 'lg:hidden')}>{item.label}</span>
+                        {item.badge === 'pending' && pending > 0 && (
+                          <span className={cn('ml-auto rounded-full bg-amber-500 px-1.5 py-0.5 text-[10px] font-bold text-white', collapsed && 'lg:absolute lg:right-1 lg:top-0.5')}>{pending}</span>
+                        )}
                         {item.badge === 'unread' && unread > 0 && (
                           <span className={cn('ml-auto rounded-full bg-brand-500 px-1.5 py-0.5 text-[10px] font-bold text-white', collapsed && 'lg:absolute lg:right-1 lg:top-0.5')}>{unread}</span>
                         )}
@@ -207,6 +211,7 @@ export default function Shell({ children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [unread, setUnread] = useState(0);
+  const [pending, setPending] = useState(0);
   const pathname = usePathname();
   const { can } = useAuth();
 
@@ -218,6 +223,11 @@ export default function Shell({ children }) {
   useEffect(() => {
     if (!can('contacts')) return;
     api.get('/admin/contacts', { status: 'UNREAD', limit: 1 }).then((r) => setUnread(r.meta.total)).catch(() => {});
+  }, [pathname, can]);
+
+  useEffect(() => {
+    if (!can('comments')) return;
+    api.get('/admin/comments/pending-count').then((r) => setPending(r.count)).catch(() => {});
   }, [pathname, can]);
 
   useEffect(() => {
@@ -233,7 +243,7 @@ export default function Shell({ children }) {
 
   return (
     <div className="min-h-screen bg-ink-50 font-admin text-ink-800 dark:bg-ink-950 dark:text-ink-200">
-      <Sidebar collapsed={collapsed} setCollapsed={setCollapsedPersist} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} unread={unread} />
+      <Sidebar collapsed={collapsed} setCollapsed={setCollapsedPersist} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} unread={unread} pending={pending} />
       <div className={cn('transition-all duration-300', collapsed ? 'lg:pl-[76px]' : 'lg:pl-[264px]')}>
         <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-ink-200/60 bg-white/75 px-4 backdrop-blur-xl dark:border-white/5 dark:bg-ink-950/75 sm:px-6">
           <button onClick={() => setMobileOpen(true)} className="a-btn-ghost a-btn-icon lg:hidden"><MenuIcon className="h-5 w-5" /></button>

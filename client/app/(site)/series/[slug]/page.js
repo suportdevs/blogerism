@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { Film, Play } from 'lucide-react';
-import { fetchPublic } from '@/lib/server';
+import { fetchPublic, getBootstrap } from '@/lib/server';
+import { engagementOf, followLabels, saveLabels } from '@/lib/engagement';
+import { SaveButton, ShareButton, SubscribeButton } from '@/components/site/Engagement';
 import { compact, formatDuration, postUrl } from '@/lib/utils';
 import { PlayButton } from '@/components/site/AudioPlayer';
 import { AudioRow, Thumb, postsToTracks } from '@/components/site/MediaCards';
@@ -29,8 +31,17 @@ function Meta({ series, episodes }) {
 }
 
 export default async function SeriesPage({ params }) {
-  const { series, episodes } = await fetchPublic(`/series/${params.slug}`);
+  const [{ series, episodes }, { settings, theme }] = await Promise.all([fetchPublic(`/series/${params.slug}`, { revalidate: 0 }), getBootstrap()]);
   const first = episodes[0];
+  const engagement = engagementOf(settings);
+  // Follow / subscribe, save (My List…) and share for the series.
+  const actions = (dark) => (
+    <div className="flex flex-wrap items-center gap-3">
+      {engagement.subscriptions && <SubscribeButton series={series} labels={followLabels(series.type)} initial={series.subscribers} dark={dark} />}
+      {engagement.saves && <SaveButton item={{ type: 'series', slug: series.slug, title: series.title }} labels={saveLabels(theme)} iconOnly={series.type !== 'SHOW'} variant="pill" />}
+      {engagement.share && <ShareButton title={series.title} variant="icon" />}
+    </div>
+  );
 
   /* ---------------- Podcast ---------------- */
   if (series.type === 'PODCAST') {
@@ -49,6 +60,7 @@ export default async function SeriesPage({ params }) {
               {series.tagline && <p className="mt-3 text-xl text-fg/70">{series.tagline}</p>}
               <div className="mt-4"><Meta series={series} episodes={episodes} /></div>
               {series.description && <p className="mt-4 max-w-2xl text-fg/65">{series.description}</p>}
+              <div className="mt-6">{actions(false)}</div>
               {tracks.length > 0 && (
                 <div className="mt-7 flex flex-wrap gap-3">
                   <PlayButton tracks={[...tracks].reverse()} label="Play latest" className="!px-7 !py-3.5" />
@@ -79,6 +91,7 @@ export default async function SeriesPage({ params }) {
             {series.tagline && <p className="mt-1 text-fg/65">{series.tagline}</p>}
             <div className="mt-3"><Meta series={series} episodes={episodes} /></div>
             {first && <Link href={postUrl(first)} className="btn-site-primary mt-5 w-full"><Play className="h-4 w-4 fill-current" />Play all</Link>}
+            <div className="mt-4">{actions(false)}</div>
           </div>
         </aside>
         <div className="divide-y divide-fg/10">
@@ -116,6 +129,7 @@ export default async function SeriesPage({ params }) {
               {first && <Link href={postUrl(first)} className="btn-site bg-white px-7 text-black hover:bg-white/85"><Play className="h-5 w-5 fill-current" />Play S{first.season || 1}:E{first.episode || 1}</Link>}
               {series.trailerUrl && <a href={series.trailerUrl} target="_blank" rel="noreferrer" className="btn-site bg-white/15 px-6 text-white backdrop-blur hover:bg-white/25"><Film className="h-5 w-5" />Trailer</a>}
             </div>
+            <div className="mt-5">{actions(true)}</div>
           </div>
         </div>
       </section>

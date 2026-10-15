@@ -7,6 +7,8 @@ import { ReadingProgress } from '@/components/site/Extras';
 import { NewsletterForm } from '@/components/site/forms';
 import { ListenView, LuxeArticleView, NewsArticleView, WatchView } from '@/components/site/PostViews';
 import { Kicker } from '@/components/site/MediaCards';
+import { Comments, PostActions, TextSizer } from '@/components/site/Engagement';
+import { engagementOf, saveLabels } from '@/lib/engagement';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
@@ -41,12 +43,15 @@ export default async function PostPage({ params }) {
     fetchPublic(`/posts/${params.slug}`, { revalidate: 0 }),
     getBootstrap(),
   ]);
-  if (post.format === 'VIDEO') return <WatchView post={post} episodes={episodes} upNext={upNext} />;
-  if (post.format === 'AUDIO') return <ListenView post={post} episodes={episodes} upNext={upNext} />;
-  if (theme?.layout?.article === 'luxe') return <LuxeArticleView post={post} related={related} />;
+  const engagement = engagementOf(settings);
+  const labels = saveLabels(theme);
+  const ui = { engagement, labels };
+  if (post.format === 'VIDEO') return <WatchView post={post} episodes={episodes} upNext={upNext} {...ui} />;
+  if (post.format === 'AUDIO') return <ListenView post={post} episodes={episodes} upNext={upNext} {...ui} />;
+  if (theme?.layout?.article === 'luxe') return <LuxeArticleView post={post} related={related} {...ui} />;
   if (theme?.layout?.article === 'news') {
     const popular = await fetchPublic(`/posts?sort=popular&limit=5&format=STANDARD&exclude=${post.id}`);
-    return <NewsArticleView post={post} related={related.slice(0, 4)} more={popular.items} />;
+    return <NewsArticleView post={post} related={related.slice(0, 4)} more={popular.items} {...ui} />;
   }
   const { html, toc } = withToc(post.content);
   const url = `${SITE_URL}/blog/${post.slug}`;
@@ -85,6 +90,7 @@ export default async function PostPage({ params }) {
             {a.showReadingTime && <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" />{post.readingTime} min read</span>}
             <span className="flex items-center gap-1.5"><Eye className="h-4 w-4" />{compact(post.views + 1)} views</span>
           </div>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3"><PostActions post={post} {...ui} /><TextSizer /></div>
         </div>
         {post.coverImage && (
           <div className="site-container max-w-6xl">
@@ -106,6 +112,7 @@ export default async function PostPage({ params }) {
             </div>
           )}
           <div
+            style={{ fontSize: 'calc(1.125rem * var(--reader-scale, 1))' }}
             className="prose prose-lg max-w-none prose-headings:scroll-mt-28 prose-headings:font-heading prose-headings:tracking-tight prose-headings:text-fg prose-p:text-fg/80 prose-a:text-primary prose-blockquote:rounded-r-theme prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:py-1 prose-blockquote:text-fg/80 prose-strong:text-fg prose-code:text-primary prose-li:text-fg/80 prose-img:rounded-theme"
             dangerouslySetInnerHTML={{ __html: html }}
           />
@@ -127,6 +134,8 @@ export default async function PostPage({ params }) {
             </div>
           )}
 
+          <PostActions post={post} {...ui} className="mt-10 justify-center rounded-theme-lg border border-fg/10 bg-surface p-4" />
+
           <nav className="mt-10 grid gap-4 sm:grid-cols-2">
             {prev ? (
               <Link href={`/blog/${prev.slug}`} className="group rounded-theme border border-fg/10 p-5 transition hover:border-primary">
@@ -141,6 +150,8 @@ export default async function PostPage({ params }) {
               </Link>
             )}
           </nav>
+
+          {engagement.comments && <Comments slug={post.slug} />}
         </div>
 
         <aside className="hidden lg:block">

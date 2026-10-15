@@ -61,7 +61,7 @@ export default function Dashboard() {
           <div>
             <p className="text-sm font-semibold text-brand-300">{formatDate(new Date(), { weekday: 'long', month: 'long', day: 'numeric' })}</p>
             <h1 className="mt-1 text-3xl font-extrabold tracking-tight sm:text-4xl">{greeting}, {user.name.split(' ')[0]} ✨</h1>
-            <p className="mt-2 max-w-lg text-ink-300">Your content got <b className="text-white">{compact(stats.views)}</b> views in total. You have <b className="text-white">{stats.unread}</b> unread message{stats.unread === 1 ? '' : 's'} and <b className="text-white">{stats.drafts}</b> draft{stats.drafts === 1 ? '' : 's'} waiting.</p>
+            <p className="mt-2 max-w-lg text-ink-300">Your content got <b className="text-white">{compact(stats.views)}</b> views in total. You have <b className="text-white">{stats.unread}</b> unread message{stats.unread === 1 ? '' : 's'}, <b className="text-white">{stats.drafts}</b> draft{stats.drafts === 1 ? '' : 's'} and <b className="text-white">{stats.pendingComments || 0}</b> comment{stats.pendingComments === 1 ? '' : 's'} waiting.</p>
           </div>
           <div className="flex flex-wrap gap-2">
             {quick.map((q) => (
@@ -75,7 +75,7 @@ export default function Dashboard() {
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard href="/admin/posts" icon={Newspaper} label="Posts" value={stats.posts} sub={`${stats.published} published`} gradient="bg-gradient-to-br from-brand-400 to-brand-600" />
-        <StatCard href="/admin/posts" icon={Eye} label="Total views" value={compact(stats.views)} sub="all time" gradient="bg-gradient-to-br from-sky-400 to-blue-600" />
+        <StatCard href="/admin/comments?status=APPROVED" icon={Eye} label="Total views" value={compact(stats.views)} sub={`${compact(stats.likes || 0)} likes · ${compact(stats.comments || 0)} comments`} gradient="bg-gradient-to-br from-sky-400 to-blue-600" />
         <StatCard href="/admin/newsletter" icon={Mail} label="Subscribers" value={stats.subscribers} sub="active" gradient="bg-gradient-to-br from-emerald-400 to-teal-600" />
         <StatCard href="/admin/contacts" icon={Inbox} label="Unread messages" value={stats.unread} sub={`${stats.pages} pages · ${stats.users} users`} gradient="bg-gradient-to-br from-amber-400 to-orange-600" />
       </div>

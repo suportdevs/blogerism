@@ -28,6 +28,12 @@ enum SeriesType {
   PODCAST
 }
 
+enum CommentStatus {
+  PENDING
+  APPROVED
+  SPAM
+}
+
 enum MessageStatus {
   UNREAD
   READ
@@ -58,6 +64,7 @@ model User {
   role        Role          @relation(fields: [roleId], references: [id])
   posts       Post[]
   activities  ActivityLog[]
+  comments    Comment[]
   lastLoginAt DateTime?
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
@@ -91,6 +98,7 @@ model Post {
   author         User?         @relation(fields: [authorId], references: [id], onDelete: SetNull)
   categories     Category[]
   tags           Tag[]
+  comments       Comment[]
   seoTitle       String?
   seoDescription String?
   publishedAt    DateTime?
@@ -119,6 +127,7 @@ model Series {
   featured    Boolean       @default(false)
   status      ContentStatus @default(PUBLISHED)
   order       Int           @default(0)
+  subscribers Int           @default(0)
   posts       Post[]
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
@@ -201,6 +210,12 @@ model MenuItem {
   label    String
   url      String
   target   String     @default("_self")
+  // Optional extras shown in dropdowns and mega menus.
+  description String?
+  icon        String?
+  badge       String?
+  image       String?
+  mega        Boolean    @default(false) // top-level item opens a full-width mega menu
   order    Int        @default(0)
   parentId Int?
   parent   MenuItem?  @relation("MenuTree", fields: [parentId], references: [id], onDelete: Cascade)
@@ -211,6 +226,28 @@ model Setting {
   key       String   @id
   value     Json
   updatedAt DateTime @updatedAt
+}
+
+// Reader comments on posts. Replies point at their parent; staff replies are linked to a user.
+model Comment {
+  id        Int           @id @default(autoincrement())
+  postId    Int
+  post      Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
+  parentId  Int?
+  parent    Comment?      @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[]     @relation("CommentReplies")
+  userId    Int?
+  user      User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  name      String
+  email     String
+  content   String
+  status    CommentStatus @default(PENDING)
+  likes     Int           @default(0)
+  ip        String?
+  createdAt DateTime      @default(now())
+
+  @@index([postId, status])
+  @@index([status])
 }
 
 model ContactMessage {

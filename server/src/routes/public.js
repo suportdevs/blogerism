@@ -9,6 +9,9 @@ const { publicTheme } = require('../themes');
 
 // Unauthenticated endpoints consumed by the Next.js storefront.
 const router = express.Router();
+// Likes, follows and comment likes: generous, but stops scripted inflation.
+const reactLimiter = rateLimit({ windowMs: 10 * 60 * 1000, limit: 120, standardHeaders: true, legacyHeaders: false, message: { message: 'Slow down a little and try again shortly.' } });
+const commentLimiter = rateLimit({ windowMs: 10 * 60 * 1000, limit: 6, standardHeaders: true, legacyHeaders: false, message: { message: 'You are commenting too quickly. Please wait a few minutes.' } });
 const formLimiter = rateLimit({ windowMs: 10 * 60 * 1000, limit: 10, standardHeaders: true, legacyHeaders: false, message: { message: 'Too many submissions, please try again later.' } });
 
 // Published posts (optionally with a future date) and scheduled posts whose date has passed.
@@ -33,7 +36,7 @@ const SERIES_TYPES = ['SHOW', 'PLAYLIST', 'PODCAST'];
 const episodeOrder = [{ season: 'asc' }, { episode: 'asc' }, { publishedAt: 'asc' }];
 const seriesCard = {
   id: true, title: true, slug: true, type: true, tagline: true, description: true, poster: true, backdrop: true, trailerUrl: true,
-  year: true, maturity: true, genres: true, featured: true,
+  year: true, maturity: true, genres: true, featured: true, subscribers: true,
 };
 
 router.get('/bootstrap', asyncHandler(async (_req, res) => {
@@ -64,6 +67,7 @@ router.get('/posts', asyncHandler(async (req, res) => {
     if (formats.length) where.format = { in: formats };
   }
   if (req.query.series) where.series = { slug: req.query.series };
+  if (req.query.slugs) where.slug = { in: String(req.query.slugs).split(',').slice(0, 100) };
   if (req.query.exclude) where.id = { notIn: String(req.query.exclude).split(',').map(Number).filter(Boolean) };
   if (req.query.q) {
     where.AND = [{ OR: ['title', 'excerpt', 'content'].map((f) => ({ [f]: { contains: req.query.q, mode: 'insensitive' } })) }];
@@ -85,6 +89,7 @@ router.get('/posts/:slug', asyncHandler(async (req, res) => {
       categories: { select: { id: true, name: true, slug: true, color: true } },
       tags: { select: { id: true, name: true, slug: true } },
       series: { select: seriesCard },
+      _count: { select: { comments: { where: { status: 'APPROVED' } } } },
     },
   });
   if (!post) throw new HttpError(404, 'Post not found');
@@ -104,12 +109,90 @@ router.get('/posts/:slug', asyncHandler(async (req, res) => {
     // Media "up next" list for watch/listen pages when the post isn't part of a series.
     post.format !== 'STANDARD' ? prisma.post.findMany({ where: { ...live(), ...sameFormat, id: { not: post.id } }, select: cardSelect, take: 10, orderBy: { publishedAt: 'desc' } }) : [],
   ]);
-  res.json({ post, related, prev, next, episodes, upNext });
+  const { _count, ...rest } = post;
+  res.json({ post: { ...rest, commentCount: _count.comments }, related, prev, next, episodes, upNext });
 }));
 
-router.post('/posts/:slug/like', formLimiter, asyncHandler(async (req, res) => {
-  const post = await prisma.post.update({ where: { slug: req.params.slug }, data: { likes: { increment: 1 } }, select: { likes: true } });
-  res.json(post);
+// Reactions. The browser remembers what a visitor liked/followed; { undo: true } reverses it.
+const counter = async (model, where, field, undo) => {
+  const row = await prisma[model].findFirst({ where, select: { id: true, [field]: true } });
+  if (!row) throw new HttpError(404, 'Not found');
+  if (undo && row[field] <= 0) return { [field]: 0 };
+  return prisma[model].update({ where: { id: row.id }, data: { [field]: undo ? { decrement: 1 } : { increment: 1 } }, select: { [field]: true } });
+};
+
+router.post('/posts/:slug/like', reactLimiter, asyncHandler(async (req, res) => {
+  if (!(await getSettings()).engagement.likes) throw new HttpError(403, 'Likes are turned off.');
+  res.json(await counter('post', { ...live(), slug: req.params.slug }, 'likes', !!req.body?.undo));
+}));
+
+router.post('/series/:slug/subscribe', reactLimiter, asyncHandler(async (req, res) => {
+  if (!(await getSettings()).engagement.subscriptions) throw new HttpError(403, 'Subscriptions are turned off.');
+  res.json(await counter('series', { slug: req.params.slug, status: 'PUBLISHED' }, 'subscribers', !!req.body?.undo));
+}));
+
+/* ------------------------------- Comments ------------------------------- */
+const publicComment = (c) => ({
+  id: c.id, parentId: c.parentId, name: c.user?.name || c.name, avatar: c.user?.avatar || null, content: c.content,
+  likes: c.likes, createdAt: c.createdAt, isStaff: !!c.userId, status: c.status,
+});
+
+router.get('/posts/:slug/comments', asyncHandler(async (req, res) => {
+  const { engagement } = await getSettings();
+  const post = await prisma.post.findFirst({ where: { ...live(), slug: req.params.slug }, select: { id: true, allowComments: true } });
+  if (!post) throw new HttpError(404, 'Post not found');
+  const rows = await prisma.comment.findMany({
+    where: { postId: post.id, status: 'APPROVED' },
+    include: { user: { select: { name: true, avatar: true } } },
+    orderBy: { createdAt: 'asc' },
+  });
+  const all = rows.map(publicComment);
+  const byParent = {};
+  all.forEach((c) => { (byParent[c.parentId || 0] = byParent[c.parentId || 0] || []).push(c); });
+  const nest = (c) => ({ ...c, replies: (byParent[c.id] || []).map(nest) });
+  res.json({
+    items: (byParent[0] || []).map(nest),
+    count: all.length,
+    open: engagement.comments && post.allowComments,
+    replies: engagement.commentReplies,
+    moderated: engagement.moderation,
+  });
+}));
+
+router.post('/posts/:slug/comments', commentLimiter, asyncHandler(async (req, res) => {
+  const { engagement } = await getSettings();
+  const data = z.object({
+    name: z.string().trim().min(2, 'Please enter your name').max(80),
+    email: z.string().trim().email('Please enter a valid email').max(160),
+    content: z.string().trim().min(2, 'Write a comment first').max(3000, 'Comments are limited to 3,000 characters'),
+    parentId: z.number().int().positive().optional().nullable(),
+    website: z.string().optional(), // honeypot: humans never see this field
+  }).parse(req.body);
+  const post = await prisma.post.findFirst({ where: { ...live(), slug: req.params.slug }, select: { id: true, allowComments: true } });
+  if (!post) throw new HttpError(404, 'Post not found');
+  if (!engagement.comments || !post.allowComments) throw new HttpError(403, 'Comments are closed for this post.');
+  if (data.parentId) {
+    if (!engagement.commentReplies) throw new HttpError(403, 'Replies are turned off.');
+    const parent = await prisma.comment.findFirst({ where: { id: data.parentId, postId: post.id, status: 'APPROVED' } });
+    if (!parent) throw new HttpError(400, 'The comment you are replying to no longer exists.');
+  }
+  const pending = { id: 0, parentId: data.parentId || null, name: data.name, avatar: null, content: data.content, likes: 0, createdAt: new Date(), isStaff: false, status: 'PENDING' };
+  if (data.website) return res.status(201).json({ comment: pending, message: 'Thanks! Your comment is awaiting moderation.' }); // bot
+
+  // Link-stuffed comments always wait for a human, even with moderation off.
+  const links = (data.content.match(/https?:\/\//gi) || []).length;
+  const status = engagement.moderation || links > 2 ? 'PENDING' : 'APPROVED';
+  const comment = await prisma.comment.create({
+    data: { postId: post.id, parentId: data.parentId || null, name: data.name, email: data.email.toLowerCase(), content: data.content, status, ip: req.ip },
+  });
+  res.status(201).json({
+    comment: publicComment(comment),
+    message: status === 'APPROVED' ? 'Thanks for joining the conversation!' : 'Thanks! Your comment will appear once it has been approved.',
+  });
+}));
+
+router.post('/comments/:id/like', reactLimiter, asyncHandler(async (req, res) => {
+  res.json(await counter('comment', { id: parseInt(req.params.id, 10) || 0, status: 'APPROVED' }, 'likes', !!req.body?.undo));
 }));
 
 // Series: shows (Netflix-style), playlists (YouTube) and podcasts.
@@ -118,6 +201,7 @@ router.get('/series', asyncHandler(async (req, res) => {
   const where = { status: 'PUBLISHED' };
   if (SERIES_TYPES.includes(req.query.type)) where.type = req.query.type;
   if (req.query.featured === 'true') where.featured = true;
+  if (req.query.slugs) where.slug = { in: String(req.query.slugs).split(',').slice(0, 100) };
   const all = await prisma.series.findMany({
     where,
     select: {

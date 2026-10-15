@@ -3,7 +3,9 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { ArrowRight, ChevronDown, Menu, Moon, Search, Sun, X } from 'lucide-react';
+import { ArrowRight, Menu, Moon, Search, Sun, X } from 'lucide-react';
+import { SavedLink } from './Engagement';
+import { Caret, DesktopNav, MobileNavTree } from './NavMenu';
 import { cn } from '@/lib/utils';
 
 export function Logo({ general, className }) {
@@ -40,9 +42,8 @@ export function ThemeToggle({ className }) {
   );
 }
 
-const isActive = (pathname, url) => (url === '/' ? pathname === '/' : pathname.startsWith(url));
 
-export default function Header({ general, appearance, menu }) {
+export default function Header({ general, appearance, menu, saved }) {
   const pathname = usePathname();
   const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
@@ -70,7 +71,7 @@ export default function Header({ general, appearance, menu }) {
     <header
       className={cn(
         'z-40 w-full transition-all duration-300',
-        appearance.headerSticky && 'sticky top-0',
+        appearance.headerSticky ? 'sticky top-0' : 'relative',
         style === 'solid' && 'border-b border-fg/10 bg-bg',
         style === 'glass' && (scrolled ? 'border-b border-fg/10 bg-bg/70 backdrop-blur-xl' : 'border-b border-transparent bg-transparent'),
         style === 'centered' && 'border-b border-fg/10 bg-bg/80 backdrop-blur-xl',
@@ -79,13 +80,13 @@ export default function Header({ general, appearance, menu }) {
       <div className={cn('site-container flex h-[72px] items-center gap-6', style === 'centered' && 'lg:grid lg:grid-cols-[1fr_auto_1fr]')}>
         {style === 'centered' ? (
           <>
-            <Nav items={items} pathname={pathname} className="hidden lg:flex" />
+            <Nav items={items} className="hidden lg:flex" />
             <Logo general={general} />
           </>
         ) : (
           <>
             <Logo general={general} />
-            <Nav items={items} pathname={pathname} className="mx-auto hidden lg:flex" />
+            <Nav items={items} className="mx-auto hidden lg:flex" />
           </>
         )}
 
@@ -93,6 +94,7 @@ export default function Header({ general, appearance, menu }) {
           <button onClick={() => setSearchOpen((s) => !s)} aria-label="Search" className="grid h-10 w-10 place-items-center rounded-full text-fg/70 transition hover:bg-fg/5 hover:text-fg">
             <Search className="h-[18px] w-[18px]" />
           </button>
+          {saved && <SavedLink label={saved} />}
           <ThemeToggle />
           {cta.enabled && cta.label && (
             <Link href={cta.url || '#'} className="btn-site-primary ml-2 hidden !py-2.5 sm:inline-flex">{cta.label}<ArrowRight className="h-4 w-4" /></Link>
@@ -119,16 +121,7 @@ export default function Header({ general, appearance, menu }) {
             <Logo general={general} />
             <button onClick={() => setOpen(false)} className="grid h-10 w-10 place-items-center rounded-full bg-fg/5 text-fg"><X className="h-5 w-5" /></button>
           </div>
-          <nav className="flex flex-col gap-1 overflow-y-auto">
-            {items.map((item) => (
-              <div key={item.id}>
-                <Link href={item.url} target={item.target} className={cn('block rounded-theme px-4 py-3 font-semibold', isActive(pathname, item.url) ? 'bg-primary/10 text-primary' : 'text-fg hover:bg-fg/5')}>{item.label}</Link>
-                {item.children?.map((c) => (
-                  <Link key={c.id} href={c.url} target={c.target} className="block rounded-theme px-4 py-2 pl-8 text-sm text-fg/65 hover:text-primary">{c.label}</Link>
-                ))}
-              </div>
-            ))}
-          </nav>
+          <nav className="-mx-2 overflow-y-auto"><MobileNavTree items={items} onNavigate={() => setOpen(false)} /></nav>
           {cta.enabled && cta.label && <Link href={cta.url || '#'} className="btn-site-primary mt-auto">{cta.label}</Link>}
         </aside>
       </div>
@@ -136,33 +129,17 @@ export default function Header({ general, appearance, menu }) {
   );
 }
 
-function Nav({ items, pathname, className }) {
+function Nav({ items, className }) {
   return (
-    <nav className={cn('items-center gap-1', className)}>
-      {items.map((item) => (
-        <div key={item.id} className="group relative">
-          <Link
-            href={item.url}
-            target={item.target}
-            className={cn(
-              'flex items-center gap-1 rounded-full px-4 py-2 text-sm font-semibold transition',
-              isActive(pathname, item.url) ? 'bg-primary/10 text-primary' : 'text-fg/70 hover:bg-fg/5 hover:text-fg',
-            )}
-          >
-            {item.label}
-            {item.children?.length > 0 && <ChevronDown className="h-3.5 w-3.5 transition group-hover:rotate-180" />}
-          </Link>
-          {item.children?.length > 0 && (
-            <div className="invisible absolute left-1/2 top-full z-50 w-56 -translate-x-1/2 translate-y-2 pt-3 opacity-0 transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
-              <div className="rounded-theme border border-fg/10 bg-bg p-2 shadow-2xl">
-                {item.children.map((c) => (
-                  <Link key={c.id} href={c.url} target={c.target} className="block rounded-[calc(var(--radius)*0.6)] px-3 py-2.5 text-sm font-medium text-fg/75 transition hover:bg-primary/10 hover:text-primary">{c.label}</Link>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      ))}
-    </nav>
+    <DesktopNav
+      items={items}
+      className={cn('items-center gap-1', className)}
+      megaClassName="pt-3"
+      renderTop={(item, { active, open, hasChildren }) => (
+        <span className={cn('flex cursor-pointer items-center gap-1 rounded-full px-4 py-2 text-sm font-semibold transition', active || open ? 'bg-primary/10 text-primary' : 'text-fg/70 hover:bg-fg/5 hover:text-fg')}>
+          {item.label}{hasChildren && <Caret open={open} />}
+        </span>
+      )}
+    />
   );
 }

@@ -7,6 +7,16 @@ import { cn, formatDuration } from '@/lib/utils';
 
 const AudioContext = createContext(null);
 const SPEEDS = [1, 1.25, 1.5, 2];
+// Listening position per episode, so a visitor can pick up where they left off.
+const POS_KEY = 'nova:audio-positions';
+const positions = () => { try { return JSON.parse(localStorage.getItem(POS_KEY)) || {}; } catch { return {}; } };
+const savePosition = (id, t, d) => {
+  try {
+    const all = positions();
+    if (!d || t < 10 || t > d - 15) delete all[id]; else all[id] = Math.floor(t); // finished or barely started
+    localStorage.setItem(POS_KEY, JSON.stringify(all));
+  } catch {}
+};
 
 
 /*
@@ -22,6 +32,8 @@ export function AudioProvider({ children }) {
   const [time, setTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [speed, setSpeed] = useState(1);
+  const [resumed, setResumed] = useState(0);
+  const lastSave = useRef(0);
   const [showQueue, setShowQueue] = useState(false);
   const current = queue[index];
 
@@ -39,16 +51,33 @@ export function AudioProvider({ children }) {
     if (!el || !current) return;
     el.src = current.src;
     el.playbackRate = speed;
+    const at = positions()[current.id];
+    if (at) { el.currentTime = at; setResumed(at); setTimeout(() => setResumed(0), 4000); }
     el.play().catch(() => setPlaying(false));
+    // Lock-screen / headphone controls.
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.metadata = new window.MediaMetadata({ title: current.title, artist: current.subtitle || '', artwork: current.cover ? [{ src: current.cover, sizes: '512x512' }] : [] });
+    }
   }, [current]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => { if (audio.current) audio.current.playbackRate = speed; }, [speed]);
+  useEffect(() => { try { const v = Number(localStorage.getItem('nova:audio-speed')); if (SPEEDS.includes(v)) setSpeed(v); } catch {} }, []);
+  useEffect(() => {
+    if (audio.current) audio.current.playbackRate = speed;
+    try { localStorage.setItem('nova:audio-speed', String(speed)); } catch {}
+  }, [speed]);
 
   const toggle = () => (audio.current.paused ? audio.current.play() : audio.current.pause());
   const skip = (s) => { audio.current.currentTime = Math.max(0, Math.min(duration, audio.current.currentTime + s)); };
   const next = () => index < queue.length - 1 && setIndex(index + 1);
   const prev = () => (time > 5 ? (audio.current.currentTime = 0) : index > 0 && setIndex(index - 1));
   const close = () => { audio.current.pause(); setQueue([]); };
+
+  useEffect(() => {
+    if (!('mediaSession' in navigator) || !current) return;
+    const ms = navigator.mediaSession;
+    const handlers = { play: () => audio.current.play(), pause: () => audio.current.pause(), seekbackward: () => skip(-15), seekforward: () => skip(15), previoustrack: index > 0 ? prev : null, nexttrack: index < queue.length - 1 ? next : null };
+    Object.entries(handlers).forEach(([k, h]) => { try { ms.setActionHandler(k, h); } catch {} });
+  });
 
   const value = { play, current, playing, toggle };
 
@@ -62,9 +91,13 @@ export function AudioProvider({ children }) {
         onPause={() => setPlaying(false)}
         onWaiting={() => setLoading(true)}
         onCanPlay={() => setLoading(false)}
-        onTimeUpdate={(e) => setTime(e.currentTarget.currentTime)}
+        onTimeUpdate={(e) => {
+          const el = e.currentTarget;
+          setTime(el.currentTime);
+          if (current && Date.now() - lastSave.current > 5000) { lastSave.current = Date.now(); savePosition(current.id, el.currentTime, el.duration); }
+        }}
         onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
-        onEnded={next}
+        onEnded={() => { if (current) savePosition(current.id, 0, 0); next(); }}
       />
       {current && (
         <>
@@ -83,7 +116,7 @@ export function AudioProvider({ children }) {
                 {current.cover ? <img src={current.cover} alt="" className={cn('h-12 w-12 shrink-0 rounded-[calc(var(--radius)*0.6)] object-cover', playing && 'animate-pulse [animation-duration:3s]')} /> : <div className="h-12 w-12 rounded bg-primary/20" />}
                 <div className="min-w-0">
                   <div className="truncate text-sm font-bold text-fg">{current.title}</div>
-                  <div className="truncate text-xs text-fg/55">{current.subtitle}</div>
+                  <div className="truncate text-xs text-fg/55">{resumed ? <span className="font-semibold text-primary">Resumed at {formatDuration(resumed)}</span> : current.subtitle}</div>
                 </div>
               </Link>
               <div className="flex items-center gap-1 sm:gap-2">

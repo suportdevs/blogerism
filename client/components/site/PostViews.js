@@ -3,18 +3,24 @@ import { Calendar, Clock, Eye, ListVideo } from 'lucide-react';
 import { compact, formatDate, formatDuration, postUrl, seriesUrl } from '@/lib/utils';
 import { PlayButton } from './AudioPlayer';
 import { AudioRow, EpisodeRow, Kicker, NewsCard, VideoCard, postsToTracks } from './MediaCards';
-import { CopyLinkButton, LikeButton, VideoPlayer } from './MediaClient';
+import { VideoPlayer } from './MediaClient';
+import { Comments, PostActions, PrintButton, ShareButton, TextSizer } from './Engagement';
+import { ReadingProgress } from './Extras';
+
+// Article text scales with the reader's A−/A+ choice (TextSizer).
+const READER_TEXT = { fontSize: 'calc(1.125rem * var(--reader-scale, 1))' };
 
 const Prose = ({ html }) => (
   <div className="prose max-w-none prose-headings:font-heading prose-headings:text-fg prose-p:text-fg/80 prose-a:text-primary prose-strong:text-fg prose-li:text-fg/80" dangerouslySetInnerHTML={{ __html: html || '' }} />
 );
 
 /* Luxe magazine article: centered serif headline, italic standfirst, drop cap, gold hairlines. */
-export function LuxeArticleView({ post, related }) {
+export function LuxeArticleView({ post, related, engagement, labels }) {
   const cat = post.categories?.[0];
   const small = 'text-[10.5px] font-medium uppercase tracking-[0.3em]';
   return (
     <article>
+      <ReadingProgress />
       <header className="site-container max-w-4xl pb-12 pt-16 text-center sm:pt-24">
         {cat && <Link href={`/category/${cat.slug}`} className={`${small} text-primary`}>{cat.name}</Link>}
         <h1 className="mt-6 font-heading text-4xl leading-[1.1] text-fg sm:text-6xl">{post.title}</h1>
@@ -22,6 +28,7 @@ export function LuxeArticleView({ post, related }) {
         <div className={`mt-10 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-fg/55 ${small}`}>
           {post.author && <span>By {post.author.name}</span>}<span className="text-primary">✦</span><span>{formatDate(post.publishedAt, { dateStyle: 'long' })}</span><span className="text-primary">✦</span><span>{post.readingTime} min read</span>
         </div>
+        <div className="mt-8 flex items-center justify-center gap-6"><PostActions post={post} engagement={engagement} labels={labels} variant="ghost" /><TextSizer /></div>
       </header>
       {post.coverImage && post.format !== 'GALLERY' && (
         <figure className="mx-auto max-w-[1400px] px-5 sm:px-10">
@@ -34,7 +41,7 @@ export function LuxeArticleView({ post, related }) {
         </div>
       )}
       <div className="site-container max-w-2xl py-16">
-        <div className="dropcap prose prose-lg max-w-none prose-headings:font-heading prose-headings:font-medium prose-headings:text-fg prose-p:leading-[1.9] prose-p:text-fg/80 prose-a:text-primary prose-strong:text-fg prose-blockquote:border-primary prose-blockquote:font-heading prose-blockquote:text-2xl prose-blockquote:italic prose-blockquote:text-fg prose-li:text-fg/80" dangerouslySetInnerHTML={{ __html: post.content || '' }} />
+        <div style={READER_TEXT} className="dropcap prose prose-lg max-w-none prose-headings:font-heading prose-headings:font-medium prose-headings:text-fg prose-p:leading-[1.9] prose-p:text-fg/80 prose-a:text-primary prose-strong:text-fg prose-blockquote:border-primary prose-blockquote:font-heading prose-blockquote:text-2xl prose-blockquote:italic prose-blockquote:text-fg prose-li:text-fg/80" dangerouslySetInnerHTML={{ __html: post.content || '' }} />
         <div className="my-14 flex items-center justify-center gap-4 text-primary"><span className="h-px w-16 bg-primary/50" />✦<span className="h-px w-16 bg-primary/50" /></div>
         {post.author && (
           <div className="text-center">
@@ -43,6 +50,8 @@ export function LuxeArticleView({ post, related }) {
             {post.author.bio && <p className="mx-auto mt-2 max-w-md font-heading italic text-fg/60">{post.author.bio}</p>}
           </div>
         )}
+        <PostActions post={post} engagement={engagement} labels={labels} variant="ghost" className="mt-12 justify-center border-y border-fg/10 py-5" />
+        {engagement.comments && <Comments slug={post.slug} title="Correspondence" />}
       </div>
       {related.length > 0 && (
         <section className="border-t border-fg/10 bg-surface py-20">
@@ -65,10 +74,11 @@ export function LuxeArticleView({ post, related }) {
 }
 
 /* Newspaper-style article: left-aligned headline, standfirst, byline bar, sidebar with more stories. */
-export function NewsArticleView({ post, related, more }) {
+export function NewsArticleView({ post, related, more, engagement, labels }) {
   const cat = post.categories?.[0];
   return (
     <article className="site-container py-8">
+      <ReadingProgress />
       <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="min-w-0">
           {cat && <Link href={`/category/${cat.slug}`} className="text-sm font-bold uppercase tracking-wider hover:underline" style={{ color: cat.color }}>{cat.name}</Link>}
@@ -83,7 +93,11 @@ export function NewsArticleView({ post, related, more }) {
                 <div className="text-fg/55">{formatDate(post.publishedAt, { dateStyle: 'long', timeStyle: 'short' })} · {post.readingTime} min read</div>
               </div>
             </div>
-            <CopyLinkButton />
+            <div className="flex flex-wrap items-center gap-2 print:hidden">
+              <TextSizer />
+              <PrintButton />
+              {engagement.share && <ShareButton title={post.title} variant="icon" />}
+            </div>
           </div>
           {post.coverImage && post.format !== 'GALLERY' && (
             <figure className="mt-6">
@@ -101,10 +115,12 @@ export function NewsArticleView({ post, related, more }) {
               ))}
             </div>
           )}
-          <div className="prose prose-lg mt-8 max-w-none prose-headings:font-heading prose-headings:text-fg prose-p:text-fg/85 prose-a:text-primary prose-strong:text-fg prose-li:text-fg/85 prose-blockquote:border-primary" dangerouslySetInnerHTML={{ __html: post.content || '' }} />
+          <div style={READER_TEXT} className="prose prose-lg mt-8 max-w-none prose-headings:font-heading prose-headings:text-fg prose-p:text-fg/85 prose-a:text-primary prose-strong:text-fg prose-li:text-fg/85 prose-blockquote:border-primary" dangerouslySetInnerHTML={{ __html: post.content || '' }} />
           {post.tags?.length > 0 && (
             <div className="mt-8 flex flex-wrap gap-2 border-t border-fg/10 pt-6">{post.tags.map((t) => <Link key={t.id} href={`/tag/${t.slug}`} className="rounded-sm bg-fg/5 px-3 py-1 text-sm font-semibold text-fg/75 hover:bg-primary hover:text-white">{t.name}</Link>)}</div>
           )}
+          <PostActions post={post} engagement={engagement} labels={labels} className="mt-8 border-t border-fg/10 pt-6 print:hidden" />
+          {engagement.comments && <Comments slug={post.slug} title="Reader comments" />}
         </div>
         <aside className="space-y-8">
           <div className="sticky top-16 space-y-8">
@@ -132,7 +148,7 @@ export function NewsArticleView({ post, related, more }) {
 }
 
 /* YouTube-style watch page. Episodes of a series appear in the sidebar; otherwise "up next". */
-export function WatchView({ post, episodes, upNext }) {
+export function WatchView({ post, episodes, upNext, engagement, labels }) {
   const inSeries = post.series && episodes.length > 1;
   const epLabel = post.season && post.episode ? `S${post.season} · E${post.episode}` : null;
   return (
@@ -154,7 +170,7 @@ export function WatchView({ post, episodes, upNext }) {
                 <div className="text-xs text-fg/50">{post.author?.bio?.slice(0, 60)}</div>
               </div>
             </div>
-            <div className="flex flex-wrap gap-2"><LikeButton slug={post.slug} initial={post.likes} /><CopyLinkButton /></div>
+            <PostActions post={post} engagement={engagement} labels={labels} />
           </div>
           <div className="mt-5 rounded-theme bg-surface p-5">
             <div className="mb-3 flex flex-wrap gap-x-4 gap-y-1 text-sm font-semibold text-fg">
@@ -168,6 +184,7 @@ export function WatchView({ post, episodes, upNext }) {
               <div className="mt-4 flex flex-wrap gap-2">{post.tags.map((t) => <Link key={t.id} href={`/tag/${t.slug}`} className="text-sm font-semibold text-primary">#{t.name}</Link>)}</div>
             )}
           </div>
+          {engagement.comments && <Comments slug={post.slug} />}
         </div>
 
         <aside className="min-w-0">
@@ -193,7 +210,7 @@ export function WatchView({ post, episodes, upNext }) {
 }
 
 /* Podcast episode page with the persistent player. */
-export function ListenView({ post, episodes, upNext }) {
+export function ListenView({ post, episodes, upNext, engagement, labels }) {
   const list = episodes.length ? episodes : [post, ...upNext];
   const tracks = postsToTracks(list);
   const index = Math.max(0, tracks.findIndex((t) => t.id === post.id));
@@ -212,15 +229,14 @@ export function ListenView({ post, episodes, upNext }) {
             <div className="mt-6 flex flex-wrap items-center gap-4">
               {tracks.length ? <PlayButton tracks={tracks} index={index} label="Play episode" className="!px-7 !py-3.5" /> : <span className="text-sm text-fg/50">No audio file attached.</span>}
               <span className="text-sm text-fg/55">{formatDate(post.publishedAt)} · {formatDuration(post.duration) || '—'}</span>
-              <LikeButton slug={post.slug} initial={post.likes} />
-              <CopyLinkButton />
+              <PostActions post={post} engagement={engagement} labels={labels} />
             </div>
             {post.audioUrl && <a href={post.audioUrl} download className="mt-4 inline-block text-xs font-semibold text-fg/50 hover:text-primary">Download MP3</a>}
           </div>
         </div>
       </section>
       <div className="site-container grid gap-12 pb-20 lg:grid-cols-[1fr_380px]">
-        <div><Prose html={post.content} /></div>
+        <div className="min-w-0"><Prose html={post.content} />{engagement.comments && <Comments slug={post.slug} />}</div>
         <aside className="space-y-2.5">
           <h3 className="mb-3 text-sm font-bold uppercase tracking-wider text-fg/50">{episodes.length ? 'All episodes' : 'More to listen'}</h3>
           {list.filter((p) => p.audioUrl).map((p) => <AudioRow key={p.id} post={p} tracks={tracks} index={Math.max(0, tracks.findIndex((t) => t.id === p.id))} />)}

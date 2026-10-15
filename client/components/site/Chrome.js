@@ -3,9 +3,12 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Compass, Flame, Home, ListVideo, Menu, PlaySquare, Search, Upload, X } from 'lucide-react';
+import { Bookmark, Compass, Flame, Home, ListVideo, Menu, PlaySquare, Search, Upload, X } from 'lucide-react';
 import { cn, formatDate } from '@/lib/utils';
 import Header, { Logo, ThemeToggle } from './Header';
+import { SavedLink } from './Engagement';
+import { Caret, DesktopNav, MobileNavTree } from './NavMenu';
+import { engagementOf, saveLabels } from '@/lib/engagement';
 import Footer, { SocialLinks } from './Footer';
 import { AnnouncementBar, BackToTop } from './Extras';
 
@@ -42,19 +45,14 @@ function MobileMenu({ open, onClose, items, general, extra }) {
       <aside className={cn('absolute left-0 top-0 flex h-full w-[86%] max-w-sm flex-col gap-1 overflow-y-auto bg-bg p-5 shadow-2xl transition-transform duration-300', open ? 'translate-x-0' : '-translate-x-full')}>
         <div className="mb-4 flex items-center justify-between"><Logo general={general} /><button onClick={onClose} className="grid h-10 w-10 place-items-center rounded-full bg-fg/5 text-fg"><X className="h-5 w-5" /></button></div>
         {extra}
-        {items.map((item) => (
-          <div key={item.id}>
-            <Link href={item.url} className={cn('block rounded-theme px-4 py-3 font-semibold', isActive(pathname, item.url) ? 'bg-primary/10 text-primary' : 'text-fg hover:bg-fg/5')}>{item.label}</Link>
-            {item.children?.map((c) => <Link key={c.id} href={c.url} className="block px-4 py-2 pl-8 text-sm text-fg/65 hover:text-primary">{c.label}</Link>)}
-          </div>
-        ))}
+        <MobileNavTree items={items} onNavigate={onClose} className="-mx-2" />
       </aside>
     </div>
   );
 }
 
 /* ----------------------------- News masthead ----------------------------- */
-function Masthead({ general, appearance, social, items }) {
+function Masthead({ general, appearance, social, items, saved }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [searching, setSearching] = useState(false);
@@ -80,19 +78,32 @@ function Masthead({ general, appearance, social, items }) {
           {general.tagline && <span className="mt-1 hidden text-xs font-semibold uppercase tracking-[0.25em] text-fg/50 sm:block">{general.tagline}</span>}
         </Link>
         <div className="flex items-center justify-end gap-1">
+          {saved && <SavedLink label={saved} />}
           <ThemeToggle />
           {cta.enabled && cta.label && <Link href={cta.url || '#'} className="ml-2 hidden rounded-[var(--radius)] bg-primary px-4 py-2 text-sm font-bold text-white hover:brightness-110 sm:inline-block">{cta.label}</Link>}
         </div>
       </div>
       {searching && <div className="site-container pb-4"><SearchForm autoFocus rounded="rounded-[var(--radius)]" className="mx-auto max-w-xl" /></div>}
       <nav className="sticky top-0 z-40 border-y-2 border-fg bg-bg/95 backdrop-blur">
-        <div className="site-container flex h-12 items-center gap-1 overflow-x-auto [scrollbar-width:none]">
+        <div className="site-container flex h-12 items-center gap-1 overflow-x-auto [scrollbar-width:none] lg:overflow-visible">
           <Link href="/" className={cn('mr-3 shrink-0 font-heading text-lg font-black text-fg transition-all', scrolled ? 'w-auto opacity-100' : 'w-0 overflow-hidden opacity-0')}>{general.siteName}</Link>
-          {items.map((item) => (
-            <Link key={item.id} href={item.url} className={cn('relative shrink-0 px-3 py-3 text-sm font-bold uppercase tracking-wide transition', isActive(pathname, item.url) ? 'text-primary after:absolute after:inset-x-3 after:bottom-0 after:h-[3px] after:bg-primary' : 'text-fg/80 hover:text-primary')}>
-              {item.label}
-            </Link>
-          ))}
+          {/* Phones and tablets: a plain scrolling strip. Desktop: dropdowns and mega menus. */}
+          <div className="flex items-center gap-1 lg:hidden">
+            {items.map((item) => (
+              <Link key={item.id} href={item.url} className={cn('relative shrink-0 px-3 py-3 text-sm font-bold uppercase tracking-wide transition', isActive(pathname, item.url) ? 'text-primary after:absolute after:inset-x-3 after:bottom-0 after:h-[3px] after:bg-primary' : 'text-fg/80 hover:text-primary')}>
+                {item.label}
+              </Link>
+            ))}
+          </div>
+          <DesktopNav
+            items={items}
+            className="hidden items-center gap-1 lg:flex"
+            renderTop={(item, { active, open, hasChildren }) => (
+              <span className={cn('relative flex shrink-0 cursor-pointer items-center gap-1 px-3 py-3 text-sm font-bold uppercase tracking-wide transition', active || open ? 'text-primary' : 'text-fg/80 hover:text-primary', active && 'after:absolute after:inset-x-3 after:bottom-0 after:h-[3px] after:bg-primary')}>
+                {item.label}{hasChildren && <Caret open={open} />}
+              </span>
+            )}
+          />
         </div>
       </nav>
       <MobileMenu open={open} onClose={() => setOpen(false)} items={items} general={general} extra={<SearchForm className="mb-3" />} />
@@ -104,7 +115,7 @@ function Masthead({ general, appearance, social, items }) {
 const VIDEO_ICONS = [[/^home$/i, Home], [/trend|popular/i, Flame], [/playlist/i, ListVideo], [/explore|browse/i, Compass]];
 const videoIcon = (label) => (VIDEO_ICONS.find(([re]) => re.test(label)) || [null, PlaySquare])[1];
 
-function VideoSidebar({ items, footerItems, className }) {
+function VideoSidebar({ items, footerItems, className, saved }) {
   const pathname = usePathname();
   const main = items.filter((i) => VIDEO_ICONS.some(([re]) => re.test(i.label)));
   const rest = items.filter((i) => !main.includes(i));
@@ -119,9 +130,19 @@ function VideoSidebar({ items, footerItems, className }) {
   return (
     <aside className={cn('space-y-1 overflow-y-auto p-3 [scrollbar-width:thin]', className)}>
       {main.map((i) => <Item key={i.id} item={i} />)}
+      {saved && (
+        <Link href="/saved" className={cn('flex items-center gap-5 rounded-[calc(var(--radius)*0.8)] px-3 py-2.5 text-sm transition', pathname === '/saved' ? 'bg-fg/10 font-bold text-fg' : 'text-fg/80 hover:bg-fg/5')}>
+          <Bookmark className="h-5 w-5 shrink-0" />{saved}
+        </Link>
+      )}
       {rest.length > 0 && <div className="mx-3 my-3 border-t border-fg/10" />}
       {rest.length > 0 && <div className="px-3 pb-1 text-sm font-bold text-fg">Explore</div>}
-      {rest.map((i) => <Item key={i.id} item={i} />)}
+      {rest.map((i) => (
+        <div key={i.id}>
+          <Item item={i} />
+          {i.children?.length > 0 && <MobileNavTree items={i.children} className="ml-9 border-l border-fg/10 text-sm [&_a]:py-1.5" />}
+        </div>
+      ))}
       {footerItems?.length > 0 && (
         <div className="mx-3 mt-4 flex flex-wrap gap-x-3 gap-y-1 border-t border-fg/10 pt-4 text-xs text-fg/50">
           {footerItems.map((i) => <Link key={i.id} href={i.url} className="hover:text-fg">{i.label}</Link>)}
@@ -131,7 +152,7 @@ function VideoSidebar({ items, footerItems, className }) {
   );
 }
 
-function VideoHeader({ general, appearance, items, footerItems }) {
+function VideoHeader({ general, appearance, items, footerItems, saved }) {
   const [open, setOpen] = useState(false);
   const cta = appearance.headerCta || {};
   return (
@@ -142,17 +163,18 @@ function VideoHeader({ general, appearance, items, footerItems }) {
         <SearchForm className="mx-auto hidden w-full max-w-2xl md:flex" />
         <div className="ml-auto flex items-center gap-1 md:ml-0">
           {cta.enabled && cta.label && <Link href={cta.url || '#'} className="hidden items-center gap-2 rounded-full bg-fg/5 px-4 py-2 text-sm font-semibold text-fg hover:bg-fg/10 sm:flex"><Upload className="h-4 w-4" />{cta.label}</Link>}
+          {saved && <SavedLink label={saved} className="xl:hidden" />}
           <ThemeToggle />
         </div>
       </header>
-      <VideoSidebar items={items} footerItems={footerItems} className="fixed bottom-0 left-0 top-16 z-30 hidden w-60 xl:block" />
+      <VideoSidebar items={items} footerItems={footerItems} saved={saved} className="fixed bottom-0 left-0 top-16 z-30 hidden w-60 xl:block" />
       <MobileMenu open={open} onClose={() => setOpen(false)} items={items} general={general} extra={<SearchForm className="mb-3" />} />
     </>
   );
 }
 
 /* ----------------------------- Streaming ----------------------------- */
-function StreamingHeader({ general, items }) {
+function StreamingHeader({ general, items, saved }) {
   const pathname = usePathname();
   const scrolled = useScrolled();
   const [searching, setSearching] = useState(false);
@@ -161,14 +183,19 @@ function StreamingHeader({ general, items }) {
     <header className={cn('sticky top-0 z-40 transition-colors duration-500', scrolled ? 'bg-[#0b0b0b]' : 'bg-gradient-to-b from-black/80 to-transparent')}>
       <div className="mx-auto flex h-16 max-w-[1600px] items-center gap-8 px-5 sm:px-8">
         <Link href="/" className="font-heading text-2xl font-black uppercase tracking-tight text-primary sm:text-3xl">{general.logo ? <img src={general.logo} alt={general.siteName} className="h-8" /> : general.siteName}</Link>
-        <nav className="hidden items-center gap-5 md:flex">
-          {items.map((item) => <Link key={item.id} href={item.url} className={cn('text-sm transition', isActive(pathname, item.url) ? 'font-bold text-white' : 'text-white/70 hover:text-white')}>{item.label}</Link>)}
-        </nav>
+        <DesktopNav
+          items={items}
+          className="hidden items-center gap-5 md:flex"
+          renderTop={(item, { active, open, hasChildren }) => (
+            <span className={cn('flex cursor-pointer items-center gap-1 py-5 text-sm transition', active ? 'font-bold text-white' : open ? 'text-white' : 'text-white/70 hover:text-white')}>{item.label}{hasChildren && <Caret open={open} />}</span>
+          )}
+        />
         <button onClick={() => setOpen(true)} className="text-sm font-semibold text-white md:hidden">Browse ▾</button>
         <div className="ml-auto flex items-center gap-3">
           {searching ? <SearchForm autoFocus className="w-56 border-white/30 bg-black/60 [&_input]:text-white" rounded="rounded" /> : (
             <button onClick={() => setSearching(true)} aria-label="Search" className="text-white/90 hover:text-white"><Search className="h-5 w-5" /></button>
           )}
+          {saved && <SavedLink label={saved} className="text-white/90 hover:bg-white/10 hover:text-white" />}
           <span className="grid h-8 w-8 place-items-center rounded bg-gradient-to-br from-primary to-accent text-xs font-black text-white">{general.siteName?.[0]}</span>
         </div>
       </div>
@@ -191,20 +218,26 @@ function OverlayHeader({ general, appearance, items }) {
   const [open, setOpen] = useState(false);
   const cta = appearance.headerCta || {};
   const half = Math.ceil(items.length / 2);
-  const link = (item) => (
-    <Link key={item.id} href={item.url} className={cn('relative px-3 py-2 text-[13px] font-semibold uppercase tracking-[0.18em] transition after:absolute after:inset-x-3 after:bottom-0.5 after:h-px after:origin-left after:scale-x-0 after:bg-current after:transition-transform hover:after:scale-x-100', isActive(pathname, item.url) && 'after:scale-x-100')}>{item.label}</Link>
+  const nav = (list, className) => (
+    <DesktopNav
+      items={list}
+      className={className}
+      renderTop={(item, { active, open: on, hasChildren }) => (
+        <span className={cn('relative flex cursor-pointer items-center gap-1 px-3 py-2 text-[13px] font-semibold uppercase tracking-[0.18em] transition after:absolute after:inset-x-3 after:bottom-0.5 after:h-px after:origin-left after:scale-x-0 after:bg-current after:transition-transform hover:after:scale-x-100', (active || on) && 'after:scale-x-100')}>{item.label}{hasChildren && <Caret open={on} />}</span>
+      )}
+    />
   );
   return (
     <header className={cn('fixed inset-x-0 top-0 z-50 transition-all duration-500', overlay ? 'bg-gradient-to-b from-black/50 to-transparent text-white' : 'bg-bg/95 text-fg shadow-[0_1px_0_rgb(var(--c-fg)/0.08)] backdrop-blur-xl')}>
       <div className={cn('mx-auto grid max-w-container grid-cols-[1fr_auto_1fr] items-center px-5 transition-all duration-500 sm:px-8', overlay ? 'h-24' : 'h-[72px]')}>
-        <nav className="hidden items-center lg:flex">{items.slice(0, half).map(link)}</nav>
+        {nav(items.slice(0, half), 'hidden items-center lg:flex')}
         <button onClick={() => setOpen(true)} aria-label="Menu" className="grid h-10 w-10 place-items-center lg:hidden"><Menu className="h-5 w-5" /></button>
         <Link href="/" className="text-center">
           {general.logo ? <img src={general.logo} alt={general.siteName} className="mx-auto h-10" /> : <span className="block font-heading text-2xl font-semibold italic tracking-tight sm:text-3xl">{general.siteName}</span>}
           {general.tagline && <span className={cn('hidden text-[10px] font-semibold uppercase tracking-[0.35em] opacity-70 transition-all sm:block', !overlay && 'h-0 overflow-hidden opacity-0')}>{general.tagline}</span>}
         </Link>
         <div className="flex items-center justify-end">
-          <nav className="hidden items-center lg:flex">{items.slice(half).map(link)}</nav>
+          {nav(items.slice(half), 'hidden items-center lg:flex')}
           {cta.enabled && cta.label && <Link href={cta.url || '#'} className={cn('ml-4 rounded-full px-5 py-2.5 text-xs font-bold uppercase tracking-[0.15em] transition', overlay ? 'border border-white/60 hover:bg-white hover:text-black' : 'bg-primary text-white hover:brightness-110')}>{cta.label}</Link>}
         </div>
       </div>
@@ -224,11 +257,13 @@ function MinimalHeader({ general, items, social }) {
       <header className={cn('fixed inset-x-0 top-0 z-50 transition-all duration-500', overlay && !open ? 'text-white' : 'bg-bg/90 text-fg backdrop-blur-xl', open && '!bg-transparent')}>
         <div className="flex h-20 items-center justify-between px-6 sm:px-10">
           <Link href="/" className="text-sm font-semibold uppercase tracking-[0.4em]">{general.siteName}</Link>
-          <nav className="hidden items-center gap-9 md:flex">
-            {items.map((item) => (
-              <Link key={item.id} href={item.url} className={cn('text-xs font-medium uppercase tracking-[0.25em] transition hover:opacity-100', isActive(pathname, item.url) ? 'opacity-100' : 'opacity-60')}>{item.label}</Link>
-            ))}
-          </nav>
+          <DesktopNav
+            items={items}
+            className="hidden items-center gap-9 md:flex"
+            renderTop={(item, { active, open: on, hasChildren }) => (
+              <span className={cn('flex cursor-pointer items-center gap-1 py-3 text-xs font-medium uppercase tracking-[0.25em] transition hover:opacity-100', active || on ? 'opacity-100' : 'opacity-60')}>{item.label}{hasChildren && <Caret open={on} />}</span>
+            )}
+          />
           <button onClick={() => setOpen(!open)} aria-label="Menu" className="relative z-[70] flex h-10 w-10 flex-col items-center justify-center gap-1.5 md:hidden">
             <span className={cn('h-px w-6 bg-current transition', open && 'translate-y-[3.5px] rotate-45')} />
             <span className={cn('h-px w-6 bg-current transition', open && '-translate-y-[3.5px] -rotate-45')} />
@@ -237,11 +272,9 @@ function MinimalHeader({ general, items, social }) {
       </header>
       {/* Full-screen menu (mobile) */}
       <div className={cn('fixed inset-0 z-[60] flex flex-col justify-center bg-bg px-8 transition-all duration-500 md:hidden', open ? 'visible opacity-100' : 'invisible opacity-0')}>
-        {items.map((item, i) => (
-          <Link key={item.id} href={item.url} className={cn('font-heading text-5xl leading-tight text-fg transition-all duration-500', open ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0')} style={{ transitionDelay: open ? `${100 + i * 70}ms` : '0ms' }}>
-            {item.label}
-          </Link>
-        ))}
+        <div className={cn('-mx-4 max-h-[70vh] overflow-y-auto transition-all duration-500', open ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0')}>
+          <MobileNavTree items={items} size="lg" onNavigate={() => setOpen(false)} />
+        </div>
         <div className="mt-12"><SocialLinks social={social} /></div>
       </div>
     </>
@@ -280,13 +313,17 @@ function LuxeHeader({ general, appearance, items, social, contact, heroOverlay }
             )}
           </div>
         </div>
-        <nav className={cn('hidden justify-center gap-10 overflow-hidden border-t transition-all duration-700 lg:flex', scrolled ? 'h-0 border-transparent opacity-0' : 'h-11 items-center opacity-100', overlay ? 'border-white/15' : 'border-fg/10')}>
-          {items.map((item) => (
-            <Link key={item.id} href={item.url} className={cn('relative py-1 text-[10.5px] font-medium uppercase tracking-[0.3em] transition', isActive(pathname, item.url) ? 'opacity-100' : 'opacity-70 hover:opacity-100')}>
-              {item.label}
-              {isActive(pathname, item.url) && <span className="absolute -bottom-0.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-primary" />}
-            </Link>
-          ))}
+        <nav className={cn('hidden justify-center gap-10 border-t transition-all duration-700 lg:flex', scrolled ? 'h-0 overflow-hidden border-transparent opacity-0' : 'h-11 items-center opacity-100', overlay ? 'border-white/15' : 'border-fg/10')}>
+          <DesktopNav
+            items={items}
+            className="flex items-center gap-10"
+            renderTop={(item, { active, open: on, hasChildren }) => (
+              <span className={cn('relative flex cursor-pointer items-center gap-1.5 py-3 text-[10.5px] font-medium uppercase tracking-[0.3em] transition', active || on ? 'opacity-100' : 'opacity-70 hover:opacity-100')}>
+                {item.label}{hasChildren && <Caret open={on} className="h-3 w-3" />}
+                {active && <span className="absolute bottom-1.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-primary" />}
+              </span>
+            )}
+          />
         </nav>
       </header>
 
@@ -295,7 +332,7 @@ function LuxeHeader({ general, appearance, items, social, contact, heroOverlay }
         <button onClick={() => setOpen(false)} className={cn('absolute right-6 top-7 z-10 flex items-center gap-3 sm:right-10', small)}>Close <X className="h-4 w-4" /></button>
         <div className="flex flex-col justify-center px-8 py-24 sm:px-20">
           <div className={cn('mb-10 text-[#c9a66b]', small)}>{general.siteName}</div>
-          <nav className="space-y-2">
+          <nav className="max-h-[70vh] space-y-2 overflow-y-auto">
             {items.map((item, i) => (
               <Link
                 key={item.id}
@@ -306,7 +343,25 @@ function LuxeHeader({ general, appearance, items, social, contact, heroOverlay }
                 <span className="font-mono text-xs text-[#efe9df]/40">{String(i + 1).padStart(2, '0')}</span>
                 <span className="font-heading text-4xl leading-tight transition duration-500 group-hover:translate-x-3 group-hover:italic group-hover:text-[#c9a66b] sm:text-6xl">{item.label}</span>
               </Link>
-            ))}
+            )).flatMap((link, i) => {
+              const item = items[i];
+              if (!item.children?.length) return [link];
+              // Sub-pages in small caps under the big label, level 3 nested beneath them.
+              return [link, (
+                <div key={`${item.id}-sub`} className={cn('ml-12 flex flex-wrap gap-x-6 gap-y-2 pb-3 transition-all duration-700', open ? 'opacity-100' : 'opacity-0')} style={{ transitionDelay: open ? `${200 + i * 70}ms` : '0ms' }}>
+                  {item.children.map((c) => (
+                    <div key={c.id}>
+                      <Link href={c.url} className={cn('text-[#efe9df]/60 transition hover:text-[#c9a66b]', small)}>{c.label}</Link>
+                      {c.children?.length > 0 && (
+                        <div className="mt-1 flex flex-col gap-1 border-l border-white/15 pl-3">
+                          {c.children.map((g) => <Link key={g.id} href={g.url} className="text-sm text-[#efe9df]/45 transition hover:text-[#c9a66b]">{g.label}</Link>)}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )];
+            })}
           </nav>
         </div>
         <aside className="hidden flex-col justify-between border-l border-white/10 p-16 lg:flex">
@@ -377,12 +432,13 @@ export default function SiteChrome({ settings, menus, theme, children }) {
   const { general, appearance: a, social } = s;
   const items = m.header?.items || [];
   const header = t?.layout?.header || 'default';
+  const saved = engagementOf(s).saves ? saveLabels(t).page : null;
 
   return (
     <>
-      {header === 'masthead' && <Masthead general={general} appearance={a} social={social} items={items} />}
-      {header === 'video' && <VideoHeader general={general} appearance={a} items={items} footerItems={m.footer?.items} />}
-      {header === 'streaming' && <StreamingHeader general={general} items={items} />}
+      {header === 'masthead' && <Masthead general={general} appearance={a} social={social} items={items} saved={saved} />}
+      {header === 'video' && <VideoHeader general={general} appearance={a} items={items} footerItems={m.footer?.items} saved={saved} />}
+      {header === 'streaming' && <StreamingHeader general={general} items={items} saved={saved} />}
       {header === 'portfolio' && <PortfolioHeader general={general} appearance={a} items={items} />}
       {header === 'overlay' && <OverlayHeader general={general} appearance={a} items={items} />}
       {header === 'luxe' && <LuxeHeader general={general} appearance={a} items={items} social={social} contact={s.contact} heroOverlay={t?.layout?.overlay !== false} />}
@@ -390,7 +446,7 @@ export default function SiteChrome({ settings, menus, theme, children }) {
       {header === 'default' && (
         <>
           <AnnouncementBar announcement={a.announcement} />
-          <Header general={general} appearance={a} menu={m.header} />
+          <Header general={general} appearance={a} menu={m.header} saved={saved} />
         </>
       )}
       <div className={cn('flex flex-1 flex-col', header === 'video' && 'xl:pl-60')}>

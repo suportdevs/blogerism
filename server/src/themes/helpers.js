@@ -13,7 +13,8 @@ const MDN_VIDEO = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos
 // Page-builder block.
 const B = (type, data, style = {}) => ({ id: uid(), type, data, style: { paddingY: 'md', width: 'normal', animate: false, ...style } });
 // Menu item.
-const m = (label, url, children = []) => ({ label, url, target: '_self', children });
+// extra: { description, icon, badge, image, mega } for rich dropdowns and mega menus.
+const m = (label, url, children = [], extra = {}) => ({ label, url, target: '_self', ...extra, children });
 
 // Verified Blender open-movie uploads on YouTube: [id, title, seconds].
 const FILMS = {

@@ -11,6 +11,7 @@ const PERMISSIONS = [
   { key: 'menus', label: 'Menus', group: 'Appearance' },
   { key: 'appearance', label: 'Theme customizer', group: 'Appearance' },
   { key: 'contacts', label: 'Contact messages', group: 'Engagement' },
+  { key: 'comments', label: 'Comments & moderation', group: 'Engagement' },
   { key: 'newsletter', label: 'Newsletter subscribers', group: 'Engagement' },
   { key: 'users', label: 'Users', group: 'System' },
   { key: 'roles', label: 'Roles & permissions', group: 'System' },

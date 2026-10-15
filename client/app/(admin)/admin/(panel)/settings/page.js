@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { Code2, Globe, Loader2, Mail, Save, Search, Settings, Share2, Facebook, Twitter, Instagram, Linkedin, Youtube, Github } from 'lucide-react';
+import { Code2, Globe, Heart, Loader2, Mail, Save, Search, Settings, Share2, Facebook, Twitter, Instagram, Linkedin, Youtube, Github } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useApi, useSaveShortcut } from '@/lib/hooks';
 import { cn } from '@/lib/utils';
@@ -14,6 +14,7 @@ const TABS = [
   { key: 'seo', label: 'SEO', icon: Search, description: 'Default meta tags, indexing and analytics' },
   { key: 'social', label: 'Social', icon: Share2, description: 'Profiles linked in the header and footer' },
   { key: 'contact', label: 'Contact', icon: Mail, description: 'Details shown on contact blocks and footer' },
+  { key: 'engagement', label: 'Engagement', icon: Heart, description: 'Comments, likes, sharing, saving and following on your site' },
   { key: 'advanced', label: 'Advanced', icon: Code2, description: 'Custom code and feature toggles' },
 ];
 const SOCIAL = [['facebook', Facebook], ['twitter', Twitter], ['instagram', Instagram], ['linkedin', Linkedin], ['youtube', Youtube], ['github', Github]];
@@ -111,6 +112,28 @@ export default function SettingsPage() {
               <Field label="Address" className="md:col-span-2">{input('address')}</Field>
               <Field label="Working hours">{input('workingHours')}</Field>
               <Field label="Google Maps embed URL" hint="From Google Maps → Share → Embed a map → src">{input('mapEmbedUrl')}</Field>
+            </div>
+          )}
+
+          {tab === 'engagement' && (
+            <div className="space-y-6">
+              <div>
+                <h4 className="mb-3 text-sm font-bold">Comments</h4>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Toggle label="Comments" description="Readers can comment on posts (each post can still turn them off)" checked={s.comments} onChange={set('comments')} />
+                  <Toggle label="Hold for moderation" description="New comments wait in Comments until approved" checked={s.moderation} onChange={set('moderation')} />
+                  <Toggle label="Threaded replies" description="Readers can reply to each other" checked={s.commentReplies} onChange={set('commentReplies')} />
+                </div>
+              </div>
+              <div className="border-t border-ink-100 pt-6 dark:border-white/5">
+                <h4 className="mb-3 text-sm font-bold">Reactions</h4>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Toggle label="Likes" description="Heart button on articles, videos and episodes" checked={s.likes} onChange={set('likes')} />
+                  <Toggle label="Share menu" description="Facebook, X, LinkedIn, WhatsApp, email and copy link" checked={s.share} onChange={set('share')} />
+                  <Toggle label="Save for later" description="Reading list / Watch later / My List, stored in the visitor's browser" checked={s.saves} onChange={set('saves')} />
+                  <Toggle label="Follow & subscribe" description="Follow podcasts and shows, subscribe to playlists (with counts)" checked={s.subscriptions} onChange={set('subscriptions')} />
+                </div>
+              </div>
             </div>
           )}
 

@@ -2,21 +2,22 @@ const prisma = require('./prisma');
 const { insertTree, resetSequences } = require('./snapshot');
 
 /*
- * Theme workspaces. Content (categories, tags, series, posts, pages, menus, FAQs, testimonials and
+ * Theme workspaces. Content (categories, tags, series, posts and their comments, pages, menus, FAQs, testimonials and
  * site settings) belongs to the active theme. When the theme changes, the outgoing theme's content
  * is saved and the incoming theme's saved content is restored — so no theme ever loses its data.
  * Users, roles, media files, messages and subscribers are shared by all themes.
  */
 
 const GLOBAL_SETTINGS = ['theme'];
-const CONTENT_TABLES = ['Category', 'Tag', 'Series', 'Post', 'Page', 'Menu', 'MenuItem', 'Faq', 'Testimonial'];
+const CONTENT_TABLES = ['Category', 'Tag', 'Series', 'Post', 'Comment', 'Page', 'Menu', 'MenuItem', 'Faq', 'Testimonial'];
 
 async function captureContent() {
-  const [categories, tags, series, posts, pages, menus, menuItems, faqs, testimonials, settings] = await Promise.all([
+  const [categories, tags, series, posts, comments, pages, menus, menuItems, faqs, testimonials, settings] = await Promise.all([
     prisma.category.findMany({ orderBy: { id: 'asc' } }),
     prisma.tag.findMany({ orderBy: { id: 'asc' } }),
     prisma.series.findMany({ orderBy: { id: 'asc' } }),
     prisma.post.findMany({ orderBy: { id: 'asc' }, include: { categories: { select: { id: true } }, tags: { select: { id: true } } } }),
+    prisma.comment.findMany({ orderBy: { id: 'asc' } }),
     prisma.page.findMany({ orderBy: { id: 'asc' } }),
     prisma.menu.findMany({ orderBy: { id: 'asc' } }),
     prisma.menuItem.findMany({ orderBy: { id: 'asc' } }),
@@ -25,7 +26,7 @@ async function captureContent() {
     prisma.setting.findMany({ where: { key: { notIn: GLOBAL_SETTINGS } } }),
   ]);
   return {
-    categories, tags, series, pages, menus, menuItems, faqs, testimonials,
+    categories, tags, series, comments, pages, menus, menuItems, faqs, testimonials,
     posts: posts.map(({ categories: c, tags: t, ...p }) => ({ ...p, categoryIds: c.map((x) => x.id), tagIds: t.map((x) => x.id) })),
     settings: settings.map(({ key, value }) => ({ key, value })),
   };
@@ -33,7 +34,7 @@ async function captureContent() {
 
 async function clearContent() {
   await prisma.$transaction([
-    prisma.menuItem.deleteMany(), prisma.menu.deleteMany(), prisma.post.deleteMany(), prisma.series.deleteMany(),
+    prisma.menuItem.deleteMany(), prisma.menu.deleteMany(), prisma.comment.deleteMany(), prisma.post.deleteMany(), prisma.series.deleteMany(),
     prisma.tag.deleteMany(), prisma.category.deleteMany(), prisma.page.deleteMany(), prisma.faq.deleteMany(), prisma.testimonial.deleteMany(),
     prisma.setting.deleteMany({ where: { key: { notIn: GLOBAL_SETTINGS } } }),
   ]);
@@ -55,6 +56,8 @@ async function restoreContent(d) {
       },
     });
   }
+  // Workspaces saved before comments existed have none.
+  await insertTree('comment', (d.comments || []).map((c) => ({ ...c, userId: userIds.has(c.userId) ? c.userId : null })), 'parentId');
   for (const p of d.pages) await prisma.page.create({ data: p });
   for (const m of d.menus) await prisma.menu.create({ data: m });
   await insertTree('menuItem', d.menuItems, 'parentId');

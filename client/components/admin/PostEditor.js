@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import { ArrowLeft, Calendar, Check, Clapperboard, ExternalLink, FileText, Images, Loader2, Mic, Plus, Save, Star, Tag, Trash2, Video, X, Zap } from 'lucide-react';
+import { ArrowLeft, Calendar, Check, Clapperboard, ExternalLink, FileText, Images, Loader2, Mic, Plus, Save, Star, Tag, Trash2, Video, X, Zap, MessagesSquare } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useApi, useSaveShortcut, useUnsavedWarning } from '@/lib/hooks';
 import { cn, embedUrl, formatDuration, slugify, stripHtml } from '@/lib/utils';
@@ -363,6 +363,7 @@ export default function PostEditor({ id }) {
               </Field>
               <Toggle label={<span className="flex items-center gap-1.5"><Star className="h-3.5 w-3.5 text-amber-400" />Featured post</span>} description="Highlight on the blog page" checked={form.featured} onChange={set('featured')} />
               <Toggle label={<span className="flex items-center gap-1.5"><Zap className="h-3.5 w-3.5 text-rose-500" />Breaking news</span>} description="Show in breaking tickers with a red badge" checked={form.isBreaking} onChange={set('isBreaking')} />
+              <Toggle label={<span className="flex items-center gap-1.5"><MessagesSquare className="h-3.5 w-3.5 text-sky-500" />Allow comments</span>} description="Readers can comment on this post" checked={form.allowComments} onChange={set('allowComments')} />
               {!isNew && <button onClick={remove} className="flex items-center gap-1.5 text-sm font-semibold text-rose-600 hover:underline"><Trash2 className="h-4 w-4" />Move to trash</button>}
             </div>
           </Card>

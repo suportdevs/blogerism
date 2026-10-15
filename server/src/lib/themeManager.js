@@ -1,4 +1,5 @@
 const prisma = require('./prisma');
+const { seedEngagement } = require('./demoEngagement');
 const { getSettings, saveGroup } = require('./settings');
 const { THEMES, DEFAULT_THEME } = require('../themes');
 const { HttpError } = require('./utils');
@@ -10,7 +11,10 @@ async function applyMenus(menus) {
     await prisma.menuItem.deleteMany({ where: { menuId: menu.id } });
     const insert = async (items, parentId) => {
       for (const [order, item] of items.entries()) {
-        const created = await prisma.menuItem.create({ data: { menuId: menu.id, parentId, order, label: item.label, url: item.url, target: item.target || '_self' } });
+        const { label, url, target, description, icon, badge, image, mega } = item;
+        const created = await prisma.menuItem.create({
+          data: { menuId: menu.id, parentId, order, label, url, target: target || '_self', description, icon, badge, image, mega: parentId === null && !!mega },
+        });
         if (item.children?.length) await insert(item.children, created.id);
       }
     };
@@ -84,6 +88,7 @@ async function activateTheme(id, { appearance = true, setup = true, demo = false
     await clearContent();
     const authors = await prisma.user.findMany({ orderBy: { id: 'asc' }, take: 3 });
     await theme.demo(prisma, { authors });
+    await seedEngagement(prisma);
   } else if (switching && !sameFamily) {
     const restoredVariant = restore ? await loadWorkspace(family(id)) : false;
     restored = !!restoredVariant;

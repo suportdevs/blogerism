@@ -76,6 +76,16 @@ const DEFAULT_SETTINGS = {
     enableNewsletter: true,
     enableContactForm: true,
   },
+  // Reader engagement on posts and series.
+  engagement: {
+    comments: true,
+    moderation: true, // new comments wait for approval
+    commentReplies: true,
+    likes: true,
+    share: true,
+    saves: true,
+    subscriptions: true,
+  },
 };
 
 const isObject = (v) => v && typeof v === 'object' && !Array.isArray(v);

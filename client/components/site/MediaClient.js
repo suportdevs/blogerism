@@ -1,9 +1,8 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight, Heart, Link2, Play } from 'lucide-react';
-import { API_URL } from '@/lib/api';
-import { cn, compact, embedUrl } from '@/lib/utils';
+import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
+import { cn, embedUrl } from '@/lib/utils';
 import { EpisodeRow, VideoCard } from './MediaCards';
 
 /* Horizontal scroller with arrow buttons (streaming-style rows). */
@@ -64,37 +63,6 @@ export function VideoPlayer({ url, poster, title, autoPlay = false, className })
         </button>
       )}
     </div>
-  );
-}
-
-export function LikeButton({ slug, initial }) {
-  const [likes, setLikes] = useState(initial || 0);
-  const [liked, setLiked] = useState(false);
-  const like = async () => {
-    if (liked) return;
-    setLiked(true);
-    setLikes((n) => n + 1);
-    try {
-      const r = await fetch(`${API_URL}/api/public/posts/${slug}/like`, { method: 'POST' });
-      if (r.ok) setLikes((await r.json()).likes);
-    } catch {}
-  };
-  return (
-    <button onClick={like} className={cn('inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition', liked ? 'bg-primary text-white' : 'bg-fg/5 text-fg hover:bg-fg/10')}>
-      <Heart className={cn('h-4 w-4', liked && 'fill-current')} />{compact(likes)}
-    </button>
-  );
-}
-
-export function CopyLinkButton() {
-  const [copied, setCopied] = useState(false);
-  return (
-    <button
-      onClick={() => { navigator.clipboard.writeText(window.location.href); setCopied(true); setTimeout(() => setCopied(false), 1500); }}
-      className="inline-flex items-center gap-2 rounded-full bg-fg/5 px-4 py-2 text-sm font-semibold text-fg transition hover:bg-fg/10"
-    >
-      <Link2 className="h-4 w-4" />{copied ? 'Copied!' : 'Share'}
-    </button>
   );
 }
 

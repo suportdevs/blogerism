@@ -90,6 +90,19 @@ They are built on twelve interactive blocks (category *Interactive*): team, proc
 
 Sections are defined in `client/lib/sections.js` (`THEME_SECTIONS`, `THEME_PAGE_DESIGNS`), so adding one means adding an entry there.
 
+### Reader engagement
+
+Every theme gets likes, comments, sharing, saving and following. Each feature can be switched off in **Settings → Engagement**.
+
+- **Comments**: threaded replies, a spam honeypot and rate limiting. With *Hold for moderation* on, new comments wait in **Admin → Comments** (the sidebar badge shows how many). There you can approve, mark as spam, edit, delete or bulk-moderate, and reply as the team; team replies get a *Team* badge. Comments can also be turned off per post in the post editor.
+- **Likes**: a like/unlike toggle on articles, videos and episodes. **Share**: the phone's native share sheet, or Facebook, X, LinkedIn, WhatsApp, email and copy link.
+- **Save for later**: called *Reading list*, *Saved stories*, *Watch later*, *My List* or *Listen later* depending on the theme. It's stored in the visitor's browser (no account needed) and listed at `/saved`, linked from the header.
+- **Follow / subscribe** to podcasts, shows and playlists, with follower counts.
+- **Reading tools**: reading progress bar and A−/A+ text size on articles, plus a print button on news articles.
+- **Podcast player**: resumes each episode where the listener stopped, remembers playback speed, and supports lock-screen and headphone controls.
+
+Importing a theme's demo content also adds sample comments, likes and follower counts.
+
 ### Content formats
 
 Each post has a **format** (Article, Video, Audio, Gallery) that picks its page layout:

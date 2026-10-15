@@ -35,6 +35,7 @@ app.use('/api/admin/media', require('./routes/media'));
 app.use('/api/admin/menus', require('./routes/menus').router);
 app.use('/api/admin/settings', require('./routes/settings'));
 app.use('/api/admin/contacts', require('./routes/contacts'));
+app.use('/api/admin/comments', require('./routes/comments'));
 app.use('/api/admin/users', users);
 app.use('/api/admin/roles', roles);
 app.use('/api/admin/system', require('./routes/system'));
