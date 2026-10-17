@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Facebook, Github, Instagram, Linkedin, Mail, MapPin, Phone, Twitter, Youtube } from 'lucide-react';
+import { ArrowRight, Facebook, Github, Instagram, Linkedin, Mail, MapPin, Phone, Twitter, Youtube } from 'lucide-react';
 import { Logo } from './Header';
 import { NewsletterForm } from './forms';
 
@@ -43,6 +43,61 @@ export default function Footer({ settings, menus }) {
         </div>
         <div className="border-t border-fg/10 py-6 text-center text-[10.5px] uppercase tracking-[0.3em] text-fg/45">
           © {year} {general.siteName}{appearance.footerText && <span> · {appearance.footerText}</span>}
+        </div>
+      </footer>
+    );
+  }
+
+  if (appearance.footerStyle === 'big') {
+    const cta = appearance.headerCta || {};
+    const name = general.siteName || '';
+    return (
+      <footer className="relative overflow-hidden bg-[#0b0b10] text-white [--c-bg:11_11_16] [--c-fg:255_255_255] [--c-surface:24_24_32]">
+        <div className="pointer-events-none absolute -top-48 right-0 h-[420px] w-[420px] rounded-full bg-primary/30 blur-[130px]" />
+        <div className="site-container relative pb-10 pt-20 sm:pt-24">
+          <div className="grid gap-12 border-b border-white/10 pb-16 lg:grid-cols-[1.5fr_1fr] lg:items-end">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.3em] text-primary">{general.siteName}</p>
+              <h2 className="mt-5 max-w-3xl font-heading text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl">{general.tagline}</h2>
+              {cta.enabled && cta.label && (
+                <Link href={cta.url || '#'} className="group mt-10 inline-flex items-center gap-4 rounded-full bg-primary py-2 pl-7 pr-2 font-bold text-white transition hover:brightness-110">
+                  {cta.label}<span className="grid h-11 w-11 place-items-center rounded-full bg-white text-gray-900 transition duration-300 group-hover:-rotate-45"><ArrowRight className="h-5 w-5" /></span>
+                </Link>
+              )}
+            </div>
+            {advanced.enableNewsletter && (
+              <div>
+                <h4 className="font-heading text-lg font-bold">Stay in the loop</h4>
+                <p className="mb-4 mt-1 text-sm text-white/60">News, offers and ideas — once a month.</p>
+                <NewsletterForm compact />
+              </div>
+            )}
+          </div>
+          <div className="grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
+            {columns.map((menu) => (
+              <div key={menu.name}>
+                <h4 className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-white/45">{menu.name.replace(/^Footer\s*[—-]\s*/i, '')}</h4>
+                <ul className="space-y-2.5">{menu.items.map((i) => <li key={i.id}><Link href={i.url} target={i.target} className="text-white/80 transition hover:text-primary">{i.label}</Link></li>)}</ul>
+              </div>
+            ))}
+            <div>
+              <h4 className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-white/45">Contact</h4>
+              <ul className="space-y-2.5 text-white/80">
+                {contact.email && <li><a href={`mailto:${contact.email}`} className="hover:text-primary">{contact.email}</a></li>}
+                {contact.phone && <li>{contact.phone}</li>}
+                {contact.address && <li className="text-white/60">{contact.address}</li>}
+              </ul>
+            </div>
+            <div>
+              <h4 className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-white/45">Follow</h4>
+              <div className="[&_a]:border-white/15 [&_a]:text-white/70"><SocialLinks social={social} /></div>
+            </div>
+          </div>
+          <div aria-hidden className="select-none overflow-hidden whitespace-nowrap font-heading font-black uppercase leading-[0.85] tracking-[-0.05em] bg-gradient-to-b from-white/[.16] to-white/0 bg-clip-text text-transparent" style={{ fontSize: `min(15rem, ${Math.min(17, 128 / Math.max(name.length, 4)).toFixed(2)}vw)` }}>{name}</div>
+          <div className="mt-8 flex flex-col justify-between gap-2 border-t border-white/10 pt-6 text-sm text-white/50 md:flex-row">
+            <span>© {year} {general.siteName}. All rights reserved.</span>
+            <span>{appearance.footerText}</span>
+          </div>
         </div>
       </footer>
     );

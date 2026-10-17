@@ -201,7 +201,7 @@ export default function AppearancePage() {
           </Section>
 
           <Section icon={PanelBottom} title="Footer">
-            <Field label="Style"><Segmented value={a.footerStyle} onChange={set('footerStyle')} options={[['columns', 'Columns'], ['simple', 'Simple']]} /></Field>
+            <Field label="Style"><Segmented value={a.footerStyle} onChange={set('footerStyle')} options={[['columns', 'Columns'], ['simple', 'Simple'], ['big', 'Statement']]} /></Field>
             <Field label="Footer text"><input className="a-input" value={a.footerText} onChange={(e) => set('footerText')(e.target.value)} /></Field>
           </Section>
         </div>

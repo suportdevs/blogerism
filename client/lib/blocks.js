@@ -715,6 +715,176 @@ export const BLOCKS = {
     ],
   },
 
+  /* ---------------------------- Business ---------------------------- */
+  splitHero: {
+    label: 'Split hero', category: 'Headers', icon: 'PanelLeft', description: 'Headline beside an image collage or arch with floating stat cards',
+    defaults: { variant: 'collage', eyebrow: 'Welcome', title: 'A headline that', highlight: 'earns trust', subtitle: 'One or two sentences that explain what you do and who it is for.', primaryLabel: 'Get started', primaryUrl: '/contact', secondaryLabel: 'Learn more', secondaryUrl: '/about', image: 'https://picsum.photos/seed/split-1/1000/1200', image2: 'https://picsum.photos/seed/split-2/800/800', bullets: [], badges: [{ icon: 'Award', value: '15+', label: 'Years of experience' }], proof: 'Rated 4.9/5 by 1,200+ clients', avatars: [] },
+    fields: [
+      { name: 'variant', label: 'Design', type: 'select', options: [['collage', 'Image collage'], ['arch', 'Arch image'], ['framed', 'Framed card']] },
+      { name: 'eyebrow', label: 'Eyebrow', type: 'text' },
+      { name: 'title', label: 'Title', type: 'text', half: true }, { name: 'highlight', label: 'Highlighted words', type: 'text', half: true },
+      { name: 'subtitle', label: 'Subtitle', type: 'textarea' },
+      { name: 'bullets', label: 'Check-list (optional)', type: 'stringList' },
+      ...button('primary', 'Primary button'),
+      ...button('secondary', 'Secondary button'),
+      { name: 'image', label: 'Main image', type: 'image' }, { name: 'image2', label: 'Second image (collage)', type: 'image' },
+      { name: 'badges', label: 'Floating cards (max 2)', type: 'list', itemLabel: 'label', defaults: { icon: 'Star', value: '100+', label: 'Label' }, fields: [
+        { name: 'icon', label: 'Icon', type: 'icon', options: ICON_NAMES, half: true }, { name: 'value', label: 'Value', type: 'text', half: true }, { name: 'label', label: 'Label', type: 'text' },
+      ] },
+      { name: 'proof', label: 'Social proof line', type: 'text' },
+      { name: 'avatars', label: 'Proof avatars (image URLs)', type: 'stringList' },
+    ],
+  },
+  searchHero: {
+    label: 'Search hero', category: 'Headers', icon: 'SearchCheck', description: 'Full-bleed image with a tabbed search / booking bar',
+    defaults: { image: 'https://picsum.photos/seed/search-hero/2000/1200', overlay: 45, height: 'tall', align: 'center', eyebrow: 'Find your place', title: 'Search made beautifully simple', subtitle: '', tabs: ['Buy', 'Rent'], buttonLabel: 'Search', action: '/contact', fields: [{ label: 'Location', icon: 'MapPin', type: 'text', placeholder: 'City or neighbourhood', options: [] }, { label: 'Type', icon: 'Home', type: 'select', placeholder: '', options: ['House', 'Apartment', 'Villa'] }], stats: [] },
+    fields: [
+      { name: 'image', label: 'Background image', type: 'image' },
+      { name: 'overlay', label: 'Darken image (%)', type: 'number', half: true },
+      { name: 'height', label: 'Height', type: 'select', options: [['full', 'Full screen'], ['tall', 'Tall']], half: true },
+      { name: 'align', label: 'Text position', type: 'select', options: [['center', 'Center'], ['left', 'Left']] },
+      { name: 'eyebrow', label: 'Eyebrow', type: 'text' }, { name: 'title', label: 'Title', type: 'text' }, { name: 'subtitle', label: 'Subtitle', type: 'textarea' },
+      { name: 'tabs', label: 'Tabs (optional)', type: 'stringList' },
+      { name: 'fields', label: 'Search fields', type: 'list', itemLabel: 'label', defaults: { label: 'Field', icon: 'Search', type: 'text', placeholder: '', options: [] }, fields: [
+        { name: 'label', label: 'Label', type: 'text', half: true }, { name: 'icon', label: 'Icon', type: 'icon', options: ICON_NAMES, half: true },
+        { name: 'type', label: 'Input', type: 'select', options: [['text', 'Text'], ['select', 'Dropdown'], ['date', 'Date']], half: true }, { name: 'placeholder', label: 'Placeholder', type: 'text', half: true },
+        { name: 'options', label: 'Dropdown options', type: 'stringList' },
+      ] },
+      { name: 'buttonLabel', label: 'Button', type: 'text', half: true }, { name: 'action', label: 'Submit to (page URL)', type: 'url', half: true },
+      { name: 'stats', label: 'Stats under the bar', type: 'list', itemLabel: 'label', defaults: { value: '100+', label: 'Label' }, fields: [{ name: 'value', label: 'Value', type: 'text', half: true }, { name: 'label', label: 'Label', type: 'text', half: true }] },
+    ],
+  },
+  kineticHero: {
+    label: 'Kinetic type hero', category: 'Headers', icon: 'Type', description: 'Giant typography, rotating word, spinning badge & marquee',
+    defaults: { eyebrow: 'Independent studio', lines: ['We make', 'brands'], rotate: ['bold', 'loved', 'unforgettable'], subtitle: 'Strategy, identity and digital products for ambitious companies.', primaryLabel: 'See our work', primaryUrl: '#work', secondaryLabel: 'Start a project', secondaryUrl: '/contact', image: 'https://picsum.photos/seed/kinetic/600/600', badge: 'Scroll to explore • Scroll to explore • ', marquee: ['Branding', 'Web design', 'Motion', 'Strategy'] },
+    fields: [
+      { name: 'eyebrow', label: 'Eyebrow', type: 'text' },
+      { name: 'lines', label: 'Headline lines', type: 'stringList' },
+      { name: 'rotate', label: 'Rotating words (last line)', type: 'stringList' },
+      { name: 'subtitle', label: 'Subtitle', type: 'textarea' },
+      ...button('primary', 'Primary button'),
+      ...button('secondary', 'Secondary button'),
+      { name: 'image', label: 'Round image beside the badge', type: 'image' },
+      { name: 'badge', label: 'Spinning badge text', type: 'text' },
+      { name: 'marquee', label: 'Marquee words', type: 'stringList' },
+    ],
+  },
+  trustBar: {
+    label: 'Trust bar', category: 'Business', icon: 'BadgeCheck', description: 'Row of icon highlights — can overlap the hero above',
+    defaults: { variant: 'overlap', items: [{ icon: 'ShieldCheck', title: 'Licensed & insured', text: 'Fully certified team.' }, { icon: 'Clock', title: 'Fast response', text: 'Replies within 24 hours.' }, { icon: 'Award', title: 'Award winning', text: 'Recognised by our peers.' }] },
+    fields: [
+      { name: 'variant', label: 'Design', type: 'select', options: [['overlap', 'Card overlapping the section above'], ['strip', 'Divided strip'], ['pills', 'Centered pills']] },
+      { name: 'items', label: 'Highlights', type: 'list', itemLabel: 'title', defaults: { icon: 'Star', title: 'Highlight', text: '' }, fields: [
+        { name: 'icon', label: 'Icon', type: 'icon', options: ICON_NAMES, half: true }, { name: 'title', label: 'Title', type: 'text', half: true }, { name: 'text', label: 'Text', type: 'text' },
+      ] },
+    ],
+  },
+  serviceCards: {
+    label: 'Service cards', category: 'Business', icon: 'LayoutTemplate', description: 'Services as image cards, icon tiles or numbered rows',
+    defaults: { eyebrow: 'Services', title: 'What we do', subtitle: '', variant: 'image', columns: 3, buttonLabel: '', buttonUrl: '', items: [1, 2, 3].map((i) => ({ icon: 'Star', title: `Service ${i}`, text: 'A short description of this service.', image: `https://picsum.photos/seed/service-${i}/900/700`, url: '/contact', linkLabel: 'Learn more' })) },
+    fields: [
+      ...heading, { name: 'subtitle', label: 'Subtitle', type: 'textarea' },
+      { name: 'variant', label: 'Design', type: 'select', options: [['image', 'Image cards'], ['icon', 'Icon tiles — fill on hover'], ['rows', 'Numbered rows']], half: true },
+      { name: 'columns', label: 'Columns', type: 'select', options: [[2, '2'], [3, '3'], [4, '4']], half: true },
+      ...button('button', 'Heading button'),
+      { name: 'items', label: 'Services', type: 'list', itemLabel: 'title', defaults: { icon: 'Star', title: 'Service', text: '', image: '', url: '', linkLabel: 'Learn more' }, fields: [
+        { name: 'icon', label: 'Icon', type: 'icon', options: ICON_NAMES, half: true }, { name: 'title', label: 'Title', type: 'text', half: true },
+        { name: 'text', label: 'Text', type: 'textarea', rows: 2 }, { name: 'image', label: 'Image', type: 'image' },
+        { name: 'linkLabel', label: 'Link label', type: 'text', half: true }, { name: 'url', label: 'Link', type: 'url', half: true },
+      ] },
+    ],
+  },
+  listingCards: {
+    label: 'Listings', category: 'Business', icon: 'LayoutList', description: 'Properties, rooms, tours or courses with price, meta & filters',
+    defaults: { eyebrow: 'Featured', title: 'Latest listings', subtitle: '', columns: 3, filters: true, subtitleIcon: 'MapPin', variant: 'card', buttonLabel: 'View all', buttonUrl: '/contact', items: [1, 2, 3].map((i) => ({ image: `https://picsum.photos/seed/listing-${i}/900/700`, badge: 'New', category: 'Category', title: `Listing ${i}`, subtitle: 'Location', price: '$1,200', period: '/month', rating: '4.9', meta: ['BedDouble: 3 beds', 'Bath: 2 baths'], url: '/contact' })) },
+    fields: [
+      ...heading, { name: 'subtitle', label: 'Subtitle', type: 'textarea' },
+      { name: 'variant', label: 'Card design', type: 'select', options: [['card', 'Image + details'], ['overlay', 'Text over image']], half: true },
+      { name: 'columns', label: 'Columns', type: 'select', options: [[2, '2'], [3, '3'], [4, '4']], half: true },
+      { name: 'filters', label: 'Category filter tabs', type: 'toggle', half: true },
+      { name: 'subtitleIcon', label: 'Subtitle icon', type: 'icon', options: ICON_NAMES, half: true },
+      ...button('button', 'Button'),
+      { name: 'items', label: 'Listings', type: 'list', itemLabel: 'title', hint: 'Meta: “Icon: text” (e.g. “BedDouble: 3 beds”) or plain text', defaults: { image: '', badge: '', category: '', title: 'Listing', subtitle: '', price: '', period: '', rating: '', meta: [], url: '' }, fields: [
+        { name: 'image', label: 'Image', type: 'image' },
+        { name: 'title', label: 'Title', type: 'text', half: true }, { name: 'subtitle', label: 'Location / subtitle', type: 'text', half: true },
+        { name: 'category', label: 'Category (filter)', type: 'text', half: true }, { name: 'badge', label: 'Badge', type: 'text', half: true },
+        { name: 'price', label: 'Price', type: 'text', half: true }, { name: 'period', label: 'Price suffix', type: 'text', half: true },
+        { name: 'rating', label: 'Rating', type: 'text', half: true }, { name: 'url', label: 'Link', type: 'url', half: true },
+        { name: 'meta', label: 'Details', type: 'stringList' },
+      ] },
+    ],
+  },
+  caseStudies: {
+    label: 'Case studies', category: 'Business', icon: 'Layers', description: 'Results-driven stories — cards stack as you scroll',
+    defaults: { eyebrow: 'Case studies', title: 'Results we are proud of', subtitle: '', variant: 'stack', items: [1, 2, 3].map((i) => ({ image: `https://picsum.photos/seed/case-${i}/1200/900`, client: `Client ${i}`, title: 'A headline result for this client', text: 'What the challenge was, what we did and what changed.', metrics: [{ value: '+120%', label: 'Growth' }, { value: '3x', label: 'ROI' }], tags: ['Strategy'], url: '/contact' })) },
+    fields: [
+      ...heading, { name: 'subtitle', label: 'Subtitle', type: 'textarea' },
+      { name: 'variant', label: 'Design', type: 'select', options: [['stack', 'Sticky stacking cards'], ['grid', 'Two-column grid']] },
+      { name: 'items', label: 'Case studies', type: 'list', itemLabel: 'title', defaults: { image: '', client: 'Client', title: 'Result', text: '', metrics: [], tags: [], url: '' }, fields: [
+        { name: 'image', label: 'Image', type: 'image' },
+        { name: 'client', label: 'Client', type: 'text', half: true }, { name: 'url', label: 'Link', type: 'url', half: true },
+        { name: 'title', label: 'Title', type: 'text' }, { name: 'text', label: 'Text', type: 'textarea', rows: 3 },
+        { name: 'metrics', label: 'Metrics', type: 'list', itemLabel: 'label', defaults: { value: '+50%', label: 'Metric' }, fields: [{ name: 'value', label: 'Value', type: 'text', half: true }, { name: 'label', label: 'Label', type: 'text', half: true }] },
+        { name: 'tags', label: 'Tags', type: 'stringList' },
+      ] },
+    ],
+  },
+  schedule: {
+    label: 'Schedule', category: 'Business', icon: 'CalendarDays', description: 'Day tabs with sessions — classes, agenda or itinerary',
+    defaults: { eyebrow: 'Schedule', title: 'This week', subtitle: '', buttonLabel: 'Book', buttonUrl: '/contact', hostIcon: 'Users', locationIcon: 'Clock', days: [{ label: 'Monday', sessions: [{ time: '07:00', title: 'Session', host: 'Host', location: 'Room 1', tag: '' }] }] },
+    fields: [
+      ...heading, { name: 'subtitle', label: 'Subtitle', type: 'textarea' },
+      { name: 'buttonLabel', label: 'Row button', type: 'text', half: true }, { name: 'buttonUrl', label: 'Row button link', type: 'url', half: true },
+      { name: 'hostIcon', label: 'Host icon', type: 'icon', options: ICON_NAMES, half: true }, { name: 'locationIcon', label: 'Place / duration icon', type: 'icon', options: ICON_NAMES, half: true },
+      { name: 'days', label: 'Tabs (days)', type: 'list', itemLabel: 'label', defaults: { label: 'Day', sessions: [] }, fields: [
+        { name: 'label', label: 'Tab label', type: 'text' },
+        { name: 'sessions', label: 'Sessions', type: 'list', itemLabel: 'title', defaults: { time: '09:00', title: 'Session', host: '', location: '', tag: '' }, fields: [
+          { name: 'time', label: 'Time', type: 'text', half: true }, { name: 'title', label: 'Title', type: 'text', half: true },
+          { name: 'host', label: 'Host / coach', type: 'text', half: true }, { name: 'location', label: 'Place / duration', type: 'text', half: true },
+          { name: 'tag', label: 'Tag', type: 'text' },
+        ] },
+      ] },
+    ],
+  },
+  donation: {
+    label: 'Donation', category: 'Business', icon: 'HandHeart', description: 'Fundraising goal, amount chips & monthly toggle',
+    defaults: { eyebrow: 'Donate', title: 'Your gift changes lives', text: '', image: 'https://picsum.photos/seed/donate/1000/1200', currency: '$', goal: 50000, raised: 32400, supporters: 812, amounts: ['25', '50', '100', '250'], impact: [{ amount: '25', text: 'Buys school supplies for one child' }], buttonLabel: 'Donate now', url: '/contact', monthly: true },
+    fields: [
+      ...heading, { name: 'text', label: 'Text', type: 'textarea' }, { name: 'image', label: 'Image', type: 'image' },
+      { name: 'currency', label: 'Currency symbol', type: 'text', half: true }, { name: 'supporters', label: 'Supporters', type: 'number', half: true },
+      { name: 'goal', label: 'Goal', type: 'number', half: true }, { name: 'raised', label: 'Raised so far', type: 'number', half: true },
+      { name: 'amounts', label: 'Amount options', type: 'stringList' },
+      { name: 'impact', label: 'What each amount does', type: 'list', itemLabel: 'amount', defaults: { amount: '50', text: '' }, fields: [{ name: 'amount', label: 'Amount', type: 'text', half: true }, { name: 'text', label: 'Impact', type: 'text', half: true }] },
+      { name: 'monthly', label: 'Offer monthly giving', type: 'toggle' },
+      { name: 'buttonLabel', label: 'Button', type: 'text', half: true }, { name: 'url', label: 'Donate page (amount is appended)', type: 'url', half: true },
+    ],
+  },
+  appointment: {
+    label: 'Appointment booking', category: 'Business', icon: 'CalendarClock', description: 'Service, date & time booking form → Messages inbox',
+    defaults: { eyebrow: 'Appointments', title: 'Book a visit', text: 'Pick a time that suits you — we will confirm by email.', serviceLabel: 'Service', services: ['Consultation', 'Follow-up'], firstSlot: '09:00', lastSlot: '17:00', interval: 30, image: '', phone: '', bullets: [] },
+    fields: [
+      ...heading, { name: 'text', label: 'Text', type: 'textarea' },
+      { name: 'serviceLabel', label: 'Service field label', type: 'text', half: true }, { name: 'phone', label: 'Phone shown beside the form', type: 'text', half: true },
+      { name: 'services', label: 'Services', type: 'stringList' },
+      { name: 'firstSlot', label: 'First slot', type: 'text', half: true }, { name: 'lastSlot', label: 'Last slot', type: 'text', half: true },
+      { name: 'interval', label: 'Minutes between slots', type: 'number' },
+      { name: 'bullets', label: 'Reassurance points', type: 'stringList' },
+      { name: 'image', label: 'Image (optional)', type: 'image' },
+    ],
+  },
+  ctaBanner: {
+    label: 'CTA banner', category: 'Business', icon: 'RectangleHorizontal', description: 'Image-backed call to action with phone number',
+    defaults: { variant: 'image', image: 'https://picsum.photos/seed/cta-banner/1800/900', eyebrow: 'Get in touch', title: 'Ready when you are', text: 'Talk to our team today — no obligation.', primaryLabel: 'Contact us', primaryUrl: '/contact', secondaryLabel: '', secondaryUrl: '', phone: '' },
+    fields: [
+      { name: 'variant', label: 'Design', type: 'select', options: [['image', 'Image with colour wash'], ['split', 'Colour panel + image']] },
+      { name: 'image', label: 'Image', type: 'image' },
+      { name: 'eyebrow', label: 'Eyebrow', type: 'text' }, { name: 'title', label: 'Title', type: 'text' }, { name: 'text', label: 'Text', type: 'textarea' },
+      ...button('primary', 'Primary button'),
+      ...button('secondary', 'Secondary button'),
+      { name: 'phone', label: 'Phone number (optional)', type: 'text' },
+    ],
+  },
+
   spacer: {
     label: 'Spacer', category: 'Layout', icon: 'MoveVertical', description: 'Vertical whitespace / divider',
     defaults: { size: 64, divider: false },
@@ -741,7 +911,7 @@ export const STYLE_FIELDS = [
 
 export const DEFAULT_STYLE = { background: 'none', paddingY: 'lg', width: 'normal', align: '', animate: true };
 
-export const BLOCK_CATEGORIES = ['Headers', 'Luxury', 'Content', 'Interactive', 'Media', 'Portfolio', 'Restaurant', 'News', 'Video', 'Audio', 'Dynamic', 'Conversion', 'Layout'];
+export const BLOCK_CATEGORIES = ['Headers', 'Luxury', 'Content', 'Business', 'Interactive', 'Media', 'Portfolio', 'Restaurant', 'News', 'Video', 'Audio', 'Dynamic', 'Conversion', 'Layout'];
 
 // Ready-made page templates for "New page".
 export const PAGE_TEMPLATES = {

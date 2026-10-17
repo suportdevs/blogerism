@@ -12,6 +12,7 @@ import {
   UserRound, IdCard, Wrench, Milestone, FolderKanban, GalleryThumbnails, MousePointerClick, LayoutDashboard, ToggleRight, UtensilsCrossed, Clock, CalendarCheck, MoveHorizontal,
   Zap, LayoutList, Columns3, PanelRight, MonitorPlay, GalleryHorizontal, Clapperboard, Trophy, Library, ListMusic,
   Users, Footprints, PanelsTopLeft, Table2, SplitSquareHorizontal, ListCollapse, GalleryHorizontalEnd, Briefcase, Timer, Disc3, LayoutTemplate,
+  PanelLeft, SearchCheck, BadgeCheck, CalendarDays, HandHeart, CalendarClock, RectangleHorizontal,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { BLOCKS, BLOCK_CATEGORIES, DEFAULT_STYLE, STYLE_FIELDS } from '@/lib/blocks';
@@ -24,7 +25,7 @@ import { ImageField } from './Media';
 import { Field, PageLoader, Tabs } from './ui';
 import { useSiteTheme } from './SiteTheme';
 
-const BLOCK_ICONS = { Crown, ScrollText, Frame, ListOrdered, BookOpen, MessageSquareQuote, Gem, MoveHorizontal, GalleryThumbnails, MousePointerClick, LayoutDashboard, ToggleRight, UtensilsCrossed, Clock, CalendarCheck, UserRound, IdCard, Wrench, Milestone, FolderKanban, Zap, LayoutList, Columns3, PanelRight, MonitorPlay, GalleryHorizontal, Clapperboard, Trophy, Library, ListMusic, Sparkles, PanelTop, LayoutGrid, Columns2, Type, BarChart3, Building2, Images, PlayCircle, Newspaper, Quote, HelpCircle, CreditCard, Megaphone, Mail, Send, MoveVertical, Code2, Users, Footprints, PanelsTopLeft, Table2, SplitSquareHorizontal, ListCollapse, GalleryHorizontalEnd, Briefcase, Timer, Disc3 };
+const BLOCK_ICONS = { Crown, ScrollText, Frame, ListOrdered, BookOpen, MessageSquareQuote, Gem, MoveHorizontal, GalleryThumbnails, MousePointerClick, LayoutDashboard, ToggleRight, UtensilsCrossed, Clock, CalendarCheck, UserRound, IdCard, Wrench, Milestone, FolderKanban, Zap, LayoutList, Columns3, PanelRight, MonitorPlay, GalleryHorizontal, Clapperboard, Trophy, Library, ListMusic, Sparkles, PanelTop, LayoutGrid, Columns2, Type, BarChart3, Building2, Images, PlayCircle, Newspaper, Quote, HelpCircle, CreditCard, Megaphone, Mail, Send, MoveVertical, Code2, Users, Footprints, PanelsTopLeft, Table2, SplitSquareHorizontal, ListCollapse, GalleryHorizontalEnd, Briefcase, Timer, Disc3, PanelLeft, SearchCheck, BadgeCheck, LayoutTemplate, CalendarDays, HandHeart, CalendarClock, RectangleHorizontal };
 const DEVICES = { desktop: { icon: Monitor, width: '100%' }, tablet: { icon: Tablet, width: '820px' }, mobile: { icon: Smartphone, width: '390px' } };
 
 export const newBlock = (type, style = {}) => ({ id: uid(), type, data: structuredClone(BLOCKS[type].defaults), style: { ...DEFAULT_STYLE, ...style } });

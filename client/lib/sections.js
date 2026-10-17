@@ -1,5 +1,6 @@
 import { BLOCKS, DEFAULT_STYLE } from './blocks';
 import { uid } from './utils';
+import { BUSINESS_PAGE_DESIGNS, BUSINESS_SECTIONS } from './businessSections';
 
 /*
  * Theme section library.
@@ -412,6 +413,7 @@ export const THEME_SECTIONS = {
   waveform, 'waveform-luxe': waveformLuxe,
   folio, 'folio-luxe': folioLuxe,
   saffron, pulse, lens,
+  ...BUSINESS_SECTIONS,
 };
 
 // Complete page starters per theme, built from the theme's sections (+ a generic page header when the first key is 'header').
@@ -468,6 +470,7 @@ export const THEME_PAGE_DESIGNS = {
     { key: 'weddings', label: 'Weddings', sections: ['header', 'lens-stories', 'lens-session', 'lens-packages'] },
     { key: 'about', label: 'About the studio', sections: ['header', 'lens-specialities', 'lens-retouch', 'lens-studio', 'lens-showreel'] },
   ],
+  ...BUSINESS_PAGE_DESIGNS,
 };
 
 // Sections for the active theme: its own first, then (for Luxe versions) the classic family's.

@@ -9,6 +9,14 @@ const mp3 = (n) => `https://www.soundhelix.com/examples/mp3/SoundHelix-Song-${n}
 // Unsplash CDN photo (ids verified to exist).
 const un = (id, w = 1600) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=80`;
 const MDN_VIDEO = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos';
+// Verified Unsplash portraits for team members and testimonials (w = women, m = men).
+const FACES = {
+  w1: '1438761681033-6461ffad8d80', w2: '1494790108377-be9c29b29330', w3: '1517841905240-472988babdf9', w4: '1544005313-94ddf0286df2',
+  w5: '1573496359142-b8d87734a5a2', w6: '1573497019940-1c28c88b4f3e', w7: '1580489944761-15a19d654956',
+  m1: '1472099645785-5658abf4ff4e', m2: '1500648767791-00dcc994a43e', m3: '1506794778202-cad84cf45f1d', m4: '1507679799987-c73779587ccf',
+  m5: '1519085360753-af0119f7cbe7', m6: '1531427186611-ecfd6d936c79', m7: '1557862921-37829c790f19', m8: '1560250097-0b93528c311a',
+};
+const face = (key, w = 600) => un(FACES[key], w);
 
 // Page-builder block.
 const B = (type, data, style = {}) => ({ id: uid(), type, data, style: { paddingY: 'md', width: 'normal', animate: false, ...style } });
@@ -65,4 +73,4 @@ async function seedFaqs(prisma, faqs) {
   await prisma.faq.createMany({ data: faqs.map(([question, answer], order) => ({ question, answer, order, category: 'General' })) });
 }
 
-module.exports = { un, uid, slug, pic, hoursAgo, yt, mp3, MDN_VIDEO, B, m, FILMS, createCategories, rand, commonPages, seedFaqs };
+module.exports = { un, face, uid, slug, pic, hoursAgo, yt, mp3, MDN_VIDEO, B, m, FILMS, createCategories, rand, commonPages, seedFaqs };

@@ -159,6 +159,63 @@ function Mockup({ theme, className }) {
           <div className="relative mt-4 grid grid-cols-3 gap-2">{[0, 1, 2].map((i) => <div key={i}>{box({ height: 34, border: `1px solid ${fg}15` })}</div>)}</div>
         </div>
       )}
+      {header === 'corporate' && (
+        <div>
+          <div className="flex h-3 items-center justify-between px-4" style={{ background: a.primaryColor }}>
+            <div className="flex gap-2">{[0, 1, 2].map((i) => <span key={i} className="h-[2px] w-8 rounded bg-white/70" />)}</div>
+            <div className="flex gap-1">{[0, 1, 2].map((i) => <span key={i} className="h-1.5 w-1.5 rounded-full bg-white/70" />)}</div>
+          </div>
+          <div className="flex items-center gap-3 border-b px-4 py-2" style={{ borderColor: `${fg}15` }}>
+            <span className="h-3 w-3 rounded" style={{ background: `linear-gradient(135deg, ${a.primaryColor}, ${a.accentColor})` }} />{line(30, 0.5)}
+            <div className="mx-auto flex gap-2.5">{[0, 1, 2, 3].map((i) => <div key={i} className="relative">{line(16, i ? 0.3 : 0.7, 3)}{!i && <span className="absolute -bottom-1.5 left-0 h-[2px] w-full" style={{ background: a.primaryColor }} />}</div>)}</div>
+            <span className="h-3 w-11 rounded-sm" style={{ background: a.primaryColor }} />
+          </div>
+          <div className="grid grid-cols-[1.1fr_1fr] items-center gap-3 px-4 pt-3">
+            <div className="space-y-1.5">{line('40%', 0.6, 3)}<div className="text-[11px] font-extrabold leading-tight" style={{ color: fg, fontFamily: a.headingFont }}>Trusted experts</div>{line('90%', 0.2, 3)}{line('70%', 0.2, 3)}<span className="mt-1 block h-3 w-12 rounded-sm" style={{ background: a.primaryColor }} /></div>
+            <div className="relative h-20">{box({ position: 'absolute', inset: '0 0 0 18%' })}{box({ position: 'absolute', left: 0, bottom: -6, width: '45%', height: '55%', border: `2px solid ${bg}` })}</div>
+          </div>
+          <div className="mx-4 mt-3 grid grid-cols-3 rounded-md shadow" style={{ background: bg, border: `1px solid ${fg}15` }}>{[0, 1, 2].map((i) => <div key={i} className="flex items-center gap-1 p-1.5"><span className="h-2.5 w-2.5 rounded-sm" style={{ background: `${a.primaryColor}40` }} />{line('60%', 0.3, 2)}</div>)}</div>
+        </div>
+      )}
+      {header === 'floating' && (
+        <div className="relative h-full">
+          <div className="absolute inset-x-0 top-0 h-[62%]" style={{ background: `linear-gradient(160deg, ${a.primaryColor}cc, #1d2a2a 70%)` }} />
+          <div className="relative mx-3 mt-2.5 flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-2 py-1">
+            <span className="h-3 w-3 rounded-full" style={{ background: a.primaryColor }} /><span className="h-[3px] w-8 rounded bg-white/80" />
+            <div className="mx-auto flex gap-2">{[0, 1, 2, 3].map((i) => <span key={i} className="h-[3px] w-4 rounded bg-white/60" />)}</div>
+            <span className="h-3 w-9 rounded-full" style={{ background: a.primaryColor }} />
+          </div>
+          <div className="relative mt-3 text-center text-[11px] font-extrabold text-white" style={{ fontFamily: a.headingFont }}>Find your next home</div>
+          <div className="relative mx-auto mt-2 flex w-4/5 items-center gap-1 rounded-md bg-white p-1 shadow-lg">{[0, 1, 2].map((i) => <div key={i} className="flex-1 border-r border-black/10 px-1">{line('70%', 0.25, 2)}</div>)}<span className="h-3 w-8 rounded-sm" style={{ background: a.primaryColor }} /></div>
+          <div className="absolute inset-x-4 bottom-3 grid grid-cols-3 gap-2">{[0, 1, 2].map((i) => <div key={i} className="overflow-hidden rounded" style={{ background: surface, border: `1px solid ${fg}15` }}><div style={{ height: 18, background: `hsl(${150 + i * 25} 25% 55%)` }} /><div className="space-y-1 p-1">{line('80%', 0.4, 2)}{line('50%', 0.2, 2)}</div></div>)}</div>
+        </div>
+      )}
+      {header === 'bold' && (
+        <div className="relative h-full" style={{ color: fg }}>
+          <div className="absolute inset-0" style={{ background: `linear-gradient(120deg, #000 30%, ${a.primaryColor}55)` }} />
+          <div className="relative flex items-center gap-3 px-4 py-2.5 text-white">
+            <span className="text-[10px] font-black uppercase italic" style={{ fontFamily: a.headingFont }}>{theme.general.siteName}<span style={{ color: a.primaryColor }}>.</span></span>
+            <div className="flex gap-2">{[0, 1, 2].map((i) => <span key={i} className="h-[3px] w-5 bg-white/60" />)}</div>
+            <span className="ml-auto h-3.5 w-12 -skew-x-12" style={{ background: a.primaryColor }} />
+          </div>
+          <div className="relative px-4 pt-3 font-black uppercase italic leading-[0.9] text-white" style={{ fontFamily: a.headingFont, fontSize: 22 }}>No limits.<br /><span style={{ color: a.primaryColor }}>Just results.</span></div>
+          <div className="absolute inset-x-0 bottom-4 -rotate-2 py-1 text-center text-[8px] font-black uppercase tracking-widest text-black" style={{ background: a.primaryColor }}>Strength ✦ Conditioning ✦ Boxing ✦ Yoga</div>
+        </div>
+      )}
+      {header === 'sidebar' && (
+        <div className="flex h-full">
+          <div className="flex w-[26%] flex-col gap-2 border-r px-2.5 py-3" style={{ borderColor: `${fg}15` }}>
+            <span className="text-[9px] font-extrabold" style={{ color: fg, fontFamily: a.headingFont }}>{theme.general.siteName}<span style={{ color: a.primaryColor }}>*</span></span>
+            <div className="mt-2 space-y-1.5">{[0, 1, 2, 3, 4].map((i) => <div key={i} className="flex items-center gap-1"><span className="text-[5px]" style={{ color: a.primaryColor }}>0{i + 1}</span>{line('70%', i ? 0.3 : 0.8, 4)}</div>)}</div>
+            <span className="mt-auto h-3 w-full rounded-sm" style={{ background: a.primaryColor }} />
+          </div>
+          <div className="relative flex-1 overflow-hidden px-3 pt-3">
+            <div className="font-extrabold uppercase leading-[0.9]" style={{ color: fg, fontFamily: a.headingFont, fontSize: 20 }}>We make<br /><span style={{ color: a.primaryColor }}>brands</span></div>
+            <div className="absolute bottom-10 right-3 h-9 w-9 rounded-full border border-dashed" style={{ borderColor: fg }} />
+            <div className="absolute inset-x-0 bottom-3 -rotate-2 py-1 text-center text-[7px] font-extrabold uppercase text-white" style={{ background: a.primaryColor }}>Branding ✦ Web ✦ Motion ✦ Strategy</div>
+          </div>
+        </div>
+      )}
       {header === 'default' && (
         <div>
           <div className="flex items-center gap-3 px-4 py-2.5">

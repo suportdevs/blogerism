@@ -72,15 +72,28 @@ The site is one kind of website at a time, chosen under **Admin → Appearance �
 | **Lens** | Photography & studio | Minimal editorial header + full-screen mobile menu, Ken Burns slideshow, giant scrolling type, filterable masonry gallery with lightbox | Articles, galleries |
 | **Folio** | Personal portfolio | Floating pill nav, one-page sections: profile hero, about, skills, timeline, projects, contact | Articles (optional) |
 
+| **Atlas** | Consulting & finance | Corporate header (contact top bar), framed split hero, overlapping trust bar, sticky stacking case studies | Articles |
+| **Haven** | Real estate | Floating pill header, full-screen search hero with Buy/Rent tabs, filterable property cards, valuation booking | Articles |
+| **Forge** | Gym & fitness | Bold athletic header + full-screen menu, slideshow hero, class timetable, coaches, membership pricing | Articles |
+| **Vitalis** | Medical clinic | Corporate header, arch-image hero, department tiles, doctors, appointment booking, opening hours | Articles |
+| **Sterling** | Law firm | Centered classic header, serif slideshow, numbered practice-area rows, notable results, consultation form | Articles |
+| **Kinetic** | Creative agency | Fixed sidebar navigation, kinetic-type hero with rotating words, stacking case studies, statement footer | Articles, galleries |
+| **Wanderly** | Travel & tours | Transparent split header, trip search hero, destination carousel, bookable tour cards, itinerary | Articles, galleries |
+| **Scholar** | Online academy | Collage hero, filterable course catalogue, learning tabs, instructors, cohort countdown | Articles |
+| **Aurelia** | Hotel & spa | Luxe design language: framed hero, room cards with nightly rates, spa & dining, reservation request | Articles, galleries |
+| **Evergreen** | Nonprofit | Slideshow hero, donation widget (live goal, impact per amount, monthly), programmes, events calendar | Articles, galleries |
+
+**Client-ready business themes.** The last ten themes above are complete, independent client sites (own demo content, pages, menus, sections and page designs). They add four header layouts (`corporate`, `floating`, `bold`, `sidebar`), a *Statement* footer (`footerStyle: 'big'`) and a **Business** block category: split hero, search hero, kinetic-type hero, trust bar, service cards, listings (properties/rooms/tours/courses), case studies, schedule, donation, appointment booking and CTA banner.
+
 **Luxe versions.** Themewright, Herald, Vidora, Marquee, Waveform and Folio each have a *Luxe* version — the same theme and the same content with a different design language: a framed full-screen hero, luxe header with a full-screen numbered menu, serif typography, gold hairlines, magazine article and archive layouts, and luxury blocks (statement, framed split, editorial list with cursor-following images, magazine feature, quote carousel, parallax CTA). Switching Classic ↔ Luxe never touches content; each version remembers its own customised design.
 
 **Every theme keeps its own content.** Content (posts, pages, series, menus, settings) is stored per theme family in a workspace. Switching themes saves the current theme's content and restores the other theme's, so nothing is ever lost. Users, media, messages and subscribers are shared. Seed all themes at once with `node prisma/seed.js nova --all`.
 
 Activating a theme can (each optional): apply its design, create its homepage/pages and menus, and **import its demo content** (replaces posts, pages, series, categories, menus, FAQs and testimonials; keeps users, media, messages and subscribers). The admin then shows only that theme's formats and blocks (with "show all" escape hatches). Themes can be previewed live before activating.
 
-Seed straight into a theme: `node prisma/seed.js herald` (or `nova`, `vidora`, `marquee`, `waveform`, `folio`, `saffron`, `pulse`, `lens`).
+Seed straight into a theme: `node prisma/seed.js herald` (or `nova`, `vidora`, `marquee`, `waveform`, `folio`, `saffron`, `pulse`, `lens`, `atlas`, `haven`, `forge`, `vitalis`, `sterling`, `kinetic`, `wanderly`, `scholar`, `aurelia`, `evergreen`).
 
-Themes live in `server/src/themes/*.js` — copy one to create your own (layout keys: `header` = `default | masthead | video | streaming | portfolio | overlay | minimal`, `article` = `blog | news`, `listing` = `cards | news | video | audio`).
+Themes live in `server/src/themes/*.js` — copy one to create your own (layout keys: `header` = `default | masthead | video | streaming | portfolio | overlay | minimal | luxe | corporate | floating | bold | sidebar`, `article` = `blog | news`, `listing` = `cards | news | video | audio`).
 
 ### Theme sections & page designs
 
@@ -88,7 +101,7 @@ Every theme (and each Luxe version) ships a library of **designed sections**: re
 
 They are built on twelve interactive blocks (category *Interactive*): team, process steps, feature tabs, comparison table, before/after slider, accordion + image, logo wall, video lightbox, card carousel, careers/jobs, countdown and episode spotlight. Each has several design variants.
 
-Sections are defined in `client/lib/sections.js` (`THEME_SECTIONS`, `THEME_PAGE_DESIGNS`), so adding one means adding an entry there.
+Sections are defined in `client/lib/sections.js` (`THEME_SECTIONS`, `THEME_PAGE_DESIGNS`) — the business themes' sections live in `client/lib/businessSections.js` — so adding one means adding an entry there.
 
 ### Menus: 3 levels, mega menus, drag & drop
 

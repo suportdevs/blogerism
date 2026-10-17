@@ -14,7 +14,8 @@ import { cn } from '@/lib/utils';
  * items become columns and level 3 items the links inside them.
  */
 
-export const isActive = (pathname, url) => !!url && url !== '#' && (url === '/' ? pathname === '/' : pathname.startsWith(url.split('#')[0] || '#'));
+// Homepage anchors ("/#pricing") point at a section, not a page, so they are never the active item.
+export const isActive = (pathname, url) => !!url && url !== '#' && !/^\/?#/.test(url) && (url === '/' ? pathname === '/' : pathname.startsWith(url.split('#')[0]));
 const hasKids = (item) => item.children?.length > 0;
 const isHeading = (item) => !item.url || item.url === '#';
 

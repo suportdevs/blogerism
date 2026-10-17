@@ -11,6 +11,17 @@ const THEMES = Object.fromEntries([
   require('./pulse'),
   require('./lens'),
   ...require('./luxe'),
+  // Client-ready business themes.
+  require('./atlas'),
+  require('./haven'),
+  require('./forge'),
+  require('./vitalis'),
+  require('./sterling'),
+  require('./kinetic'),
+  require('./wanderly'),
+  require('./scholar'),
+  require('./aurelia'),
+  require('./evergreen'),
 ].map((t) => [t.id, t]));
 
 const DEFAULT_THEME = 'nova';

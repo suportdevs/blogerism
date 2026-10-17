@@ -4,6 +4,7 @@ export const FONT_OPTIONS = [
   'Inter', 'Plus Jakarta Sans', 'Manrope', 'DM Sans', 'Outfit', 'Sora', 'Space Grotesk', 'Poppins',
   'Lexend', 'Urbanist', 'Figtree', 'Nunito', 'Rubik', 'Work Sans', 'Bricolage Grotesque',
   'Playfair Display', 'Cormorant Garamond', 'Bodoni Moda', 'Cinzel', 'Marcellus', 'Italiana', 'Jost', 'Fraunces', 'Noto Serif', 'Source Serif 4', 'Roboto', 'Open Sans', 'Oswald', 'Hind Siliguri', 'Noto Sans Bengali', 'Noto Serif Bengali', 'Baloo Da 2', 'Tiro Bangla', 'DM Serif Display', 'Lora', 'Merriweather', 'Instrument Serif', 'JetBrains Mono',
+  'Montserrat', 'Syne', 'Unbounded', 'Archivo', 'EB Garamond', 'Barlow Condensed', 'Red Hat Display',
 ];
 
 export const THEME_PRESETS = {

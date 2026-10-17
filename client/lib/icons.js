@@ -5,6 +5,9 @@ import {
   Newspaper, Feather, Scale, Vote, Radio, Mic, Headphones, Music, Film, Tv, Camera, Video, Play, Popcorn, Download,
   Wifi, Eye, Trophy, BookOpen, Coffee, ChefHat, Wine, Leaf, Flame, Gem, Crown, Briefcase, GraduationCap, MapPin,
   Mail, Phone, Calendar, Handshake, Send, FileCheck2, Megaphone, Sun, Mountain, Aperture, Gift, Truck, Smile,
+  Stethoscope, HeartPulse, Activity, Pill, Microscope, Brain, Baby, Home, BedDouble, Bath, Ruler, Key, Building, Dumbbell, Bike, Timer,
+  Plane, Map, Ship, Tent, Palmtree, Gavel, Landmark, TrendingUp, PiggyBank, LineChart, PieChart, HandHeart, Sprout, Droplets, School,
+  Laptop, Waves, Car, Utensils, Flower2, Medal, Shield, BadgeCheck, Wallet, Hotel, ConciergeBell, Calculator, FileText, Hammer, Ticket, Sunrise,
 } from 'lucide-react';
 
 // Curated icon set available to "features" blocks (keeps the bundle small vs. importing all of lucide).
@@ -15,6 +18,9 @@ export const ICONS = {
   Newspaper, Feather, Scale, Vote, Radio, Mic, Headphones, Music, Film, Tv, Camera, Video, Play, Popcorn, Download,
   Wifi, Eye, Trophy, BookOpen, Coffee, ChefHat, Wine, Leaf, Flame, Gem, Crown, Briefcase, GraduationCap, MapPin,
   Mail, Phone, Calendar, Handshake, Send, FileCheck2, Megaphone, Sun, Mountain, Aperture, Gift, Truck, Smile,
+  Stethoscope, HeartPulse, Activity, Pill, Microscope, Brain, Baby, Home, BedDouble, Bath, Ruler, Key, Building, Dumbbell, Bike, Timer,
+  Plane, Map, Ship, Tent, Palmtree, Gavel, Landmark, TrendingUp, PiggyBank, LineChart, PieChart, HandHeart, Sprout, Droplets, School,
+  Laptop, Waves, Car, Utensils, Flower2, Medal, Shield, BadgeCheck, Wallet, Hotel, ConciergeBell, Calculator, FileText, Hammer, Ticket, Sunrise,
 };
 
 export const ICON_NAMES = Object.keys(ICONS);

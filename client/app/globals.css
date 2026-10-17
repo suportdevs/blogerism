@@ -79,6 +79,7 @@ section[id] { scroll-margin-top: 96px; }
 @keyframes draw-line { from { stroke-dashoffset: 600; } to { stroke-dashoffset: 0; } }
 @keyframes marquee-reverse { from { transform: translateX(-50%); } to { transform: translateX(0); } }
 @keyframes border-spin { to { --angle: 360deg; } }
+@keyframes word-in { from { opacity: 0; transform: translateY(45%) rotateX(-70deg); } to { opacity: 1; transform: none; } }
 
 /* Scroll reveal: sections fade up as they enter the viewport (see RevealObserver). */
 .reveal { opacity: 0; transform: translateY(28px); transition: opacity .8s cubic-bezier(.2,.7,.2,1), transform .8s cubic-bezier(.2,.7,.2,1); }

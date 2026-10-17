@@ -9,6 +9,7 @@ import { PORTFOLIO_RENDERERS } from './PortfolioBlocks';
 import { SHOWCASE_RENDERERS } from './ShowcaseBlocks';
 import { LUXE_RENDERERS } from './LuxeBlocks';
 import { INTERACTIVE_RENDERERS } from './InteractiveBlocks';
+import { BUSINESS_RENDERERS, businessSectionClass } from './BusinessBlocks';
 import { CountUp } from './ShowcaseClient';
 
 /* ---------------------------------------------------------------------------
@@ -391,6 +392,7 @@ const RENDERERS = {
   ...SHOWCASE_RENDERERS,
   ...LUXE_RENDERERS,
   ...INTERACTIVE_RENDERERS,
+  ...BUSINESS_RENDERERS,
 };
 
 export default function Blocks({ blocks = [], ctx = {}, settings }) {
@@ -398,7 +400,7 @@ export default function Blocks({ blocks = [], ctx = {}, settings }) {
     const Comp = RENDERERS[block.type];
     if (!Comp) return null;
     return (
-      <Section key={block.id} style={block.style} className={block.type === 'spacer' ? '!py-0' : undefined}>
+      <Section key={block.id} style={block.style} className={block.type === 'spacer' ? '!py-0' : businessSectionClass(block)}>
         <span data-block-id={block.id} className="hidden" />
         <Comp d={block.data || {}} block={block} ctx={ctx} settings={settings} />
       </Section>

@@ -68,52 +68,54 @@ export default function Header({ general, appearance, menu, saved }) {
   };
 
   return (
-    <header
-      className={cn(
-        'z-40 w-full transition-all duration-300',
-        appearance.headerSticky ? 'sticky top-0' : 'relative',
-        style === 'solid' && 'border-b border-fg/10 bg-bg',
-        style === 'glass' && (scrolled ? 'border-b border-fg/10 bg-bg/70 backdrop-blur-xl' : 'border-b border-transparent bg-transparent'),
-        style === 'centered' && 'border-b border-fg/10 bg-bg/80 backdrop-blur-xl',
-      )}
-    >
-      <div className={cn('site-container flex h-[72px] items-center gap-6', style === 'centered' && 'lg:grid lg:grid-cols-[1fr_auto_1fr]')}>
-        {style === 'centered' ? (
-          <>
-            <Nav items={items} className="hidden lg:flex" />
-            <Logo general={general} />
-          </>
-        ) : (
-          <>
-            <Logo general={general} />
-            <Nav items={items} className="mx-auto hidden lg:flex" />
-          </>
+    <>
+      <header
+        className={cn(
+          'z-40 w-full transition-all duration-300',
+          appearance.headerSticky ? 'sticky top-0' : 'relative',
+          style === 'solid' && 'border-b border-fg/10 bg-bg',
+          style === 'glass' && (scrolled ? 'border-b border-fg/10 bg-bg/70 backdrop-blur-xl' : 'border-b border-transparent bg-transparent'),
+          style === 'centered' && 'border-b border-fg/10 bg-bg/80 backdrop-blur-xl',
         )}
-
-        <div className="ml-auto flex items-center gap-1 lg:justify-self-end">
-          <button onClick={() => setSearchOpen((s) => !s)} aria-label="Search" className="grid h-10 w-10 place-items-center rounded-full text-fg/70 transition hover:bg-fg/5 hover:text-fg">
-            <Search className="h-[18px] w-[18px]" />
-          </button>
-          {saved && <SavedLink label={saved} />}
-          <ThemeToggle />
-          {cta.enabled && cta.label && (
-            <Link href={cta.url || '#'} className="btn-site-primary ml-2 hidden !py-2.5 sm:inline-flex">{cta.label}<ArrowRight className="h-4 w-4" /></Link>
+      >
+        <div className={cn('site-container flex h-[72px] items-center gap-6', style === 'centered' && 'lg:grid lg:grid-cols-[1fr_auto_1fr]')}>
+          {style === 'centered' ? (
+            <>
+              <Nav items={items} className="hidden lg:flex" />
+              <Logo general={general} />
+            </>
+          ) : (
+            <>
+              <Logo general={general} />
+              <Nav items={items} className="mx-auto hidden lg:flex" />
+            </>
           )}
-          <button onClick={() => setOpen(true)} aria-label="Open menu" className="grid h-10 w-10 place-items-center rounded-full text-fg lg:hidden"><Menu className="h-5 w-5" /></button>
+  
+          <div className="ml-auto flex items-center gap-1 lg:justify-self-end">
+            <button onClick={() => setSearchOpen((s) => !s)} aria-label="Search" className="grid h-10 w-10 place-items-center rounded-full text-fg/70 transition hover:bg-fg/5 hover:text-fg">
+              <Search className="h-[18px] w-[18px]" />
+            </button>
+            {saved && <SavedLink label={saved} />}
+            <ThemeToggle />
+            {cta.enabled && cta.label && (
+              <Link href={cta.url || '#'} className="btn-site-primary ml-2 hidden !py-2.5 sm:inline-flex">{cta.label}<ArrowRight className="h-4 w-4" /></Link>
+            )}
+            <button onClick={() => setOpen(true)} aria-label="Open menu" className="grid h-10 w-10 place-items-center rounded-full text-fg lg:hidden"><Menu className="h-5 w-5" /></button>
+          </div>
         </div>
-      </div>
+  
+        {searchOpen && (
+          <div className="border-t border-fg/10 bg-bg/95 backdrop-blur-xl animate-fade-in">
+            <form onSubmit={onSearch} className="site-container flex items-center gap-3 py-4">
+              <Search className="h-5 w-5 text-fg/40" />
+              <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search articles…" className="flex-1 bg-transparent text-lg text-fg outline-none placeholder:text-fg/40" />
+              <kbd className="hidden rounded-md border border-fg/10 px-2 py-0.5 text-xs text-fg/50 sm:block">Enter</kbd>
+            </form>
+          </div>
+        )}
+      </header>
 
-      {searchOpen && (
-        <div className="border-t border-fg/10 bg-bg/95 backdrop-blur-xl animate-fade-in">
-          <form onSubmit={onSearch} className="site-container flex items-center gap-3 py-4">
-            <Search className="h-5 w-5 text-fg/40" />
-            <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search articles…" className="flex-1 bg-transparent text-lg text-fg outline-none placeholder:text-fg/40" />
-            <kbd className="hidden rounded-md border border-fg/10 px-2 py-0.5 text-xs text-fg/50 sm:block">Enter</kbd>
-          </form>
-        </div>
-      )}
-
-      {/* Mobile drawer */}
+      {/* Mobile drawer — outside <header>: its backdrop blur would otherwise trap this fixed panel inside the bar. */}
       <div className={cn('fixed inset-0 z-50 lg:hidden', open ? 'pointer-events-auto' : 'pointer-events-none')}>
         <div onClick={() => setOpen(false)} className={cn('absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity', open ? 'opacity-100' : 'opacity-0')} />
         <aside className={cn('absolute right-0 top-0 flex h-full w-[86%] max-w-sm flex-col bg-bg p-6 shadow-2xl transition-transform duration-300', open ? 'translate-x-0' : 'translate-x-full')}>
@@ -125,7 +127,7 @@ export default function Header({ general, appearance, menu, saved }) {
           {cta.enabled && cta.label && <Link href={cta.url || '#'} className="btn-site-primary mt-auto">{cta.label}</Link>}
         </aside>
       </div>
-    </header>
+    </>
   );
 }
 
