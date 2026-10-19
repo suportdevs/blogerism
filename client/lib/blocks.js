@@ -751,6 +751,7 @@ export const BLOCKS = {
         { name: 'options', label: 'Dropdown options', type: 'stringList' },
       ] },
       { name: 'buttonLabel', label: 'Button', type: 'text', half: true }, { name: 'action', label: 'Submit to (page URL)', type: 'url', half: true },
+      { name: 'buttonIcon', label: 'Button icon', type: 'icon', options: ICON_NAMES },
       { name: 'stats', label: 'Stats under the bar', type: 'list', itemLabel: 'label', defaults: { value: '100+', label: 'Label' }, fields: [{ name: 'value', label: 'Value', type: 'text', half: true }, { name: 'label', label: 'Label', type: 'text', half: true }] },
     ],
   },

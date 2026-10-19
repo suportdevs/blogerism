@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { ArrowRight, ArrowUp, X } from 'lucide-react';
-import { googleFontsUrl, themeVars } from '@/lib/theme';
+import { googleFontsUrl, scriptCss, themeVars } from '@/lib/theme';
 import { cn } from '@/lib/utils';
 
 export function AnnouncementBar({ announcement }) {
@@ -84,6 +84,13 @@ export function PreviewListener() {
         document.head.appendChild(link);
       }
       link.href = googleFontsUrl([a.headingFont, a.bodyFont]);
+      let script = document.getElementById('nova-preview-script');
+      if (!script) {
+        script = document.createElement('style');
+        script.id = 'nova-preview-script';
+        document.head.appendChild(script);
+      }
+      script.textContent = scriptCss(a);
     };
     window.addEventListener('message', onMessage);
     window.parent.postMessage({ type: 'nova:preview-ready' }, window.location.origin);

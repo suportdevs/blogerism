@@ -73,4 +73,31 @@ async function seedFaqs(prisma, faqs) {
   await prisma.faq.createMany({ data: faqs.map(([question, answer], order) => ({ question, answer, order, category: 'General' })) });
 }
 
-module.exports = { un, face, uid, slug, pic, hoursAgo, yt, mp3, MDN_VIDEO, B, m, FILMS, createCategories, rand, commonPages, seedFaqs };
+/*
+ * Demo version of a theme: same content (posts, series, pages, menus, demo installer) with its own homepage,
+ * header layout, colours and fonts. Switching between versions of a theme never touches content.
+ * def: { id, name, description, source, layout, appearance, menus, home: () => blocks, seoTitle }
+ */
+function demoVariant(base, def) {
+  const { id, name, description, source, layout = {}, appearance = {}, menus, home, seoTitle, blocks = [] } = def;
+  return {
+    ...base,
+    id,
+    name: `${base.name} ${name}`,
+    description,
+    source,
+    variantOf: base.id,
+    variantName: name,
+    features: { ...base.features, blocks: [...new Set([...base.features.blocks, ...blocks, 'Business', 'Interactive'])] },
+    layout: { ...base.layout, style: 'modern', overlay: true, ...layout },
+    appearance: { ...base.appearance, preset: id, announcement: { enabled: false, text: '', linkLabel: '', url: '' }, ...appearance },
+    menus: menus || base.menus,
+    pages: () => [
+      { slug: `${id}-home`, title: 'Home', home: true, template: 'full-width', seoTitle: seoTitle || `${base.general.siteName} — ${name}`, blocks: home() },
+      ...base.pages().filter((p) => !p.home),
+    ],
+    demo: base.demo,
+  };
+}
+
+module.exports = { demoVariant, un, face, uid, slug, pic, hoursAgo, yt, mp3, MDN_VIDEO, B, m, FILMS, createCategories, rand, commonPages, seedFaqs };

@@ -22,6 +22,12 @@ const THEMES = Object.fromEntries([
   require('./scholar'),
   require('./aurelia'),
   require('./evergreen'),
+  // Ten homepage demos for each of these themes (same content, different design).
+  ...require('./herald-demos'),
+  ...require('./vidora-demos'),
+  ...require('./marquee-demos'),
+  ...require('./folio-demos'),
+  ...require('./forge-demos'),
 ].map((t) => [t.id, t]));
 
 const DEFAULT_THEME = 'nova';

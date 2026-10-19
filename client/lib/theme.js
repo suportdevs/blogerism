@@ -42,11 +42,15 @@ export function themeVars(a, mode = 'light') {
   };
 }
 
+// Letter-spacing splits Bengali conjuncts apart, so sites using a Bengali font drop tracked text spacing.
+const BENGALI_FONTS = ['Hind Siliguri', 'Noto Sans Bengali', 'Noto Serif Bengali', 'Baloo Da 2', 'Tiro Bangla'];
+export const scriptCss = (a) => ([a.headingFont, a.bodyFont].some((f) => BENGALI_FONTS.includes(f)) ? '[class*="tracking-"]{letter-spacing:0!important}' : '');
+
 const toCss = (vars) => Object.entries(vars).map(([k, v]) => `${k}:${v};`).join('');
 
 // Full stylesheet: light vars on :root, dark vars on .dark (class toggled by the mode script).
 export function themeCss(a) {
-  return `:root{${toCss(themeVars(a, 'light'))}}html.dark{${toCss(themeVars(a, 'dark'))}}html{font-size:${a.baseFontSize || 16}px}`;
+  return `:root{${toCss(themeVars(a, 'light'))}}html.dark{${toCss(themeVars(a, 'dark'))}}html{font-size:${a.baseFontSize || 16}px}${scriptCss(a)}`;
 }
 
 export function googleFontsUrl(fonts) {

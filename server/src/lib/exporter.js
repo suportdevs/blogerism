@@ -32,16 +32,20 @@ const secret = (bytes = 32) => crypto.randomBytes(bytes).toString('hex');
 
 /* ------------------------------ generated files ------------------------------ */
 
-// Luxe versions live in luxe.js, which builds on the classic theme files it requires.
+// Versions of a theme live in a file that builds on the classic theme files it requires:
+// luxe.js for Luxe versions, <theme>-demos.js for homepage demos (theme.source).
+const variantFile = (theme) => theme.source || 'luxe.js';
+
 function themeSourceFiles(theme) {
   if (!theme.variantOf) return ['helpers.js', `${theme.id}.js`];
-  const luxe = fs.readFileSync(path.join(PROJECT_ROOT, 'server/src/themes/luxe.js'), 'utf8');
-  const required = [...luxe.matchAll(/require\('\.\/([a-z-]+)'\)/g)].map((m) => `${m[1]}.js`);
-  return ['luxe.js', ...new Set(required)];
+  const file = variantFile(theme);
+  const src = fs.readFileSync(path.join(PROJECT_ROOT, 'server/src/themes', file), 'utf8');
+  const required = [...src.matchAll(/require\('\.\/([a-z-]+)'\)/g)].map((m) => `${m[1]}.js`);
+  return [file, ...new Set(required)];
 }
 
 function themeIndex(theme) {
-  const entry = theme.variantOf ? `...require('./luxe').filter((t) => t.id === '${theme.id}')` : `require('./${theme.id}')`;
+  const entry = theme.variantOf ? `...require('./${variantFile(theme).replace(/\.js$/, '')}').filter((t) => t.id === '${theme.id}')` : `require('./${theme.id}')`;
   const src = fs.readFileSync(path.join(PROJECT_ROOT, 'server/src/themes/index.js'), 'utf8');
   return src
     .replace(/const THEMES = Object\.fromEntries\(\[[\s\S]*?\]\.map/, `const THEMES = Object.fromEntries([\n  ${entry},\n].map`)

@@ -15,6 +15,7 @@ export function SearchBar({ d, className }) {
   const router = useRouter();
   const tabs = (d.tabs || []).filter(Boolean);
   const fields = d.fields || [];
+  const ButtonIcon = ICONS[d.buttonIcon] || Search;
   const [tab, setTab] = useState(tabs[0] || '');
   const [values, setValues] = useState({});
   const submit = (e) => {
@@ -55,7 +56,7 @@ export function SearchBar({ d, className }) {
             </label>
           );
         })}
-        <button className="btn-site-primary min-h-[56px] px-8 md:ml-2 md:w-auto"><Search className="h-4 w-4" />{d.buttonLabel || 'Search'}</button>
+        <button className="btn-site-primary min-h-[56px] px-8 md:ml-2 md:w-auto"><ButtonIcon className="h-4 w-4" />{d.buttonLabel || 'Search'}</button>
       </div>
     </form>
   );

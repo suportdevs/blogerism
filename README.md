@@ -87,6 +87,18 @@ The site is one kind of website at a time, chosen under **Admin → Appearance �
 
 **Luxe versions.** Themewright, Herald, Vidora, Marquee, Waveform and Folio each have a *Luxe* version — the same theme and the same content with a different design language: a framed full-screen hero, luxe header with a full-screen numbered menu, serif typography, gold hairlines, magazine article and archive layouts, and luxury blocks (statement, framed split, editorial list with cursor-following images, magazine feature, quote carousel, parallax CTA). Switching Classic ↔ Luxe never touches content; each version remembers its own customised design.
 
+**Homepage demos.** Herald, Vidora, Marquee, Folio and Forge each come with 10 extra homepage demos — client-ready designs with their own header style, colours, fonts and homepage built from different blocks. All of them share the theme's content (posts, series, pages), so switching demos never touches content. Pick a demo from the theme card's **Design** dropdown on the Themes page.
+
+| Theme | Demos |
+|---|---|
+| **Herald** | Daily, Broadsheet, Tech, Business, Sports, Culture, City, Live, Reader, Investigations |
+| **Vidora** | Creators, Toons, Festival, Academy, Neon, Newsroom, Gallery, Shorts, Studio, Live, **Porda** |
+| **Marquee** | Prime, Kids, Docs, Anime, Premiere, Binge, Indie, Landing, Noir, Family |
+| **Folio** | Minimal, Terminal, Studio, Corporate, Swiss, Freelancer, Neon, Brutal, Story, Gazette |
+| **Forge** | Zen, Box, Fight, Coach, Club, Her, Run, App, Dojo, Chain |
+
+**Porda** (Vidora) is a Bengali OTT streaming demo — Bengali fonts and menus, top-10 row, series rails, ৳ subscription plans. It is the one demo that brings its own content: *Install demo & activate* adds Bengali series, episodes, categories and FAQs (this replaces the Vidora family's content, so the other Vidora versions will show it too).
+
 **Every theme keeps its own content.** Content (posts, pages, series, menus, settings) is stored per theme family in a workspace. Switching themes saves the current theme's content and restores the other theme's, so nothing is ever lost. Users, media, messages and subscribers are shared. Seed all themes at once with `node prisma/seed.js nova --all`.
 
 Activating a theme can (each optional): apply its design, create its homepage/pages and menus, and **import its demo content** (replaces posts, pages, series, categories, menus, FAQs and testimonials; keeps users, media, messages and subscribers). The admin then shows only that theme's formats and blocks (with "show all" escape hatches). Themes can be previewed live before activating.

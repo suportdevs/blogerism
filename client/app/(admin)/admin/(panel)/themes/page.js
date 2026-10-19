@@ -347,23 +347,30 @@ export default function ThemesPage() {
   const activeFamily = active ? familyOf(active) : null;
   const families = data.items.filter((t) => !t.variantOf).map((base) => [base, ...data.items.filter((v) => v.variantOf === base.id)]);
   const features = (t) => [...t.features.formats.map((f) => FORMAT_LABELS[f]), ...t.features.series.map((s) => SERIES_LABELS[s])];
-  const sibling = active && data.items.find((t) => t.id !== active.id && familyOf(t) === activeFamily);
+  const siblings = active ? data.items.filter((t) => t.id !== active.id && familyOf(t) === activeFamily) : [];
+  const versionIcon = (v) => (!v.variantOf ? null : v.variantName === 'Luxe' ? <Crown className="h-3 w-3 text-amber-500" /> : <Sparkles className="h-3 w-3 text-brand-500" />);
 
   return (
     <>
-      <PageHeader title="Themes" description="Each theme turns the site into a different kind of website. Themes with a Luxe version can switch to a luxury design — same content, different layout." />
+      <PageHeader title="Themes" description="Each theme turns the site into a different kind of website. Many themes come with extra designs (Luxe and homepage demos) — switching between them keeps all your content." />
 
       {active && (
         <div className="a-card mb-8 grid overflow-hidden lg:grid-cols-[1.2fr_1fr]">
           <Mockup theme={active} />
           <div className="flex flex-col justify-center p-6 sm:p-8">
-            <div className="mb-2 flex flex-wrap items-center gap-2"><Badge color="green" dot>Active theme</Badge><Badge>{active.category}</Badge>{active.variantOf && <Badge color="amber"><Crown className="h-3 w-3" />Luxe</Badge>}</div>
+            <div className="mb-2 flex flex-wrap items-center gap-2"><Badge color="green" dot>Active theme</Badge><Badge>{active.category}</Badge>{active.variantOf && <Badge color="amber">{versionIcon(active)}{active.variantName}</Badge>}</div>
             <h2 className="text-3xl font-extrabold tracking-tight text-ink-900 dark:text-white">{active.name}</h2>
             <p className="mt-2 text-ink-500">{active.description}</p>
             <div className="mt-4 flex flex-wrap gap-1.5">{features(active).map((f) => <Badge key={f} color="brand">{f}</Badge>)}</div>
             <div className="mt-6 flex flex-wrap gap-2">
               <Link href="/admin/appearance" className="a-btn-primary"><Palette className="h-4 w-4" />Customize</Link>
-              {sibling && <button onClick={() => setActivating(sibling)} className="a-btn-secondary">{sibling.variantOf ? <Crown className="h-4 w-4 text-amber-500" /> : <Sparkles className="h-4 w-4" />}Switch to {sibling.variantName} design</button>}
+              {siblings.length === 1 && <button onClick={() => setActivating(siblings[0])} className="a-btn-secondary">{siblings[0].variantOf ? <Crown className="h-4 w-4 text-amber-500" /> : <Sparkles className="h-4 w-4" />}Switch to {siblings[0].variantName} design</button>}
+              {siblings.length > 1 && (
+                <select className="a-input w-auto" value="" onChange={(e) => { const v = siblings.find((s) => s.id === e.target.value); if (v) setActivating(v); }}>
+                  <option value="">Switch design ({siblings.length} more)…</option>
+                  {siblings.map((s) => <option key={s.id} value={s.id}>{s.variantName}</option>)}
+                </select>
+              )}
               <a href="/" target="_blank" rel="noreferrer" className="a-btn-ghost"><ExternalLink className="h-4 w-4" />View site</a>
               <button onClick={() => setActivating(active)} className="a-btn-ghost">Re-apply / demo</button>
             </div>
@@ -392,17 +399,25 @@ export default function ThemesPage() {
                     <div className="text-xs font-bold uppercase tracking-wider text-brand-600">{t.category}</div>
                     <h3 className="mt-1 text-lg font-extrabold text-ink-900 dark:text-white">{t.name}</h3>
                   </div>
-                  {versions.length > 1 && (
+                  {versions.length === 2 && (
                     <div className="flex shrink-0 rounded-lg bg-ink-100 p-0.5 dark:bg-white/5">
                       {versions.map((v) => (
                         <button key={v.id} onClick={() => setPicked((p) => ({ ...p, [base.id]: v.id }))} className={cn('flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-bold transition', v.id === t.id ? 'bg-white text-ink-900 shadow-sm dark:bg-ink-800 dark:text-white' : 'text-ink-400 hover:text-ink-700')}>
-                          {v.variantOf && <Crown className="h-3 w-3 text-amber-500" />}{v.variantName}
+                          {versionIcon(v)}{v.variantName}
                         </button>
                       ))}
                     </div>
                   )}
                 </div>
-                <p className="mt-1 flex-1 text-sm text-ink-500">{t.description}</p>
+                {versions.length > 2 && (
+                  <label className="mt-2 block">
+                    <span className="mb-1 flex items-center gap-2 text-xs font-semibold text-ink-500">Design <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-bold text-brand-700 dark:bg-brand-500/10 dark:text-brand-300">{versions.length} designs</span></span>
+                    <select className="a-input" value={t.id} onChange={(e) => setPicked((p) => ({ ...p, [base.id]: e.target.value }))}>
+                      {versions.map((v) => <option key={v.id} value={v.id}>{v.variantName}{v.id === data.active ? ' — active' : ''}</option>)}
+                    </select>
+                  </label>
+                )}
+                <p className="mt-2 flex-1 text-sm text-ink-500">{t.description}</p>
                 <div className="mt-3 flex flex-wrap gap-1">{features(t).map((f) => <Badge key={f}>{f}</Badge>)}</div>
                 <div className="mt-4 flex gap-2">
                   <button onClick={() => setPreview(t)} className="a-btn-secondary flex-1"><Eye className="h-4 w-4" />Preview</button>
