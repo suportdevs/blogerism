@@ -3,7 +3,7 @@
 export const FONT_OPTIONS = [
   'Inter', 'Plus Jakarta Sans', 'Manrope', 'DM Sans', 'Outfit', 'Sora', 'Space Grotesk', 'Poppins',
   'Lexend', 'Urbanist', 'Figtree', 'Nunito', 'Rubik', 'Work Sans', 'Bricolage Grotesque',
-  'Playfair Display', 'Cormorant Garamond', 'Bodoni Moda', 'Cinzel', 'Marcellus', 'Italiana', 'Jost', 'Fraunces', 'Noto Serif', 'Source Serif 4', 'Roboto', 'Open Sans', 'Oswald', 'Hind Siliguri', 'Noto Sans Bengali', 'Noto Serif Bengali', 'Baloo Da 2', 'Tiro Bangla', 'DM Serif Display', 'Lora', 'Merriweather', 'Instrument Serif', 'JetBrains Mono',
+  'Playfair Display', 'Cormorant Garamond', 'Bodoni Moda', 'Cinzel', 'Marcellus', 'Italiana', 'Jost', 'Fraunces', 'Noto Serif', 'Source Serif 4', 'Roboto', 'Open Sans', 'Oswald', 'Hind Siliguri', 'Noto Sans Bengali', 'Noto Serif Bengali', 'Baloo Da 2', 'Tiro Bangla', 'DM Serif Display', 'Lora', 'Merriweather', 'Instrument Serif', 'JetBrains Mono', 'Fugaz One',
   'Montserrat', 'Syne', 'Unbounded', 'Archivo', 'EB Garamond', 'Barlow Condensed', 'Red Hat Display',
 ];
 
@@ -44,7 +44,12 @@ export function themeVars(a, mode = 'light') {
 
 // Letter-spacing splits Bengali conjuncts apart, so sites using a Bengali font drop tracked text spacing.
 const BENGALI_FONTS = ['Hind Siliguri', 'Noto Sans Bengali', 'Noto Serif Bengali', 'Baloo Da 2', 'Tiro Bangla'];
-export const scriptCss = (a) => ([a.headingFont, a.bodyFont].some((f) => BENGALI_FONTS.includes(f)) ? '[class*="tracking-"]{letter-spacing:0!important}' : '');
+// Single-weight display fonts would otherwise be smeared into a fake bold by the extrabold heading classes.
+const SINGLE_WEIGHT_FONTS = ['Fugaz One'];
+export const scriptCss = (a) => [
+  [a.headingFont, a.bodyFont].some((f) => BENGALI_FONTS.includes(f)) ? '[class*="tracking-"]{letter-spacing:0!important}' : '',
+  SINGLE_WEIGHT_FONTS.includes(a.headingFont) ? '.font-heading{font-synthesis:none}' : '',
+].join('');
 
 const toCss = (vars) => Object.entries(vars).map(([k, v]) => `${k}:${v};`).join('');
 

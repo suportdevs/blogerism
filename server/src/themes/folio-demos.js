@@ -1,4 +1,4 @@
-// Ten homepage demos for Folio. Every demo reuses the same CV data (profile, skills, experience, projects, education)
+// Homepage demos for Folio. Every demo reuses the same CV data (profile, skills, experience, projects, education)
 // in a different design. Header menus link to #about, #skills, #experience, #projects and #contact, so every demo keeps those anchors.
 const { B: block, un, demoVariant } = require('./helpers');
 const folio = require('./folio');
@@ -225,4 +225,49 @@ const gazette = demo({
   ],
 });
 
-module.exports = [minimal, terminal, studio, corporate, swiss, freelancer, neon, brutal, story, gazette];
+/* 11 ─ Glow */
+// Pure black with a neon glow: centered name hero with floating chips, giant solid/outline titles, glass bio card,
+// glowing timelines and a "tech set" of brand-logo tiles that glow in each brand's colour.
+const TECH = (label, logo, color) => ({ label, logo, color, image: '' });
+const glow = demo({
+  id: 'folio-glow', name: 'Glow',
+  description: 'A neon-on-black developer portfolio: glowing name hero with floating chips, giant outline titles, glass bio card, glowing timelines and a brand-logo tech set.',
+  layout: { header: 'minimal' },
+  appearance: { primaryColor: '#1cc8ff', accentColor: '#7af5d6', backgroundColor: '#f4f8fb', surfaceColor: '#e6eef4', textColor: '#05080b', darkBackgroundColor: '#000000', darkSurfaceColor: '#0a1218', darkTextColor: '#ffffff', headingFont: 'Fugaz One', bodyFont: 'Open Sans', radius: 12, colorMode: 'dark', footerStyle: 'simple', headerCta: { enabled: true, label: 'Hire me', url: '/#contact' } },
+  home: () => [
+    B('glowHero', {
+      greeting: 'Hi, I am', name: SHORT.split(' ')[0], role: hero.roles[0], intro: '',
+      chips: [{ label: 'About me', url: '#about', position: 'tl' }, { label: 'Projects', url: '#projects', position: 'tr' }, { label: 'Tech', url: '#skills', position: 'br' }],
+      socials: [
+        { icon: 'Github', url: folio.social.github, label: 'GitHub' },
+        { icon: 'Linkedin', url: folio.social.linkedin, label: 'LinkedIn' },
+        { icon: 'Mail', url: `mailto:${folio.contact.email}`, label: 'Email' },
+      ],
+    }, { paddingY: 'none', width: 'wide', anchor: 'home', animate: false }),
+    B('glowAbout', {
+      solid: 'About', outline: 'Me',
+      lead: `👋 Hey, I’m ${SHORT}, a ${hero.roles[0]}.`,
+      text: about.text,
+      groups: [
+        { title: 'Experience', anchor: 'experience', items: experience.items.map((e) => ({ title: e.title, org: `@${e.org}`, period: e.period, text: e.description || '', bullets: e.bullets.slice(0, 4).map((b) => b.replace(/^[^:]{3,40}:\s*/, '')) })) },
+        { title: 'Education', anchor: 'education', items: education.items.map((e) => ({ title: e.title, org: e.org, period: e.period, text: '', bullets: [] })) },
+      ],
+    }, { paddingY: 'xl', width: 'wide', anchor: 'about' }),
+    B('glowTech', {
+      solid: 'Tech', outline: 'Set', titleSide: 'right',
+      groups: [
+        { title: 'Core stack I work with', items: [TECH('Laravel', 'laravel', '#FF2D20'), TECH('PHP', 'php', '#8892BF'), TECH('Node.js', 'nodedotjs', '#5FA04E'), TECH('Express', 'express', '#FFFFFF'), TECH('Django', 'django', '#44B78B'), TECH('Python', 'python', '#3776AB')] },
+        { title: 'Frontend & UI', items: [TECH('JavaScript', 'javascript', '#F7DF1E'), TECH('React', 'react', '#61DAFB'), TECH('Next.js', 'nextdotjs', '#FFFFFF'), TECH('Redux', 'redux', '#9B6DD8'), TECH('Tailwind CSS', 'tailwindcss', '#06B6D4'), TECH('Material UI', 'mui', '#007FFF'), TECH('Bootstrap', 'bootstrap', '#9B6BF2')] },
+        { title: 'Databases I use', items: [TECH('PostgreSQL', 'postgresql', '#4F8FEA'), TECH('MySQL', 'mysql', '#5D9BD5'), TECH('MongoDB', 'mongodb', '#47A248'), TECH('Prisma', 'prisma', '#FFFFFF')] },
+        { title: 'Tools & DevOps', items: [TECH('Git', 'git', '#F05032'), TECH('GitHub', 'github', '#FFFFFF'), TECH('Ubuntu', 'ubuntu', '#E95420'), TECH('Nginx', 'nginx', '#009639'), TECH('PM2', 'pm2', '#A78BFA'), TECH('Postman', 'postman', '#FF6C37')] },
+      ],
+    }, { paddingY: 'lg', width: 'wide', anchor: 'skills' }),
+    B('glowTitle', { solid: 'My', outline: 'Work', align: 'center', size: 'lg', subtitle: projects.subtitle }, { paddingY: 'md', anchor: 'projects' }),
+    B('projects', { ...projectsWithImages(), eyebrow: '', title: '', subtitle: '' }, { paddingY: 'md', ...W }),
+    B('stats', stats, { paddingY: 'lg' }),
+    B('glowTitle', { solid: 'Say', outline: 'Hello', align: 'center', size: 'lg', subtitle: '' }, { paddingY: 'lg', anchor: 'contact' }),
+    B('contactForm', { title: 'Got a project in mind?', text: hero.availability ? `${hero.availability}. I usually reply within 24 hours.` : 'I usually reply within 24 hours.', showInfo: true }, { paddingY: 'md' }),
+  ],
+});
+
+module.exports = [minimal, terminal, studio, corporate, swiss, freelancer, neon, brutal, story, gazette, glow];

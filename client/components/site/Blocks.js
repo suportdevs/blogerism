@@ -10,6 +10,7 @@ import { SHOWCASE_RENDERERS } from './ShowcaseBlocks';
 import { LUXE_RENDERERS } from './LuxeBlocks';
 import { INTERACTIVE_RENDERERS } from './InteractiveBlocks';
 import { BUSINESS_RENDERERS, businessSectionClass } from './BusinessBlocks';
+import { GLOW_RENDERERS } from './GlowBlocks';
 import { CountUp } from './ShowcaseClient';
 
 /* ---------------------------------------------------------------------------
@@ -393,14 +394,18 @@ const RENDERERS = {
   ...LUXE_RENDERERS,
   ...INTERACTIVE_RENDERERS,
   ...BUSINESS_RENDERERS,
+  ...GLOW_RENDERERS,
 };
+
+// Sticky titles need a clipping (not scrolling) section.
+const STICKY_BLOCKS = new Set(['glowAbout', 'glowTech']);
 
 export default function Blocks({ blocks = [], ctx = {}, settings }) {
   return blocks.filter((b) => !b.style?.hidden).map((block) => {
     const Comp = RENDERERS[block.type];
     if (!Comp) return null;
     return (
-      <Section key={block.id} style={block.style} className={block.type === 'spacer' ? '!py-0' : businessSectionClass(block)}>
+      <Section key={block.id} style={block.style} className={block.type === 'spacer' ? '!py-0' : STICKY_BLOCKS.has(block.type) ? '!overflow-clip' : businessSectionClass(block)}>
         <span data-block-id={block.id} className="hidden" />
         <Comp d={block.data || {}} block={block} ctx={ctx} settings={settings} />
       </Section>

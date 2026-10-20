@@ -135,6 +135,13 @@ function Input({ field, value, onChange }) {
       return <Repeater field={field} value={value} onChange={onChange} />;
     case 'icon':
       return <IconPicker value={value} onChange={onChange} options={field.options} />;
+    case 'color':
+      return (
+        <div className="flex items-center gap-2">
+          <input type="color" value={/^#[0-9a-f]{6}$/i.test(value || '') ? value : '#ffffff'} onChange={(e) => onChange(e.target.value)} className="h-10 w-12 shrink-0 cursor-pointer rounded-lg border border-ink-200 bg-transparent p-1 dark:border-white/10" />
+          <input className="a-input font-mono text-sm" value={value ?? ''} onChange={(e) => onChange(e.target.value)} placeholder="#61DAFB" />
+        </div>
+      );
     default:
       return <input className="a-input" value={value ?? ''} onChange={(e) => onChange(e.target.value)} placeholder={field.type === 'url' ? '/page or https://…' : ''} />;
   }

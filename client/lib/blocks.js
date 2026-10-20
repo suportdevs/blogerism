@@ -283,6 +283,61 @@ export const BLOCKS = {
       { name: 'email', label: 'Email', type: 'text' },
     ],
   },
+  glowHero: {
+    label: 'Glow name hero', category: 'Portfolio', icon: 'Sparkles', description: 'Huge glowing name, floating link chips and glowing social tiles',
+    defaults: { greeting: 'Hi, I am', name: 'Your name', role: 'Full Stack Developer', intro: '', chips: [{ label: 'About me', url: '#about', position: 'tl' }, { label: 'Tech', url: '#skills', position: 'br' }], socials: [{ icon: 'Github', url: 'https://github.com', label: 'GitHub' }, { icon: 'Linkedin', url: 'https://linkedin.com', label: 'LinkedIn' }, { icon: 'Mail', url: 'mailto:you@example.com', label: 'Email' }] },
+    fields: [
+      { name: 'greeting', label: 'Greeting', type: 'text', half: true }, { name: 'name', label: 'Name', type: 'text', half: true },
+      { name: 'role', label: 'Role', type: 'text' }, { name: 'intro', label: 'Short intro (optional)', type: 'textarea', rows: 2 },
+      { name: 'chips', label: 'Floating link chips', type: 'list', itemLabel: 'label', defaults: { label: 'Link', url: '#', position: 'tl' }, fields: [
+        { name: 'label', label: 'Label', type: 'text', half: true }, { name: 'url', label: 'Link', type: 'url', half: true },
+        { name: 'position', label: 'Position (desktop)', type: 'select', options: [['tl', 'Top left'], ['tr', 'Top right'], ['ml', 'Middle left'], ['mr', 'Middle right'], ['bl', 'Lower left'], ['br', 'Lower right']] },
+      ] },
+      { name: 'socials', label: 'Social tiles', type: 'list', itemLabel: 'label', defaults: { icon: 'Globe', url: '', label: '' }, fields: [
+        { name: 'icon', label: 'Icon', type: 'icon', options: ICON_NAMES, half: true }, { name: 'label', label: 'Label', type: 'text', half: true }, { name: 'url', label: 'Link (https:// or mailto:)', type: 'url' },
+      ] },
+    ],
+  },
+  glowTitle: {
+    label: 'Stacked outline title', category: 'Portfolio', icon: 'Type', description: 'Giant two-word title — solid word over an outlined word',
+    defaults: { solid: 'My', outline: 'Work', align: 'left', size: 'lg', subtitle: '' },
+    fields: [
+      { name: 'solid', label: 'Solid word', type: 'text', half: true }, { name: 'outline', label: 'Outline word', type: 'text', half: true },
+      { name: 'align', label: 'Alignment', type: 'select', options: [['left', 'Left'], ['center', 'Center'], ['right', 'Right']], half: true },
+      { name: 'size', label: 'Size', type: 'select', options: [['lg', 'Large'], ['xl', 'Extra large']], half: true },
+      { name: 'subtitle', label: 'Subtitle', type: 'textarea', rows: 2 },
+    ],
+  },
+  glowAbout: {
+    label: 'Glow about & timeline', category: 'Portfolio', icon: 'IdCard', description: 'Stacked title beside a glass bio card and glowing timelines',
+    defaults: { solid: 'About', outline: 'Me', lead: '👋 Hey, I’m …', text: 'Write a few lines about yourself.', groups: [{ title: 'Experience', anchor: 'experience', items: [{ title: 'Role', org: '@Company', period: '2022 – Present', text: '', bullets: ['What you achieved.'] }] }] },
+    fields: [
+      { name: 'solid', label: 'Solid word', type: 'text', half: true }, { name: 'outline', label: 'Outline word', type: 'text', half: true },
+      { name: 'lead', label: 'Opening line', type: 'text' }, { name: 'text', label: 'Bio (blank line between paragraphs)', type: 'textarea', rows: 6 },
+      { name: 'groups', label: 'Timeline groups', type: 'list', itemLabel: 'title', defaults: { title: 'Experience', anchor: '', items: [] }, fields: [
+        { name: 'title', label: 'Title', type: 'text', half: true }, { name: 'anchor', label: 'Anchor (for menu links)', type: 'text', half: true },
+        { name: 'items', label: 'Entries', type: 'list', itemLabel: 'title', defaults: { title: 'Role', org: '', period: '', text: '', bullets: [] }, fields: [
+          { name: 'title', label: 'Title', type: 'text' }, { name: 'org', label: 'Organisation', type: 'text', half: true }, { name: 'period', label: 'Period', type: 'text', half: true },
+          { name: 'text', label: 'Description', type: 'textarea', rows: 2 }, { name: 'bullets', label: 'Highlights', type: 'stringList' },
+        ] },
+      ] },
+    ],
+  },
+  glowTech: {
+    label: 'Glow tech set', category: 'Portfolio', icon: 'Cpu', description: 'Brand-logo tiles that glow in each brand’s colour, grouped, beside a stacked title',
+    defaults: { solid: 'Tech', outline: 'Set', titleSide: 'right', groups: [{ title: 'Core stack', items: [{ label: 'React', logo: 'react', color: '#61DAFB', image: '' }, { label: 'Node.js', logo: 'nodedotjs', color: '#5FA04E', image: '' }] }] },
+    fields: [
+      { name: 'solid', label: 'Solid word', type: 'text', half: true }, { name: 'outline', label: 'Outline word', type: 'text', half: true },
+      { name: 'titleSide', label: 'Title side', type: 'select', options: [['right', 'Right'], ['left', 'Left']] },
+      { name: 'groups', label: 'Groups', type: 'list', itemLabel: 'title', defaults: { title: 'Group', items: [] }, fields: [
+        { name: 'title', label: 'Title', type: 'text' },
+        { name: 'items', label: 'Technologies', type: 'list', itemLabel: 'label', defaults: { label: 'Tech', logo: '', color: '#ffffff', image: '' }, fields: [
+          { name: 'label', label: 'Name', type: 'text', half: true }, { name: 'color', label: 'Glow colour', type: 'color', half: true },
+          { name: 'logo', label: 'Logo slug from simpleicons.org (e.g. react, laravel)', type: 'text' }, { name: 'image', label: 'Or your own logo image', type: 'image' },
+        ] },
+      ] },
+    ],
+  },
   aboutMe: {
     label: 'About me', category: 'Portfolio', icon: 'IdCard', description: 'Bio with quick facts',
     defaults: { eyebrow: 'About me', title: 'A little about me', text: 'Write your story here.', facts: [{ label: 'Location', value: 'Your city' }], buttonLabel: '', buttonUrl: '' },
