@@ -14,14 +14,18 @@ A modern, fully customizable content management system inspired by Botble CMS.
 | **Blog** | Posts with rich text editor, cover image, categories (nested, colored), tags, featured flag, scheduled publishing, reading time, views, SEO + Google preview, bulk actions, duplicate |
 | **Media library** | Drag-and-drop uploads, folders, grid/list views, alt text, picker used across the admin |
 | **Menus** | Multiple menus by location (`header`, `footer`, `footer-2`), nested dropdowns |
-| **Engagement** | Contact inbox (unread/read/replied), newsletter subscribers with CSV export, testimonials, FAQs |
+| **Engagement** | Contact inbox (unread/read/replied) and newsletter subscribers, both with CSV export, testimonials, FAQs |
 | **System** | Users, roles with granular permissions, activity log, settings (general, SEO, social, contact, custom CSS/scripts, maintenance mode) |
 | **News portals** | Breaking ticker, headline layouts (lead + list, center lead, mosaic), category sections (4 layouts), multi-category columns, latest + most-read sidebar, kicker/strapline and "breaking" flag on posts, Bangla fonts and a Bangla news preset |
 | **Video platforms** | Video posts (YouTube/Vimeo links or uploaded MP4), YouTube-style watch page (up next, likes, share), video grid with category chips, featured player |
 | **Streaming** | Shows with seasons/episodes, billboard hero, Top 10 row, poster/landscape rows, show page with season tabs, playlists |
 | **Audio / podcasts** | Audio posts and podcast series, persistent mini-player that keeps playing across pages (queue, ±15s, speed), episode playlists |
 | **Admin UX** | ⌘K command palette, dark mode, collapsible sidebar, Ctrl+S to save, unsaved-changes warnings |
-| **SEO** | Per-page/post meta, Open Graph, JSON-LD, `sitemap.xml`, `robots.txt` |
+| **SEO** | Per-page/post meta, Open Graph, structured data (BlogPosting / NewsArticle / VideoObject / Episode / PodcastEpisode / TVSeries / PodcastSeries), `sitemap.xml`, `robots.txt`, RSS feeds |
+| **Content safety** | **Trash** for posts and pages (restore as draft, auto-purged after 30 days, undo on delete) and **revision history** — every save is kept (latest 30), compare with the saved version and restore in one click |
+| **Redirects & 404 monitor** | 301/302/307/308 redirects with hit counts, `/old/*` wildcard rules, automatic 301 when a published post or page changes its URL, and a log of missing addresses visitors hit (one click to redirect them) |
+| **Backup & restore** | One-click backups of all content, settings, media records, subscribers, messages, redirects and every theme's workspace; download, upload, restore (a safety copy is taken first). Users and passwords are never touched |
+| **Feeds** | `/feed.xml` (filter with `?category=` or `?tag=`), and `/series/:slug/feed.xml` per series — podcasts get iTunes tags for Apple Podcasts / Spotify |
 
 ## Quick start
 

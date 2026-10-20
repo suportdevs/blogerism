@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Film, Play } from 'lucide-react';
+import { Film, Play, Rss } from 'lucide-react';
 import { fetchPublic, getBootstrap } from '@/lib/server';
 import { engagementOf, followLabels, saveLabels } from '@/lib/engagement';
 import { SaveButton, ShareButton, SubscribeButton } from '@/components/site/Engagement';
@@ -7,12 +7,18 @@ import { compact, formatDuration, postUrl } from '@/lib/utils';
 import { PlayButton } from '@/components/site/AudioPlayer';
 import { AudioRow, Thumb, postsToTracks } from '@/components/site/MediaCards';
 import { SeasonEpisodes } from '@/components/site/MediaClient';
+import { JsonLd, seriesJsonLd } from '@/components/site/StructuredData';
 
 export async function generateMetadata({ params }) {
   const data = await fetchPublic(`/series/${params.slug}`, { allow404: true });
   if (!data) return { title: 'Not found' };
   const { series } = data;
-  return { title: series.title, description: series.tagline || series.description, openGraph: { images: [series.backdrop || series.poster].filter(Boolean) } };
+  return {
+    title: series.title,
+    description: series.tagline || series.description,
+    openGraph: { images: [series.backdrop || series.poster].filter(Boolean) },
+    alternates: { types: { 'application/rss+xml': [{ url: `/series/${series.slug}/feed.xml`, title: `${series.title} feed` }] } },
+  };
 }
 
 function Meta({ series, episodes }) {
@@ -40,6 +46,7 @@ export default async function SeriesPage({ params }) {
       {engagement.subscriptions && <SubscribeButton series={series} labels={followLabels(series.type)} initial={series.subscribers} dark={dark} />}
       {engagement.saves && <SaveButton item={{ type: 'series', slug: series.slug, title: series.title }} labels={saveLabels(theme)} iconOnly={series.type !== 'SHOW'} variant="pill" />}
       {engagement.share && <ShareButton title={series.title} variant="icon" />}
+      {series.type === 'PODCAST' && <a href={`/series/${series.slug}/feed.xml`} title="Podcast RSS feed — paste into any podcast app" className="btn-site-ghost !px-4"><Rss className="h-4 w-4" />RSS</a>}
     </div>
   );
 
@@ -49,6 +56,7 @@ export default async function SeriesPage({ params }) {
     const latestFirst = [...episodes].reverse();
     return (
       <>
+        <JsonLd data={seriesJsonLd(series, episodes)} />
         <section className="relative overflow-hidden">
           {series.poster && <img src={series.poster} alt="" className="absolute inset-0 h-full w-full scale-110 object-cover opacity-30 blur-3xl" />}
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[rgb(var(--c-bg))]" />
@@ -84,6 +92,7 @@ export default async function SeriesPage({ params }) {
   if (series.type === 'PLAYLIST') {
     return (
       <div className="site-container grid gap-8 py-10 lg:grid-cols-[360px_1fr]">
+        <JsonLd data={seriesJsonLd(series, episodes)} />
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <div className="overflow-hidden rounded-theme-lg bg-gradient-to-b from-primary/30 to-surface p-5">
             {(first?.coverImage || series.poster) && <img src={first?.coverImage || series.poster} alt="" className="aspect-video w-full rounded-theme object-cover shadow-xl" />}
@@ -115,6 +124,7 @@ export default async function SeriesPage({ params }) {
   const seasons = Object.entries(bySeason).map(([n, eps]) => [Number(n), eps]).sort((a, b) => a[0] - b[0]);
   return (
     <div className="dark bg-[#0b0b0f] text-white [--c-bg:11_11_15] [--c-fg:245_245_245] [--c-surface:24_24_30]">
+      <JsonLd data={seriesJsonLd(series, episodes)} />
       <section className="relative h-[70vh] min-h-[520px] max-h-[820px] overflow-hidden">
         {series.backdrop && <img src={series.backdrop} alt="" className="absolute inset-0 h-full w-full object-cover" />}
         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent" />

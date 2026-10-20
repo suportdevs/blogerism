@@ -12,6 +12,7 @@ enum ContentStatus {
   DRAFT
   PUBLISHED
   SCHEDULED
+  TRASH // in the trash — restorable until it is deleted permanently
 }
 
 // What kind of media a post is — drives which single-page layout the site uses.
@@ -102,6 +103,7 @@ model Post {
   seoTitle       String?
   seoDescription String?
   publishedAt    DateTime?
+  trashedAt      DateTime?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
@@ -167,6 +169,7 @@ model Page {
   seoTitle       String?
   seoDescription String?
   ogImage        String?
+  trashedAt      DateTime?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 }
@@ -307,6 +310,44 @@ model ActivityLog {
   createdAt   DateTime @default(now())
 
   @@index([createdAt])
+}
+
+// A saved copy of a post or page, taken every time it is saved. Restoring one copies it back.
+model Revision {
+  id        Int      @id @default(autoincrement())
+  entity    String // "post" | "page"
+  entityId  Int
+  title     String
+  data      Json
+  userId    Int?
+  userName  String?
+  createdAt DateTime @default(now())
+
+  @@index([entity, entityId, createdAt])
+}
+
+// URL redirects applied by the site (e.g. after a slug change or when moving from another platform).
+model Redirect {
+  id        Int       @id @default(autoincrement())
+  from      String    @unique // path, e.g. /old-post
+  to        String // path or full URL
+  code      Int       @default(301)
+  isActive  Boolean   @default(true)
+  hits      Int       @default(0)
+  lastHitAt DateTime?
+  note      String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+// Paths visitors requested that did not exist — the 404 monitor.
+model NotFoundLog {
+  id         Int      @id @default(autoincrement())
+  path       String   @unique
+  hits       Int      @default(1)
+  referrer   String?
+  lastSeenAt DateTime @default(now())
+  createdAt  DateTime @default(now())
 }
 
 // Saved content per theme: switching themes stores the outgoing theme's content here and

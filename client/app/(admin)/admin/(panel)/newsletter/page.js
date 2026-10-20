@@ -1,20 +1,14 @@
 'use client';
 
 import { Download, Mail } from 'lucide-react';
+import { toast } from 'sonner';
 import { api } from '@/lib/api';
 import CrudPage from '@/components/admin/CrudPage';
 import { Avatar } from '@/components/admin/ui';
 import { formatDate } from '@/lib/utils';
 
-async function exportCsv() {
-  const { items } = await api.get('/admin/subscribers', { limit: 100, page: 1 });
-  const rows = [['email', 'name', 'active', 'subscribed_at'], ...items.map((s) => [s.email, s.name || '', s.isActive, s.createdAt])];
-  const csv = rows.map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
-  a.download = `subscribers-${new Date().toISOString().slice(0, 10)}.csv`;
-  a.click();
-}
+// Server-side export of every subscriber (not just the current page).
+const exportCsv = () => api.download('/admin/subscribers/export', 'subscribers.csv').catch((e) => toast.error(e.message));
 
 export default function NewsletterPage() {
   return (

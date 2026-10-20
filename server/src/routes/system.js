@@ -17,9 +17,9 @@ router.get('/dashboard', asyncHandler(async (_req, res) => {
 
   const [posts, published, pages, users, media, unread, subscribers, views, comments, pendingComments, topPosts, recentPosts, recentMessages, recentActivity, postsByDay, subsByDay, categories] =
     await Promise.all([
-      prisma.post.count(),
+      prisma.post.count({ where: { status: { not: 'TRASH' } } }),
       prisma.post.count({ where: { status: 'PUBLISHED' } }),
-      prisma.page.count(),
+      prisma.page.count({ where: { status: { not: 'TRASH' } } }),
       prisma.user.count(),
       prisma.media.count(),
       prisma.contactMessage.count({ where: { status: 'UNREAD' } }),
@@ -28,7 +28,7 @@ router.get('/dashboard', asyncHandler(async (_req, res) => {
       prisma.comment.count({ where: { status: 'APPROVED' } }),
       prisma.comment.count({ where: { status: 'PENDING' } }),
       prisma.post.findMany({ where: { status: 'PUBLISHED' }, orderBy: { views: 'desc' }, take: 5, select: { id: true, title: true, slug: true, views: true, coverImage: true } }),
-      prisma.post.findMany({ orderBy: { createdAt: 'desc' }, take: 5, select: { id: true, title: true, status: true, createdAt: true, author: { select: { name: true } } } }),
+      prisma.post.findMany({ where: { status: { not: 'TRASH' } }, orderBy: { createdAt: 'desc' }, take: 5, select: { id: true, title: true, status: true, createdAt: true, author: { select: { name: true } } } }),
       prisma.contactMessage.findMany({ orderBy: { createdAt: 'desc' }, take: 5 }),
       prisma.activityLog.findMany({ orderBy: { createdAt: 'desc' }, take: 8, include: { user: { select: { name: true, avatar: true } } } }),
       prisma.$queryRaw`SELECT to_char(date_trunc('day', "createdAt"), 'YYYY-MM-DD') AS day, COUNT(*)::int AS count FROM "Post" WHERE "createdAt" >= ${since} GROUP BY 1`,
@@ -114,8 +114,8 @@ router.get('/search', asyncHandler(async (req, res) => {
   if (q.length < 2) return res.json({ posts: [], pages: [], users: [] });
   const contains = { contains: q, mode: 'insensitive' };
   const [posts, pages, categories] = await Promise.all([
-    prisma.post.findMany({ where: { title: contains }, take: 6, select: { id: true, title: true, status: true } }),
-    prisma.page.findMany({ where: { title: contains }, take: 6, select: { id: true, title: true, status: true } }),
+    prisma.post.findMany({ where: { title: contains, status: { not: 'TRASH' } }, take: 6, select: { id: true, title: true, status: true } }),
+    prisma.page.findMany({ where: { title: contains, status: { not: 'TRASH' } }, take: 6, select: { id: true, title: true, status: true } }),
     prisma.category.findMany({ where: { name: contains }, take: 4, select: { id: true, name: true } }),
   ]);
   res.json({ posts, pages, categories });

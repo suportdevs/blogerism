@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
-import { Check, Inbox, Mail, MailOpen, Phone, Reply, Trash2 } from 'lucide-react';
+import { Check, Download, Inbox, Mail, MailOpen, Phone, Reply, Trash2 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useApi } from '@/lib/hooks';
 import { cn, formatDate, timeAgo } from '@/lib/utils';
@@ -39,7 +39,7 @@ function ContactsInner() {
 
   return (
     <>
-      <PageHeader title="Messages" description="Contact form submissions from your website." />
+      <PageHeader title="Messages" description="Contact form submissions from your website." actions={<button onClick={() => api.download('/admin/contacts/export', 'messages.csv').catch((e) => toast.error(e.message))} className="a-btn-secondary"><Download className="h-4 w-4" />Export CSV</button>} />
       <div className="a-card grid overflow-hidden lg:h-[calc(100vh-14rem)] lg:grid-cols-[380px_1fr]">
         <div className="flex min-h-0 flex-col border-b border-ink-100 dark:border-white/5 lg:border-b-0 lg:border-r">
           <div className="space-y-3 border-b border-ink-100 p-3 dark:border-white/5">

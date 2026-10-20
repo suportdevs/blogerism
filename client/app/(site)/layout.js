@@ -23,6 +23,7 @@ export async function generateMetadata() {
     robots: seo.allowIndexing ? { index: true, follow: true } : { index: false, follow: false },
     openGraph: { siteName: general.siteName, type: 'website', images: seo.ogImage ? [seo.ogImage] : undefined },
     twitter: { card: 'summary_large_image', site: seo.twitterHandle || undefined },
+    alternates: { types: { 'application/rss+xml': [{ url: '/feed.xml', title: general.siteName }] } },
   };
 }
 

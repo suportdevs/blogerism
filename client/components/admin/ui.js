@@ -65,7 +65,7 @@ export function Badge({ color = 'gray', children, dot, className }) {
   );
 }
 
-export const STATUS_COLORS = { PUBLISHED: 'green', DRAFT: 'gray', SCHEDULED: 'blue', UNREAD: 'brand', READ: 'gray', REPLIED: 'green', PENDING: 'amber', APPROVED: 'green', SPAM: 'red' };
+export const STATUS_COLORS = { PUBLISHED: 'green', DRAFT: 'gray', SCHEDULED: 'blue', TRASH: 'red', UNREAD: 'brand', READ: 'gray', REPLIED: 'green', PENDING: 'amber', APPROVED: 'green', SPAM: 'red' };
 export function StatusBadge({ status }) {
   return <Badge color={STATUS_COLORS[status] || 'gray'} dot>{status.charAt(0) + status.slice(1).toLowerCase()}</Badge>;
 }

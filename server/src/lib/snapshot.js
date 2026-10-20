@@ -84,7 +84,7 @@ async function restoreSnapshot(snapshot, { admin } = {}) {
   const d = snapshot.data;
 
   await prisma.$transaction([
-    prisma.activityLog.deleteMany(), prisma.menuItem.deleteMany(), prisma.menu.deleteMany(), prisma.comment.deleteMany(), prisma.post.deleteMany(), prisma.series.deleteMany(),
+    prisma.activityLog.deleteMany(), prisma.revision.deleteMany(), prisma.menuItem.deleteMany(), prisma.menu.deleteMany(), prisma.comment.deleteMany(), prisma.post.deleteMany(), prisma.series.deleteMany(),
     prisma.category.deleteMany(), prisma.tag.deleteMany(), prisma.page.deleteMany(), prisma.media.deleteMany(), prisma.mediaFolder.deleteMany(),
     prisma.faq.deleteMany(), prisma.testimonial.deleteMany(), prisma.subscriber.deleteMany(), prisma.contactMessage.deleteMany(),
     prisma.setting.deleteMany(), prisma.user.deleteMany(), prisma.role.deleteMany(),

@@ -1,13 +1,13 @@
 const express = require('express');
 const prisma = require('./prisma');
-const { asyncHandler, paginate, pageMeta, logActivity, toInt } = require('./utils');
+const { asyncHandler, paginate, pageMeta, logActivity, toInt, sendCsv } = require('./utils');
 const { authenticate, authorize } = require('../middleware/auth');
 
 /**
  * Builds a standard admin CRUD router for simple models.
- * opts: { model, permission, schema (zod object), searchFields, orderBy, label }
+ * opts: { model, permission, schema (zod object), searchFields, orderBy, label, csv: [[field, header], …] }
  */
-module.exports = function crudRouter({ model, permission, schema, searchFields = [], orderBy = { id: 'desc' }, label }) {
+module.exports = function crudRouter({ model, permission, schema, searchFields = [], orderBy = { id: 'desc' }, label, csv }) {
   const router = express.Router();
   router.use(authenticate, authorize(permission));
 
@@ -23,6 +23,14 @@ module.exports = function crudRouter({ model, permission, schema, searchFields =
     ]);
     res.json({ items, meta: pageMeta(total, page, limit) });
   }));
+
+  if (csv) {
+    router.get('/export', asyncHandler(async (req, res) => {
+      const rows = await prisma[model].findMany({ orderBy });
+      await logActivity(req, 'created', label, null, `Exported ${rows.length} ${label.toLowerCase()} record(s) to CSV`);
+      sendCsv(res, `${model}s-${new Date().toISOString().slice(0, 10)}.csv`, csv, rows);
+    }));
+  }
 
   router.get('/:id', asyncHandler(async (req, res) => {
     res.json(await prisma[model].findUniqueOrThrow({ where: { id: toInt(req.params.id) } }));

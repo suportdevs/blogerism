@@ -9,10 +9,10 @@ const { insertTree, resetSequences } = require('./snapshot');
  */
 
 const GLOBAL_SETTINGS = ['theme'];
-const CONTENT_TABLES = ['Category', 'Tag', 'Series', 'Post', 'Comment', 'Page', 'Menu', 'MenuItem', 'Faq', 'Testimonial'];
+const CONTENT_TABLES = ['Category', 'Tag', 'Series', 'Post', 'Comment', 'Page', 'Menu', 'MenuItem', 'Faq', 'Testimonial', 'Revision'];
 
 async function captureContent() {
-  const [categories, tags, series, posts, comments, pages, menus, menuItems, faqs, testimonials, settings] = await Promise.all([
+  const [categories, tags, series, posts, comments, pages, menus, menuItems, faqs, testimonials, revisions, settings] = await Promise.all([
     prisma.category.findMany({ orderBy: { id: 'asc' } }),
     prisma.tag.findMany({ orderBy: { id: 'asc' } }),
     prisma.series.findMany({ orderBy: { id: 'asc' } }),
@@ -23,10 +23,11 @@ async function captureContent() {
     prisma.menuItem.findMany({ orderBy: { id: 'asc' } }),
     prisma.faq.findMany({ orderBy: { id: 'asc' } }),
     prisma.testimonial.findMany({ orderBy: { id: 'asc' } }),
+    prisma.revision.findMany({ orderBy: { id: 'asc' } }),
     prisma.setting.findMany({ where: { key: { notIn: GLOBAL_SETTINGS } } }),
   ]);
   return {
-    categories, tags, series, comments, pages, menus, menuItems, faqs, testimonials,
+    categories, tags, series, comments, pages, menus, menuItems, faqs, testimonials, revisions,
     posts: posts.map(({ categories: c, tags: t, ...p }) => ({ ...p, categoryIds: c.map((x) => x.id), tagIds: t.map((x) => x.id) })),
     settings: settings.map(({ key, value }) => ({ key, value })),
   };
@@ -36,7 +37,7 @@ async function clearContent() {
   await prisma.$transaction([
     prisma.menuItem.deleteMany(), prisma.menu.deleteMany(), prisma.comment.deleteMany(), prisma.post.deleteMany(), prisma.series.deleteMany(),
     prisma.tag.deleteMany(), prisma.category.deleteMany(), prisma.page.deleteMany(), prisma.faq.deleteMany(), prisma.testimonial.deleteMany(),
-    prisma.setting.deleteMany({ where: { key: { notIn: GLOBAL_SETTINGS } } }),
+    prisma.revision.deleteMany(), prisma.setting.deleteMany({ where: { key: { notIn: GLOBAL_SETTINGS } } }),
   ]);
 }
 
@@ -63,6 +64,8 @@ async function restoreContent(d) {
   await insertTree('menuItem', d.menuItems, 'parentId');
   for (const f of d.faqs) await prisma.faq.create({ data: f });
   for (const t of d.testimonials) await prisma.testimonial.create({ data: t });
+  // Revision history belongs to this content (ids match); workspaces saved before revisions existed have none.
+  if (d.revisions?.length) await prisma.revision.createMany({ data: d.revisions });
   for (const s of d.settings) await prisma.setting.create({ data: s });
   await resetSequences(CONTENT_TABLES);
 }
@@ -91,4 +94,4 @@ async function workspaceSummary() {
   }]));
 }
 
-module.exports = { saveWorkspace, loadWorkspace, clearContent, workspaceSummary };
+module.exports = { saveWorkspace, loadWorkspace, clearContent, workspaceSummary, captureContent, restoreContent };

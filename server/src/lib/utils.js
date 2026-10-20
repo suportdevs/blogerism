@@ -60,4 +60,17 @@ const toInt = (v) => {
   return Number.isNaN(n) ? undefined : n;
 };
 
-module.exports = { slugify, uniqueSlug, paginate, pageMeta, readingTime, asyncHandler, HttpError, logActivity, toInt };
+// CSV download. Cells that spreadsheet apps would run as formulas are prefixed with a quote.
+function sendCsv(res, filename, columns, rows) {
+  const cell = (v) => {
+    let s = v == null ? '' : v instanceof Date ? v.toISOString() : String(v);
+    if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`;
+    return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  };
+  const lines = [columns.map(([, label]) => cell(label)).join(','), ...rows.map((r) => columns.map(([key]) => cell(r[key])).join(','))];
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  res.send(`\uFEFF${lines.join('\r\n')}`); // BOM so Excel reads UTF-8 (e.g. Bengali names) correctly
+}
+
+module.exports = { sendCsv, slugify, uniqueSlug, paginate, pageMeta, readingTime, asyncHandler, HttpError, logActivity, toInt };

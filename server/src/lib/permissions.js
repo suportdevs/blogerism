@@ -17,6 +17,8 @@ const PERMISSIONS = [
   { key: 'roles', label: 'Roles & permissions', group: 'System' },
   { key: 'settings', label: 'System settings', group: 'System' },
   { key: 'logs', label: 'Activity logs', group: 'System' },
+  { key: 'redirects', label: 'Redirects & 404 monitor', group: 'System' },
+  { key: 'backups', label: 'Backup & restore', group: 'System' },
 ];
 
 const hasPermission = (user, key) => {

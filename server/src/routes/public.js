@@ -6,6 +6,7 @@ const { asyncHandler, paginate, pageMeta, HttpError } = require('../lib/utils');
 const { getSettings } = require('../lib/settings');
 const { toTree } = require('./menus');
 const { publicTheme } = require('../themes');
+const { normalizePath } = require('../lib/redirects');
 
 // Unauthenticated endpoints consumed by the Next.js storefront.
 const router = express.Router();
@@ -276,6 +277,29 @@ router.get('/sitemap', asyncHandler(async (_req, res) => {
     prisma.series.findMany({ where: { status: 'PUBLISHED' }, select: { slug: true, updatedAt: true } }),
   ]);
   res.json({ posts, pages, categories, series });
+}));
+
+// Active redirects, read (and cached briefly) by the site's middleware.
+router.get('/redirects', asyncHandler(async (_req, res) => {
+  res.json({ items: await prisma.redirect.findMany({ where: { isActive: true }, select: { id: true, from: true, to: true, code: true } }) });
+}));
+
+router.post('/redirects/:id/hit', asyncHandler(async (req, res) => {
+  await prisma.redirect.updateMany({ where: { id: parseInt(req.params.id, 10) || 0 }, data: { hits: { increment: 1 }, lastHitAt: new Date() } });
+  res.status(204).end();
+}));
+
+// The 404 monitor: visitors' browsers report paths that did not exist. Static files and admin/API paths are ignored.
+const NOT_FOUND_CAP = 2000;
+const notFoundLimiter = rateLimit({ windowMs: 60 * 1000, limit: 30, standardHeaders: true, legacyHeaders: false, message: { message: 'Too many requests' } });
+router.post('/not-found', notFoundLimiter, asyncHandler(async (req, res) => {
+  const { path, referrer } = z.object({ path: z.string().min(1).max(500), referrer: z.string().max(500).optional().nullable() }).parse(req.body);
+  const p = normalizePath(path);
+  if (/^\/(_next|api|admin|uploads)(\/|$)/.test(p) || /\.(js|css|map|png|jpe?g|gif|svg|ico|webp|avif|woff2?|txt|xml)$/i.test(p)) return res.status(204).end();
+  const existing = await prisma.notFoundLog.findUnique({ where: { path: p } });
+  if (existing) await prisma.notFoundLog.update({ where: { path: p }, data: { hits: { increment: 1 }, lastSeenAt: new Date(), ...(referrer ? { referrer } : {}) } });
+  else if ((await prisma.notFoundLog.count()) < NOT_FOUND_CAP) await prisma.notFoundLog.create({ data: { path: p, referrer: referrer || null } });
+  res.status(204).end();
 }));
 
 router.post('/contact', formLimiter, asyncHandler(async (req, res) => {

@@ -62,4 +62,16 @@ export const api = {
   put: (path, body) => request('PUT', path, body),
   del: (path) => request('DELETE', path),
   upload: (path, formData) => request('POST', path, formData, { isForm: true }),
+  // Downloads an authenticated file (CSV export, backup) and saves it with the server's filename.
+  download: async (path, fallbackName = 'download') => {
+    const res = await fetch(`${API_URL}/api${path}`, { headers: { Authorization: `Bearer ${tokenStore.get()}` } });
+    if (!res.ok) throw new ApiError(res.status, (await res.json().catch(() => ({}))).message || 'Download failed');
+    const name = /filename="?([^";]+)"?/.exec(res.headers.get('Content-Disposition') || '')?.[1] || fallbackName;
+    const url = URL.createObjectURL(await res.blob());
+    const a = Object.assign(document.createElement('a'), { href: url, download: name });
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  },
 };

@@ -3,6 +3,9 @@ const { z } = require('zod');
 const prisma = require('../lib/prisma');
 const { authenticate, authorize } = require('../middleware/auth');
 const { asyncHandler, paginate, pageMeta, uniqueSlug, readingTime, logActivity, toInt } = require('../lib/utils');
+const { saveRevision, listRevisions, getRevision } = require('../lib/revisions');
+const trashBin = require('../lib/trash');
+const { postPath, autoRedirect } = require('../lib/redirects');
 
 const router = express.Router();
 router.use(authenticate, authorize('posts'));
@@ -67,7 +70,7 @@ router.get('/', asyncHandler(async (req, res) => {
   const { page, limit, skip } = paginate(req.query, 15);
   const where = {};
   if (req.query.q) where.title = { contains: req.query.q, mode: 'insensitive' };
-  if (req.query.status) where.status = req.query.status;
+  where.status = req.query.status || { not: 'TRASH' };
   if (req.query.format) where.format = req.query.format;
   if (req.query.series) where.seriesId = toInt(req.query.series);
   if (req.query.category) where.categories = { some: { id: toInt(req.query.category) } };
@@ -92,6 +95,7 @@ router.post('/', asyncHandler(async (req, res) => {
   data.categories = { connect: input.categoryIds.map((id) => ({ id })) };
   data.tags = { connect: await resolveTags(input.tags) };
   const post = await prisma.post.create({ data: { ...data, authorId: req.user.id }, include });
+  await saveRevision('post', post, req.user);
   await logActivity(req, 'created', 'Post', post.id, `Created post "${post.title}"`);
   res.status(201).json(post);
 }));
@@ -99,9 +103,51 @@ router.post('/', asyncHandler(async (req, res) => {
 router.put('/:id', asyncHandler(async (req, res) => {
   const id = toInt(req.params.id);
   const input = postSchema.partial().parse(req.body);
+  const before = await prisma.post.findUniqueOrThrow({ where: { id }, select: { slug: true, format: true, status: true } });
   const post = await prisma.post.update({ where: { id }, data: await buildData(input, id), include });
+  if (before.status === 'PUBLISHED' || before.status === 'SCHEDULED') await autoRedirect(postPath(before), postPath(post));
+  await saveRevision('post', post, req.user);
   await logActivity(req, 'updated', 'Post', post.id, `Updated post "${post.title}"`);
   res.json(post);
+}));
+
+router.get('/:id/revisions', asyncHandler(async (req, res) => {
+  res.json(await listRevisions('post', toInt(req.params.id)));
+}));
+
+router.get('/:id/revisions/:revId', asyncHandler(async (req, res) => {
+  res.json(await getRevision('post', toInt(req.params.id), toInt(req.params.revId)));
+}));
+
+// Copies a revision's content back onto the post (slug and status stay as they are).
+router.post('/:id/revisions/:revId/restore', asyncHandler(async (req, res) => {
+  const id = toInt(req.params.id);
+  const rev = await getRevision('post', id, toInt(req.params.revId));
+  const { categoryIds = [], tags = [], ...fields } = rev.data;
+  if (fields.seriesId && !(await prisma.series.findUnique({ where: { id: fields.seriesId }, select: { id: true } }))) fields.seriesId = null;
+  const categories = await prisma.category.findMany({ where: { id: { in: categoryIds } }, select: { id: true } });
+  const post = await prisma.post.update({
+    where: { id },
+    data: { ...fields, gallery: fields.gallery || [], readingTime: readingTime(fields.content || ''), categories: { set: categories }, tags: { set: await resolveTags(tags) } },
+    include,
+  });
+  await saveRevision('post', post, req.user);
+  await logActivity(req, 'updated', 'Post', post.id, `Restored a revision of post "${post.title}"`);
+  res.json(post);
+}));
+
+router.post('/:id/restore', asyncHandler(async (req, res) => {
+  const id = toInt(req.params.id);
+  await trashBin.restore('post', [id]);
+  const post = await prisma.post.findUniqueOrThrow({ where: { id }, select: { id: true, title: true } });
+  await logActivity(req, 'updated', 'Post', id, `Restored post "${post.title}" from the trash`);
+  res.json(post);
+}));
+
+router.post('/empty-trash', asyncHandler(async (req, res) => {
+  const count = await trashBin.emptyTrash('post');
+  await logActivity(req, 'deleted', 'Post', null, `Emptied the trash (${count} post(s))`);
+  res.json({ count });
 }));
 
 router.post('/:id/duplicate', asyncHandler(async (req, res) => {
@@ -135,18 +181,28 @@ router.post('/:id/duplicate', asyncHandler(async (req, res) => {
 }));
 
 router.post('/bulk', asyncHandler(async (req, res) => {
-  const { ids, action } = z.object({ ids: z.array(z.number()).min(1), action: z.enum(['publish', 'draft', 'delete']) }).parse(req.body);
+  const { ids, action } = z.object({ ids: z.array(z.number()).min(1), action: z.enum(['publish', 'draft', 'trash', 'restore', 'delete']) }).parse(req.body);
+  const live = { id: { in: ids }, NOT: { status: 'TRASH' } };
   let count;
-  if (action === 'delete') ({ count } = await prisma.post.deleteMany({ where: { id: { in: ids } } }));
-  else if (action === 'publish') ({ count } = await prisma.post.updateMany({ where: { id: { in: ids } }, data: { status: 'PUBLISHED', publishedAt: new Date() } }));
-  else ({ count } = await prisma.post.updateMany({ where: { id: { in: ids } }, data: { status: 'DRAFT' } }));
-  await logActivity(req, action === 'delete' ? 'deleted' : 'updated', 'Post', ids.join(','), `Bulk ${action} on ${count} post(s)`);
+  if (action === 'delete') count = await trashBin.destroy('post', ids);
+  else if (action === 'trash') ({ count } = await trashBin.trash('post', ids));
+  else if (action === 'restore') ({ count } = await trashBin.restore('post', ids));
+  else if (action === 'publish') ({ count } = await prisma.post.updateMany({ where: live, data: { status: 'PUBLISHED', publishedAt: new Date() } }));
+  else ({ count } = await prisma.post.updateMany({ where: live, data: { status: 'DRAFT' } }));
+  await logActivity(req, action === 'delete' || action === 'trash' ? 'deleted' : 'updated', 'Post', ids.join(','), `Bulk ${action} on ${count} post(s)`);
   res.json({ count });
 }));
 
+// Moves the post to the trash; a post already in the trash (or ?permanent=1) is deleted for good.
 router.delete('/:id', asyncHandler(async (req, res) => {
-  const post = await prisma.post.delete({ where: { id: toInt(req.params.id) } });
-  await logActivity(req, 'deleted', 'Post', post.id, `Deleted post "${post.title}"`);
+  const post = await prisma.post.findUniqueOrThrow({ where: { id: toInt(req.params.id) }, select: { id: true, title: true, status: true } });
+  if (post.status === 'TRASH' || req.query.permanent === '1') {
+    await trashBin.destroy('post', [post.id]);
+    await logActivity(req, 'deleted', 'Post', post.id, `Permanently deleted post "${post.title}"`);
+  } else {
+    await trashBin.trash('post', [post.id]);
+    await logActivity(req, 'deleted', 'Post', post.id, `Moved post "${post.title}" to the trash`);
+  }
   res.status(204).end();
 }));
 

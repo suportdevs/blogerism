@@ -13,6 +13,7 @@ import SeoPanel from './SeoPanel';
 import { ImageField, MediaPicker, MediaUrlField } from './Media';
 import { Card, Field, PageLoader, StatusBadge, Toggle, useConfirm } from './ui';
 import { useSiteTheme } from './SiteTheme';
+import RevisionHistory from './RevisionHistory';
 
 const EMPTY = {
   title: '', slug: '', excerpt: '', content: '', coverImage: '', status: 'DRAFT', featured: false, allowComments: true, categoryIds: [], tags: [], seoTitle: '', seoDescription: '', publishedAt: '',
@@ -210,20 +211,26 @@ export default function PostEditor({ id }) {
     if (isNew && theme && !search.get('format') && !dirty) setForm((f) => ({ ...f, format: themeFormats[0] }));
   }, [theme]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Loads a saved post into the form (on open, and after restoring a revision).
+  const loadPost = (p) => {
+    setForm({
+      ...EMPTY, ...p,
+      excerpt: p.excerpt || '', coverImage: p.coverImage || '', seoTitle: p.seoTitle || '', seoDescription: p.seoDescription || '',
+      categoryIds: p.categories.map((c) => c.id), tags: p.tags.map((t) => t.name), publishedAt: toLocalInput(p.publishedAt),
+      subtitle: p.subtitle || '', videoUrl: p.videoUrl || '', audioUrl: p.audioUrl || '', gallery: p.gallery || [],
+      seriesId: p.seriesId || '', season: p.season ?? '', episode: p.episode ?? '',
+    });
+    setMeta(p);
+    setDirty(false);
+  };
+
   useEffect(() => {
     if (isNew) return;
     api.get(`/admin/posts/${id}`).then((p) => {
-      setForm({
-        ...EMPTY, ...p,
-        excerpt: p.excerpt || '', coverImage: p.coverImage || '', seoTitle: p.seoTitle || '', seoDescription: p.seoDescription || '',
-        categoryIds: p.categories.map((c) => c.id), tags: p.tags.map((t) => t.name), publishedAt: toLocalInput(p.publishedAt),
-        subtitle: p.subtitle || '', videoUrl: p.videoUrl || '', audioUrl: p.audioUrl || '', gallery: p.gallery || [],
-        seriesId: p.seriesId || '', season: p.season ?? '', episode: p.episode ?? '',
-      });
-      setMeta(p);
+      loadPost(p);
       setLoaded(true);
     }).catch(() => { toast.error('Post not found'); router.replace('/admin/posts'); });
-  }, [id, isNew, router]);
+  }, [id, isNew, router]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const set = (k) => (v) => {
     setDirty(true);
@@ -266,10 +273,10 @@ export default function PostEditor({ id }) {
   useSaveShortcut(() => save());
 
   const remove = async () => {
-    if (!(await confirm({ title: 'Delete this post?' }))) return;
+    if (!(await confirm({ title: 'Move this post to the trash?', message: 'It is taken off the site and can be restored from Posts → Trash for 30 days.', confirmLabel: 'Move to trash' }))) return;
     await api.del(`/admin/posts/${id}`);
     setDirty(false);
-    toast.success('Post deleted');
+    toast.success('Post moved to the trash');
     router.replace('/admin/posts');
   };
 
@@ -289,6 +296,7 @@ export default function PostEditor({ id }) {
           </div>
         </div>
         {!isNew && meta?.status === 'PUBLISHED' && <a href={`/${URL_PREFIX[meta.format] || 'blog'}/${meta.slug}`} target="_blank" rel="noreferrer" className="a-btn-secondary"><ExternalLink className="h-4 w-4" />View</a>}
+        {!isNew && <RevisionHistory entity="posts" id={id} saved={meta} dirty={dirty} onRestored={loadPost} />}
         <button onClick={() => save('DRAFT')} className="a-btn-secondary" disabled={saving}>Save draft</button>
         <button onClick={() => save(form.status === 'DRAFT' ? 'PUBLISHED' : form.status)} className="a-btn-primary" disabled={saving}>
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}

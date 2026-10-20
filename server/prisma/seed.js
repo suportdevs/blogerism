@@ -15,7 +15,7 @@ async function main() {
   console.log(`🌱 Seeding database with the “${THEMES[themeId].name}” theme…`);
 
   await prisma.$transaction([
-    prisma.themeWorkspace.deleteMany(), prisma.activityLog.deleteMany(), prisma.menuItem.deleteMany(), prisma.menu.deleteMany(), prisma.post.deleteMany(), prisma.series.deleteMany(),
+    prisma.themeWorkspace.deleteMany(), prisma.activityLog.deleteMany(), prisma.revision.deleteMany(), prisma.menuItem.deleteMany(), prisma.menu.deleteMany(), prisma.post.deleteMany(), prisma.series.deleteMany(),
     prisma.category.deleteMany(), prisma.tag.deleteMany(), prisma.page.deleteMany(), prisma.media.deleteMany(),
     prisma.mediaFolder.deleteMany(), prisma.faq.deleteMany(), prisma.testimonial.deleteMany(), prisma.subscriber.deleteMany(),
     prisma.contactMessage.deleteMany(), prisma.setting.deleteMany(), prisma.user.deleteMany(), prisma.role.deleteMany(),
@@ -23,7 +23,7 @@ async function main() {
 
   const [adminRole, editorRole, authorRole] = await Promise.all([
     prisma.role.create({ data: { name: 'Super Admin', slug: 'super-admin', description: 'Full access to everything', permissions: ['*'], isSystem: true } }),
-    prisma.role.create({ data: { name: 'Editor', slug: 'editor', description: 'Manage all content, media and menus', permissions: ['posts', 'categories', 'series', 'pages', 'media', 'faqs', 'testimonials', 'menus', 'contacts', 'comments', 'newsletter'] } }),
+    prisma.role.create({ data: { name: 'Editor', slug: 'editor', description: 'Manage all content, media and menus', permissions: ['posts', 'categories', 'series', 'pages', 'media', 'faqs', 'testimonials', 'menus', 'contacts', 'comments', 'newsletter', 'redirects'] } }),
     prisma.role.create({ data: { name: 'Author', slug: 'author', description: 'Write and publish posts', permissions: ['posts', 'media'] } }),
   ]);
 

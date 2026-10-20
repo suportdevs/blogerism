@@ -9,6 +9,7 @@ import { ListenView, LuxeArticleView, NewsArticleView, WatchView } from '@/compo
 import { Kicker } from '@/components/site/MediaCards';
 import { Comments, PostActions, TextSizer } from '@/components/site/Engagement';
 import { engagementOf, saveLabels } from '@/lib/engagement';
+import { JsonLd, postJsonLd } from '@/components/site/StructuredData';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
@@ -46,12 +47,13 @@ export default async function PostPage({ params }) {
   const engagement = engagementOf(settings);
   const labels = saveLabels(theme);
   const ui = { engagement, labels };
-  if (post.format === 'VIDEO') return <WatchView post={post} episodes={episodes} upNext={upNext} {...ui} />;
-  if (post.format === 'AUDIO') return <ListenView post={post} episodes={episodes} upNext={upNext} {...ui} />;
-  if (theme?.layout?.article === 'luxe') return <LuxeArticleView post={post} related={related} {...ui} />;
+  const ld = <JsonLd data={postJsonLd(post, { news: theme?.layout?.article === 'news' })} />;
+  if (post.format === 'VIDEO') return <>{ld}<WatchView post={post} episodes={episodes} upNext={upNext} {...ui} /></>;
+  if (post.format === 'AUDIO') return <>{ld}<ListenView post={post} episodes={episodes} upNext={upNext} {...ui} /></>;
+  if (theme?.layout?.article === 'luxe') return <>{ld}<LuxeArticleView post={post} related={related} {...ui} /></>;
   if (theme?.layout?.article === 'news') {
     const popular = await fetchPublic(`/posts?sort=popular&limit=5&format=STANDARD&exclude=${post.id}`);
-    return <NewsArticleView post={post} related={related.slice(0, 4)} more={popular.items} {...ui} />;
+    return <>{ld}<NewsArticleView post={post} related={related.slice(0, 4)} more={popular.items} {...ui} /></>;
   }
   const { html, toc } = withToc(post.content);
   const url = `${SITE_URL}/blog/${post.slug}`;
@@ -61,15 +63,10 @@ export default async function PostPage({ params }) {
     [Facebook, `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`],
     [Linkedin, `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`],
   ];
-  const jsonLd = {
-    '@context': 'https://schema.org', '@type': 'BlogPosting', headline: post.title, image: post.coverImage, datePublished: post.publishedAt,
-    dateModified: post.updatedAt, author: post.author ? { '@type': 'Person', name: post.author.name } : undefined, description: post.excerpt,
-  };
-
   return (
     <article>
       <ReadingProgress />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      {ld}
 
       <header className="relative overflow-hidden">
         <div className="pointer-events-none absolute -top-40 left-1/2 h-96 w-[800px] -translate-x-1/2 rounded-full bg-primary/15 blur-[110px]" />

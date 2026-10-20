@@ -2,7 +2,7 @@ const express = require('express');
 const { z } = require('zod');
 const prisma = require('../lib/prisma');
 const { authenticate, authorize } = require('../middleware/auth');
-const { asyncHandler, paginate, pageMeta, logActivity, toInt } = require('../lib/utils');
+const { asyncHandler, paginate, pageMeta, logActivity, toInt, sendCsv } = require('../lib/utils');
 
 const router = express.Router();
 router.use(authenticate, authorize('contacts'));
@@ -20,6 +20,12 @@ router.get('/', asyncHandler(async (req, res) => {
     prisma.contactMessage.groupBy({ by: ['status'], _count: true }),
   ]);
   res.json({ items, meta: pageMeta(total, page, limit), statusCounts: Object.fromEntries(counts.map((c) => [c.status, c._count])) });
+}));
+
+router.get('/export', asyncHandler(async (req, res) => {
+  const rows = await prisma.contactMessage.findMany({ orderBy: { createdAt: 'desc' } });
+  await logActivity(req, 'created', 'Contact', null, `Exported ${rows.length} message(s) to CSV`);
+  sendCsv(res, `messages-${new Date().toISOString().slice(0, 10)}.csv`, [['createdAt', 'Received'], ['name', 'Name'], ['email', 'Email'], ['phone', 'Phone'], ['subject', 'Subject'], ['message', 'Message'], ['status', 'Status']], rows);
 }));
 
 router.put('/:id', asyncHandler(async (req, res) => {

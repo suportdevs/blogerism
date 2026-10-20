@@ -39,6 +39,8 @@ app.use('/api/admin/comments', require('./routes/comments'));
 app.use('/api/admin/users', users);
 app.use('/api/admin/roles', roles);
 app.use('/api/admin/system', require('./routes/system'));
+app.use('/api/admin/redirects', require('./routes/redirects'));
+app.use('/api/admin/backups', require('./routes/backups'));
 
 app.use('/api/admin/faqs', crud({
   model: 'faq',
@@ -79,6 +81,7 @@ app.use('/api/admin/subscribers', crud({
   label: 'Subscriber',
   searchFields: ['email', 'name'],
   orderBy: { createdAt: 'desc' },
+  csv: [['email', 'Email'], ['name', 'Name'], ['isActive', 'Active'], ['createdAt', 'Subscribed at']],
   schema: z.object({ email: z.string().email(), name: z.string().nullable().optional(), isActive: z.boolean().default(true) }),
 }));
 
@@ -87,3 +90,9 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`🚀 Themewright API running on http://localhost:${PORT}`));
+
+// Housekeeping: permanently remove posts and pages that have been in the trash too long.
+const { purgeExpired } = require('./lib/trash');
+const housekeeping = () => purgeExpired().catch((e) => console.error('Trash purge failed:', e.message));
+setTimeout(housekeeping, 30 * 1000);
+setInterval(housekeeping, 6 * 60 * 60 * 1000).unref();

@@ -21,6 +21,7 @@ import { useSaveShortcut, useUnsavedWarning } from '@/lib/hooks';
 import { cn, slugify, uid } from '@/lib/utils';
 import { SchemaFields } from './FieldRenderer';
 import SeoPanel from './SeoPanel';
+import RevisionHistory from './RevisionHistory';
 import { ImageField } from './Media';
 import { Field, PageLoader, Tabs } from './ui';
 import { useSiteTheme } from './SiteTheme';
@@ -324,6 +325,13 @@ export default function PageBuilder({ id }) {
         <button onClick={undo} disabled={!history.past.length} className="a-btn-ghost a-btn-icon" title="Undo (Ctrl+Z)"><Undo2 className="h-4 w-4" /></button>
         <button onClick={redo} disabled={!history.future.length} className="a-btn-ghost a-btn-icon" title="Redo (Ctrl+Shift+Z)"><Redo2 className="h-4 w-4" /></button>
         <button onClick={() => { setShowSettings(true); setSelected(null); }} className={cn('a-btn-ghost', showSettings && 'bg-ink-100 dark:bg-white/10')}><Settings2 className="h-4 w-4" /><span className="hidden md:inline">Page settings</span></button>
+        <RevisionHistory
+          entity="pages"
+          id={id}
+          saved={page}
+          dirty={dirty}
+          onRestored={(p) => { setPage(p); setBlocksRaw(p.blocks || []); setHistory({ past: [], future: [] }); setSelected(null); setDirty(false); }}
+        />
         {page.status === 'PUBLISHED' && <a href={page.slug === 'home' ? '/' : `/${page.slug}`} target="_blank" rel="noreferrer" className="a-btn-secondary a-btn-icon" title="View live"><ExternalLink className="h-4 w-4" /></a>}
         {page.status !== 'PUBLISHED' && <button onClick={() => save('DRAFT')} disabled={saving} className="a-btn-secondary">Save draft</button>}
         <button onClick={() => save(page.status === 'PUBLISHED' ? undefined : 'PUBLISHED')} disabled={saving} className="a-btn-primary">

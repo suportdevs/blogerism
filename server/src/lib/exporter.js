@@ -13,7 +13,7 @@ const { THEMES } = require('../themes');
 
 const PROJECT_ROOT = process.env.PROJECT_ROOT || path.resolve(__dirname, '..', '..', '..');
 
-const SKIP_DIRS = new Set(['node_modules', '.next', '.git', 'uploads', 'coverage', 'dist', '.turbo']);
+const SKIP_DIRS = new Set(['node_modules', '.next', '.git', 'uploads', 'backups', 'coverage', 'dist', '.turbo']);
 const SKIP_FILE = (name) => /^\.env(\..*)?$/.test(name) || name.endsWith('.log') || name === '.DS_Store' || name.endsWith('.tsbuildinfo');
 
 function walk(dir, base, out = []) {

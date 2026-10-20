@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { Copy, ExternalLink, Eye, MoreHorizontal, Newspaper, Pencil, Plus, Star, Trash2, CheckCircle2, FileX, Video, Mic, Images, Zap } from 'lucide-react';
+import { Copy, ExternalLink, Eye, MoreHorizontal, Newspaper, Pencil, Plus, Star, Trash2, CheckCircle2, FileX, Video, Mic, Images, Zap, RotateCcw } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useApi, useSelection } from '@/lib/hooks';
 import { compact, formatDate, formatDuration, postUrl } from '@/lib/utils';
@@ -21,21 +21,42 @@ export default function PostsPage() {
   const items = data?.items || [];
   const sel = useSelection(items);
   const counts = data?.statusCounts || {};
-  const total = Object.values(counts).reduce((a, b) => a + b, 0);
+  const total = Object.entries(counts).reduce((a, [k, n]) => (k === 'TRASH' ? a : a + n), 0);
+  const inTrash = params.status === 'TRASH';
   const set = (p) => setParams((s) => ({ ...s, page: 1, ...p }));
 
+  const BULK_DONE = { publish: 'published', draft: 'moved to drafts', trash: 'moved to the trash', restore: 'restored', delete: 'deleted permanently' };
   const bulk = async (action) => {
-    if (action === 'delete' && !(await confirm({ title: `Delete ${sel.selected.length} post(s)?` }))) return;
+    if (action === 'delete' && !(await confirm({ title: `Permanently delete ${sel.selected.length} post(s)?` }))) return;
     const { count } = await api.post('/admin/posts/bulk', { ids: sel.selected, action });
-    toast.success(`${count} post(s) updated`);
+    toast.success(`${count} post(s) ${BULK_DONE[action]}`);
     sel.clear();
     reload();
   };
 
+  const restore = async (post) => {
+    await api.post(`/admin/posts/${post.id}/restore`);
+    toast.success(`“${post.title}” restored as a draft`);
+    reload();
+  };
+
+  // Deleting moves a post to the trash (with undo); deleting from the trash is permanent.
   const remove = async (post) => {
-    if (!(await confirm({ title: `Delete “${post.title}”?` }))) return;
-    await api.del(`/admin/posts/${post.id}`);
-    toast.success('Post deleted');
+    if (post.status === 'TRASH') {
+      if (!(await confirm({ title: `Permanently delete “${post.title}”?`, message: 'The post, its comments and its revision history are removed. This cannot be undone.' }))) return;
+      await api.del(`/admin/posts/${post.id}`);
+      toast.success('Post deleted permanently');
+    } else {
+      await api.del(`/admin/posts/${post.id}`);
+      toast.success('Post moved to the trash', { action: { label: 'Undo', onClick: () => restore(post) } });
+    }
+    reload();
+  };
+
+  const emptyTrash = async () => {
+    if (!(await confirm({ title: 'Empty the trash?', message: `${counts.TRASH} post(s) will be deleted permanently. This cannot be undone.`, confirmLabel: 'Empty trash' }))) return;
+    const { count } = await api.post('/admin/posts/empty-trash');
+    toast.success(`${count} post(s) deleted permanently`);
     reload();
   };
 
@@ -57,7 +78,7 @@ export default function PostsPage() {
       <PageHeader
         title="Posts"
         description="Write, schedule and manage your blog articles."
-        actions={<Link href="/admin/posts/new" className="a-btn-primary"><Plus className="h-4 w-4" />New post</Link>}
+        actions={inTrash && counts.TRASH ? <button onClick={emptyTrash} className="a-btn-danger"><Trash2 className="h-4 w-4" />Empty trash</button> : <Link href="/admin/posts/new" className="a-btn-primary"><Plus className="h-4 w-4" />New post</Link>}
       />
 
       <div className="a-card overflow-hidden">
@@ -70,6 +91,7 @@ export default function PostsPage() {
               { value: 'PUBLISHED', label: 'Published', count: counts.PUBLISHED || 0 },
               { value: 'DRAFT', label: 'Drafts', count: counts.DRAFT || 0 },
               { value: 'SCHEDULED', label: 'Scheduled', count: counts.SCHEDULED || 0 },
+              { value: 'TRASH', label: 'Trash', count: counts.TRASH || 0 },
             ]}
           />
           <div className="ml-auto flex flex-wrap gap-2">
@@ -92,12 +114,23 @@ export default function PostsPage() {
           <div className="flex items-center gap-2 border-b border-brand-100 bg-brand-50/70 px-4 py-2.5 text-sm dark:border-brand-500/20 dark:bg-brand-500/10">
             <b className="text-brand-700 dark:text-brand-200">{sel.selected.length} selected</b>
             <div className="ml-auto flex gap-2">
-              <button className="a-btn-secondary h-8" onClick={() => bulk('publish')}><CheckCircle2 className="h-4 w-4" />Publish</button>
-              <button className="a-btn-secondary h-8" onClick={() => bulk('draft')}><FileX className="h-4 w-4" />Move to draft</button>
-              <button className="a-btn-danger h-8" onClick={() => bulk('delete')}><Trash2 className="h-4 w-4" />Delete</button>
+              {inTrash ? (
+                <>
+                  <button className="a-btn-secondary h-8" onClick={() => bulk('restore')}><RotateCcw className="h-4 w-4" />Restore</button>
+                  <button className="a-btn-danger h-8" onClick={() => bulk('delete')}><Trash2 className="h-4 w-4" />Delete permanently</button>
+                </>
+              ) : (
+                <>
+                  <button className="a-btn-secondary h-8" onClick={() => bulk('publish')}><CheckCircle2 className="h-4 w-4" />Publish</button>
+                  <button className="a-btn-secondary h-8" onClick={() => bulk('draft')}><FileX className="h-4 w-4" />Move to draft</button>
+                  <button className="a-btn-danger h-8" onClick={() => bulk('trash')}><Trash2 className="h-4 w-4" />Move to trash</button>
+                </>
+              )}
             </div>
           </div>
         )}
+
+        {inTrash && items.length > 0 && <div className="border-b border-ink-100 bg-ink-50/60 px-4 py-2.5 text-xs text-ink-500 dark:border-white/5 dark:bg-white/[.02]">Posts in the trash are deleted permanently after 30 days. Restoring a post brings it back as a draft.</div>}
 
         <div className="a-scroll overflow-x-auto">
           <table className="a-table min-w-[860px]">
@@ -142,10 +175,19 @@ export default function PostsPage() {
                   <td className="whitespace-nowrap text-xs">{formatDate(p.publishedAt || p.createdAt)}</td>
                   <td>
                     <Dropdown trigger={<button className="a-btn-ghost a-btn-icon h-8 w-8"><MoreHorizontal className="h-4 w-4" /></button>}>
-                      <DropdownItem icon={Pencil} onClick={() => router.push(`/admin/posts/${p.id}`)}>Edit</DropdownItem>
-                      {p.status === 'PUBLISHED' && <DropdownItem icon={ExternalLink} href={postUrl(p)}>View on site</DropdownItem>}
-                      <DropdownItem icon={Copy} onClick={() => duplicate(p)}>Duplicate</DropdownItem>
-                      <DropdownItem icon={Trash2} danger onClick={() => remove(p)}>Delete</DropdownItem>
+                      {p.status === 'TRASH' ? (
+                        <>
+                          <DropdownItem icon={RotateCcw} onClick={() => restore(p)}>Restore</DropdownItem>
+                          <DropdownItem icon={Trash2} danger onClick={() => remove(p)}>Delete permanently</DropdownItem>
+                        </>
+                      ) : (
+                        <>
+                          <DropdownItem icon={Pencil} onClick={() => router.push(`/admin/posts/${p.id}`)}>Edit</DropdownItem>
+                          {p.status === 'PUBLISHED' && <DropdownItem icon={ExternalLink} href={postUrl(p)}>View on site</DropdownItem>}
+                          <DropdownItem icon={Copy} onClick={() => duplicate(p)}>Duplicate</DropdownItem>
+                          <DropdownItem icon={Trash2} danger onClick={() => remove(p)}>Move to trash</DropdownItem>
+                        </>
+                      )}
                     </Dropdown>
                   </td>
                 </tr>
@@ -153,7 +195,9 @@ export default function PostsPage() {
             </tbody>
           </table>
           {!loading && items.length === 0 && (
-            <EmptyState icon={Newspaper} title="No posts found" description="Try a different filter, or write your first article." action={<Link href="/admin/posts/new" className="a-btn-primary"><Plus className="h-4 w-4" />New post</Link>} />
+            inTrash
+              ? <EmptyState icon={Trash2} title="The trash is empty" description="Deleted posts wait here for 30 days before they are removed for good." />
+              : <EmptyState icon={Newspaper} title="No posts found" description="Try a different filter, or write your first article." action={<Link href="/admin/posts/new" className="a-btn-primary"><Plus className="h-4 w-4" />New post</Link>} />
           )}
         </div>
         <Pagination meta={data?.meta} onChange={(page) => setParams((s) => ({ ...s, page }))} />

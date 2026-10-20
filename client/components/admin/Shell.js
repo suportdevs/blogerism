@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   Activity, Bell, ChevronsLeft, ExternalLink, FileText, FolderTree, HelpCircle, Image as ImageIcon, Inbox, LayoutDashboard,
   LogOut, Mail, Menu as MenuIcon, MessageSquareQuote, Moon, Newspaper, Palette, Search, Settings, ShieldCheck, Sun, Tags,
-  UserCircle, Users, X, Command, Plus, CornerDownLeft, Clapperboard, Brush, PackageOpen, MessagesSquare,
+  UserCircle, Users, X, Command, Plus, CornerDownLeft, Clapperboard, Brush, PackageOpen, MessagesSquare, Route, DatabaseBackup,
 } from 'lucide-react';
 import { useAuth } from './AuthProvider';
 import { useSiteTheme } from './SiteTheme';
@@ -41,6 +41,8 @@ export const NAV = [
     { href: '/admin/users', label: 'Users', icon: Users, perm: 'users' },
     { href: '/admin/roles', label: 'Roles & permissions', icon: ShieldCheck, perm: 'roles' },
     { href: '/admin/settings', label: 'Settings', icon: Settings, perm: 'settings' },
+    { href: '/admin/redirects', label: 'Redirects', icon: Route, perm: 'redirects' },
+    { href: '/admin/backups', label: 'Backup & restore', icon: DatabaseBackup, perm: 'backups' },
     { href: '/admin/logs', label: 'Activity logs', icon: Activity, perm: 'logs' },
     { href: '/admin/export', label: 'Export project', icon: PackageOpen, perm: 'settings', builderOnly: true },
   ] },
