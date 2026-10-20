@@ -42,7 +42,8 @@ async function createSnapshot({ includeMessages = false, includeUsers = true } =
       posts: posts.map(({ categories: c, tags: t, ...p }) => ({ ...p, authorId: includeUsers ? p.authorId : null, categoryIds: c.map((x) => x.id), tagIds: t.map((x) => x.id) })),
       comments: comments.map((c) => ({ ...c, userId: includeUsers ? c.userId : null })),
       pages, mediaFolders, media, menus, menuItems, faqs, testimonials,
-      settings: settings.filter((s) => s.key !== 'email').map(({ key, value }) => ({ key, value })), // SMTP credentials stay here
+      // SMTP credentials and the AI translation key stay on this server.
+      settings: settings.filter((s) => s.key !== 'email').map(({ key, value }) => ({ key, value: key === 'i18n' ? { ...value, ai: { ...value.ai, apiKey: '' } } : value })),
       subscribers, contactMessages,
     },
   };

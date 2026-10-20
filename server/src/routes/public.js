@@ -5,12 +5,35 @@ const prisma = require('../lib/prisma');
 const { asyncHandler, paginate, pageMeta, HttpError } = require('../lib/utils');
 const { getSettings, publicSettings } = require('../lib/settings');
 const { notifyOwner, autoReply } = require('../lib/mailer');
+const { localize, uiStrings, LANGUAGE_PRESETS } = require('../lib/i18n');
 const { toTree } = require('./menus');
 const { publicTheme } = require('../themes');
 const { normalizePath } = require('../lib/redirects');
 
 // Unauthenticated endpoints consumed by the Next.js storefront.
 const router = express.Router();
+
+// ?lang=xx localizes the JSON of every public endpoint (when that language is enabled and is not the default).
+router.use(asyncHandler(async (req, res, next) => {
+  const lang = String(req.query.lang || '').toLowerCase();
+  if (!lang || req.method !== 'GET') return next();
+  const { i18n } = await getSettings();
+  if (!i18n.enabled || lang === i18n.defaultLanguage || !i18n.languages.some((l) => l.code === lang)) return next();
+  req.lang = lang;
+  const send = res.json.bind(res);
+  res.json = (body) => {
+    localize(body, lang).then((b) => send(b)).catch(next);
+    return res;
+  };
+  next();
+}));
+
+router.get('/i18n', asyncHandler(async (_req, res) => {
+  const { i18n } = await getSettings();
+  res.set('Cache-Control', 'public, max-age=30');
+  res.json({ enabled: !!i18n.enabled && i18n.languages.length > 1, defaultLanguage: i18n.defaultLanguage, languages: i18n.languages.map(({ code, native, dir }) => ({ code, native, dir })) });
+}));
+
 // Likes, follows and comment likes: generous, but stops scripted inflation.
 const reactLimiter = rateLimit({ windowMs: 10 * 60 * 1000, limit: 120, standardHeaders: true, legacyHeaders: false, message: { message: 'Slow down a little and try again shortly.' } });
 const commentLimiter = rateLimit({ windowMs: 10 * 60 * 1000, limit: 6, standardHeaders: true, legacyHeaders: false, message: { message: 'You are commenting too quickly. Please wait a few minutes.' } });
@@ -41,12 +64,25 @@ const seriesCard = {
   year: true, maturity: true, genres: true, featured: true, subscribers: true,
 };
 
-router.get('/bootstrap', asyncHandler(async (_req, res) => {
+router.get('/bootstrap', asyncHandler(async (req, res) => {
   const [settings, menus] = await Promise.all([
     getSettings(),
     prisma.menu.findMany({ include: { items: true } }),
   ]);
-  res.json({ settings: publicSettings(settings), theme: publicTheme(settings.theme.active), menus: Object.fromEntries(menus.map((m) => [m.location, { name: m.name, items: toTree(m.items) }])) });
+  const { i18n } = settings;
+  const on = !!i18n.enabled && i18n.languages.length > 1;
+  const lang = on && req.lang ? req.lang : i18n.defaultLanguage;
+  res.json({
+    settings: publicSettings(settings),
+    theme: publicTheme(settings.theme.active),
+    menus: Object.fromEntries(menus.map((m) => [m.location, { name: m.name, items: toTree(m.items) }])),
+    locale: {
+      enabled: on, lang, defaultLanguage: i18n.defaultLanguage, switcher: i18n.switcher !== false,
+      dir: i18n.languages.find((l) => l.code === lang)?.dir || LANGUAGE_PRESETS.find((l) => l.code === lang)?.dir || 'ltr',
+      languages: on ? i18n.languages.map(({ code, native, dir }) => ({ code, native, dir })) : [],
+      ui: await uiStrings(lang, i18n.defaultLanguage),
+    },
+  });
 }));
 
 router.get('/home', asyncHandler(async (_req, res) => {
@@ -104,8 +140,8 @@ router.get('/posts/:slug', asyncHandler(async (req, res) => {
       where: { ...live(), ...sameFormat, id: { not: post.id }, categories: { some: { id: { in: post.categories.map((c) => c.id) } } } },
       select: cardSelect, take: post.format === 'STANDARD' ? 3 : 6, orderBy: { publishedAt: 'desc' },
     }),
-    prisma.post.findFirst({ where: { ...live(), ...sameFormat, publishedAt: { lt: date } }, orderBy: { publishedAt: 'desc' }, select: { title: true, slug: true, format: true } }),
-    prisma.post.findFirst({ where: { ...live(), ...sameFormat, publishedAt: { gt: date } }, orderBy: { publishedAt: 'asc' }, select: { title: true, slug: true, format: true } }),
+    prisma.post.findFirst({ where: { ...live(), ...sameFormat, publishedAt: { lt: date } }, orderBy: { publishedAt: 'desc' }, select: { id: true, title: true, slug: true, format: true } }),
+    prisma.post.findFirst({ where: { ...live(), ...sameFormat, publishedAt: { gt: date } }, orderBy: { publishedAt: 'asc' }, select: { id: true, title: true, slug: true, format: true } }),
     // Every episode in the same series (for season lists / playlists / podcast feeds).
     post.seriesId ? prisma.post.findMany({ where: { ...live(), seriesId: post.seriesId }, select: cardSelect, orderBy: episodeOrder }) : [],
     // Media "up next" list for watch/listen pages when the post isn't part of a series.
@@ -286,6 +322,40 @@ router.get('/sitemap', asyncHandler(async (_req, res) => {
     prisma.series.findMany({ where: { status: 'PUBLISHED' }, select: { slug: true, updatedAt: true } }),
   ]);
   res.json({ posts, pages, categories, series });
+}));
+
+// Public GitHub repositories for the "GitHub repositories" block. Cached per user for an hour; GITHUB_TOKEN raises the limit.
+const githubCache = new Map();
+router.get('/github/:user', asyncHandler(async (req, res) => {
+  const user = String(req.params.user);
+  if (!/^[a-z\d](?:[a-z\d-]{0,38})$/i.test(user)) throw new HttpError(400, 'Invalid GitHub username');
+  const sort = req.query.sort === 'updated' ? 'updated' : 'stars';
+  const key = user.toLowerCase();
+  let entry = githubCache.get(key);
+  if (!entry || Date.now() - entry.at > 60 * 60 * 1000) {
+    const headers = { 'User-Agent': 'Themewright-CMS', Accept: 'application/vnd.github+json', ...(process.env.GITHUB_TOKEN ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` } : {}) };
+    const [p, r] = await Promise.all([
+      fetch(`https://api.github.com/users/${user}`, { headers }),
+      fetch(`https://api.github.com/users/${user}/repos?per_page=100&type=owner&sort=pushed`, { headers }),
+    ]);
+    if (p.status === 404) throw new HttpError(404, 'GitHub user not found');
+    if (!p.ok || !r.ok) {
+      if (entry) return res.json(entry.data); // serve stale data while GitHub is unavailable or rate-limited
+      throw new HttpError(502, 'GitHub is unavailable right now');
+    }
+    const [profile, repos] = await Promise.all([p.json(), r.json()]);
+    entry = {
+      at: Date.now(),
+      data: {
+        profile: { login: profile.login, name: profile.name, avatar: profile.avatar_url, url: profile.html_url, publicRepos: profile.public_repos, followers: profile.followers },
+        repos: repos.filter((x) => !x.fork && !x.archived && !x.private).map((x) => ({ name: x.name, description: x.description, url: x.html_url, homepage: x.homepage, language: x.language, stars: x.stargazers_count, forks: x.forks_count, updatedAt: x.pushed_at, topics: x.topics || [] })),
+      },
+    };
+    githubCache.set(key, entry);
+  }
+  const repos = [...entry.data.repos].sort((a, b) => (sort === 'stars' ? b.stars - a.stars || new Date(b.updatedAt) - new Date(a.updatedAt) : new Date(b.updatedAt) - new Date(a.updatedAt)));
+  res.set('Cache-Control', 'public, max-age=600');
+  res.json({ profile: entry.data.profile, repos });
 }));
 
 // Active redirects, read (and cached briefly) by the site's middleware.

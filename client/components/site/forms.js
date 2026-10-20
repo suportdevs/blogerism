@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { ArrowRight, CheckCircle2, Loader2, Send } from 'lucide-react';
 import { API_URL } from '@/lib/api';
 import { cn } from '@/lib/utils';
+import { useT } from './I18n';
 
 async function submit(path, body) {
   const res = await fetch(`${API_URL}/api/public${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
@@ -23,6 +24,7 @@ export function Honeypot() {
 const trap = (e) => e.currentTarget.elements.namedItem('website')?.value || '';
 
 export function NewsletterForm({ compact, className }) {
+  const t = useT();
   const [email, setEmail] = useState('');
   const [state, setState] = useState({ status: 'idle', message: '' });
 
@@ -43,11 +45,11 @@ export function NewsletterForm({ compact, className }) {
       <Honeypot />
       <div className={cn('flex gap-2 rounded-theme border border-fg/10 bg-bg p-1.5 shadow-sm focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/15', compact && 'flex-col p-2 [&>button]:w-full [&>input]:py-2')}>
         <input
-          type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com"
+          type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t('emailPlaceholder')}
           className="min-w-0 flex-1 bg-transparent px-3 text-sm text-fg outline-none placeholder:text-fg/40"
         />
         <button className="btn-site-primary !px-4 !py-2.5 !shadow-none" disabled={state.status === 'loading'}>
-          {state.status === 'loading' ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Subscribe <ArrowRight className="h-4 w-4" /></>}
+          {state.status === 'loading' ? <Loader2 className="h-4 w-4 animate-spin" /> : <>{t('subscribe')} <ArrowRight className="h-4 w-4" /></>}
         </button>
       </div>
       {state.message && (
@@ -74,6 +76,7 @@ function contextFromUrl() {
 }
 
 export function ContactForm() {
+  const t = useT();
   const empty = { name: '', email: '', phone: '', subject: '', message: '' };
   const [form, setForm] = useState(empty);
   const [state, setState] = useState({ status: 'idle', message: '' });
@@ -100,9 +103,9 @@ export function ContactForm() {
     return (
       <div className="flex flex-col items-center justify-center rounded-theme-lg border border-fg/10 bg-bg p-10 text-center">
         <div className="mb-4 grid h-14 w-14 place-items-center rounded-full bg-emerald-500/10 text-emerald-500"><CheckCircle2 className="h-7 w-7" /></div>
-        <h3 className="font-heading text-xl font-bold text-fg">Message sent!</h3>
+        <h3 className="font-heading text-xl font-bold text-fg">{t('messageSent')}</h3>
         <p className="mt-2 text-fg/60">{state.message}</p>
-        <button onClick={() => setState({ status: 'idle' })} className="btn-site-ghost mt-6">Send another</button>
+        <button onClick={() => setState({ status: 'idle' })} className="btn-site-ghost mt-6">{t('sendAnother')}</button>
       </div>
     );
   }
@@ -116,14 +119,14 @@ export function ContactForm() {
           <div className="mt-2 flex flex-wrap gap-2">{Object.entries(context.details).map(([k, v]) => <span key={k} className="rounded-full bg-bg px-3 py-1 text-xs text-fg/75 ring-1 ring-fg/10"><b className="text-fg">{k}:</b> {v}</span>)}</div>
         </div>
       )}
-      <input className="site-input" placeholder="Your name *" required value={form.name} onChange={set('name')} />
-      <input className="site-input" type="email" placeholder="Email address *" required value={form.email} onChange={set('email')} />
-      <input className="site-input" placeholder="Phone (optional)" value={form.phone} onChange={set('phone')} />
-      <input className="site-input" placeholder="Subject" value={form.subject} onChange={set('subject')} />
-      <textarea className="site-input min-h-[140px] sm:col-span-2" placeholder="How can we help? *" required value={form.message} onChange={set('message')} />
+      <input className="site-input" placeholder={t('yourName')} required value={form.name} onChange={set('name')} />
+      <input className="site-input" type="email" placeholder={t('emailAddress')} required value={form.email} onChange={set('email')} />
+      <input className="site-input" placeholder={t('phoneOptional')} value={form.phone} onChange={set('phone')} />
+      <input className="site-input" placeholder={t('subject')} value={form.subject} onChange={set('subject')} />
+      <textarea className="site-input min-h-[140px] sm:col-span-2" placeholder={t('howCanWeHelp')} required value={form.message} onChange={set('message')} />
       {state.status === 'error' && <p className="text-sm text-rose-500 sm:col-span-2">{state.message}</p>}
       <button className="btn-site-primary sm:col-span-2" disabled={state.status === 'loading'}>
-        {state.status === 'loading' ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Send className="h-4 w-4" /> Send message</>}
+        {state.status === 'loading' ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Send className="h-4 w-4" /> {t('sendMessage')}</>}
       </button>
     </form>
   );

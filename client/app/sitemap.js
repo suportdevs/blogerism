@@ -5,10 +5,21 @@ export const dynamic = 'force-dynamic';
 
 export default async function sitemap() {
   try {
-    const res = await fetch(`${API_URL}/api/public/sitemap`, { next: { revalidate: 3600 } });
+    const [res, langRes] = await Promise.all([
+      fetch(`${API_URL}/api/public/sitemap`, { next: { revalidate: 3600 } }),
+      fetch(`${API_URL}/api/public/i18n`, { next: { revalidate: 300 } }).catch(() => null),
+    ]);
     const { posts, pages, categories, series = [] } = await res.json();
+    const i18n = langRes?.ok ? await langRes.json() : { enabled: false };
     const prefix = { VIDEO: 'watch', AUDIO: 'listen' };
-    return [
+    // With several languages, every URL lists its translations (hreflang) so search engines index each version.
+    const withLanguages = (entry) => {
+      if (!i18n.enabled) return entry;
+      const path = entry.url.slice(SITE_URL.length) || '';
+      const languages = Object.fromEntries(i18n.languages.map((l) => [l.code, `${SITE_URL}${l.code === i18n.defaultLanguage ? '' : `/${l.code}`}${path}`]));
+      return { ...entry, alternates: { languages } };
+    };
+    const entries = [
       { url: SITE_URL, changeFrequency: 'daily', priority: 1 },
       { url: `${SITE_URL}/blog`, changeFrequency: 'daily', priority: 0.9 },
       ...pages.filter((p) => p.slug !== 'home').map((p) => ({ url: `${SITE_URL}/${p.slug}`, lastModified: p.updatedAt, priority: 0.7 })),
@@ -16,6 +27,7 @@ export default async function sitemap() {
       ...series.map((s) => ({ url: `${SITE_URL}/series/${s.slug}`, lastModified: s.updatedAt, priority: 0.7 })),
       ...categories.map((c) => ({ url: `${SITE_URL}/category/${c.slug}`, lastModified: c.updatedAt, priority: 0.5 })),
     ];
+    return entries.map(withLanguages);
   } catch {
     return [{ url: SITE_URL }];
   }

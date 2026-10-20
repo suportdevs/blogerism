@@ -11,6 +11,7 @@ import { LUXE_RENDERERS } from './LuxeBlocks';
 import { INTERACTIVE_RENDERERS } from './InteractiveBlocks';
 import { BUSINESS_RENDERERS, businessSectionClass } from './BusinessBlocks';
 import { GLOW_RENDERERS } from './GlowBlocks';
+import { DEV_RENDERERS } from './DevBlocks';
 import { CountUp } from './ShowcaseClient';
 
 /* ---------------------------------------------------------------------------
@@ -395,6 +396,7 @@ const RENDERERS = {
   ...INTERACTIVE_RENDERERS,
   ...BUSINESS_RENDERERS,
   ...GLOW_RENDERERS,
+  ...DEV_RENDERERS,
 };
 
 // Sticky titles need a clipping (not scrolling) section.

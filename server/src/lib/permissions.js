@@ -18,6 +18,7 @@ const PERMISSIONS = [
   { key: 'settings', label: 'System settings', group: 'System' },
   { key: 'logs', label: 'Activity logs', group: 'System' },
   { key: 'redirects', label: 'Redirects & 404 monitor', group: 'System' },
+  { key: 'translations', label: 'Translations', group: 'Content' },
   { key: 'backups', label: 'Backup & restore', group: 'System' },
 ];
 

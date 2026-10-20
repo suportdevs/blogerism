@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { I18nProvider, unprefix, useLocaleHref, usePagePath, useT } from './I18n';
 import { useEffect, useState } from 'react';
 import { ArrowRight, Bookmark, Clock, Compass, Flame, Home, ListVideo, Mail, Menu, Phone, PlaySquare, Search, Upload, X } from 'lucide-react';
 import { cn, formatDate } from '@/lib/utils';
@@ -12,7 +13,7 @@ import { engagementOf, saveLabels } from '@/lib/engagement';
 import Footer, { SocialLinks } from './Footer';
 import { AnnouncementBar, BackToTop } from './Extras';
 
-const isActive = (pathname, url) => (url === '/' ? pathname === '/' : pathname.startsWith(url));
+const isActive = (pathname, rawUrl) => { const url = unprefix(rawUrl); return url === '/' ? pathname === '/' : pathname.startsWith(url); };
 
 function useScrolled(offset = 12) {
   const [scrolled, setScrolled] = useState(false);
@@ -26,18 +27,20 @@ function useScrolled(offset = 12) {
 }
 
 function SearchForm({ className, autoFocus, rounded = 'rounded-full' }) {
+  const t = useT();
+  const href = useLocaleHref();
   const router = useRouter();
   const [q, setQ] = useState('');
   return (
-    <form onSubmit={(e) => { e.preventDefault(); if (q.trim()) router.push(`/search?q=${encodeURIComponent(q.trim())}`); }} className={cn('flex items-center overflow-hidden border border-fg/15 bg-bg focus-within:border-primary', rounded, className)}>
-      <input autoFocus={autoFocus} value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search" className="min-w-0 flex-1 bg-transparent px-4 py-2 text-sm text-fg outline-none placeholder:text-fg/40" />
-      <button aria-label="Search" className="grid h-10 w-14 place-items-center border-l border-fg/15 bg-fg/5 text-fg/70 hover:bg-fg/10"><Search className="h-4 w-4" /></button>
+    <form onSubmit={(e) => { e.preventDefault(); if (q.trim()) router.push(href(`/search?q=${encodeURIComponent(q.trim())}`)); }} className={cn('flex items-center overflow-hidden border border-fg/15 bg-bg focus-within:border-primary', rounded, className)}>
+      <input autoFocus={autoFocus} value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('search')} className="min-w-0 flex-1 bg-transparent px-4 py-2 text-sm text-fg outline-none placeholder:text-fg/40" />
+      <button aria-label={t('search')} className="grid h-10 w-14 place-items-center border-l border-fg/15 bg-fg/5 text-fg/70 hover:bg-fg/10"><Search className="h-4 w-4" /></button>
     </form>
   );
 }
 
 function MobileMenu({ open, onClose, items, general, extra }) {
-  const pathname = usePathname();
+  const pathname = usePagePath();
   useEffect(() => { onClose(); }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <div className={cn('fixed inset-0 z-[60]', open ? 'pointer-events-auto' : 'pointer-events-none')}>
@@ -53,7 +56,7 @@ function MobileMenu({ open, onClose, items, general, extra }) {
 
 /* ----------------------------- News masthead ----------------------------- */
 function Masthead({ general, appearance, social, items, saved }) {
-  const pathname = usePathname();
+  const pathname = usePagePath();
   const [open, setOpen] = useState(false);
   const [searching, setSearching] = useState(false);
   const scrolled = useScrolled(160);
@@ -116,7 +119,8 @@ const VIDEO_ICONS = [[/^home$/i, Home], [/trend|popular/i, Flame], [/playlist/i,
 const videoIcon = (label) => (VIDEO_ICONS.find(([re]) => re.test(label)) || [null, PlaySquare])[1];
 
 function VideoSidebar({ items, footerItems, className, saved }) {
-  const pathname = usePathname();
+  const t = useT();
+  const pathname = usePagePath();
   const main = items.filter((i) => VIDEO_ICONS.some(([re]) => re.test(i.label)));
   const rest = items.filter((i) => !main.includes(i));
   const Item = ({ item }) => {
@@ -136,7 +140,7 @@ function VideoSidebar({ items, footerItems, className, saved }) {
         </Link>
       )}
       {rest.length > 0 && <div className="mx-3 my-3 border-t border-fg/10" />}
-      {rest.length > 0 && <div className="px-3 pb-1 text-sm font-bold text-fg">Explore</div>}
+      {rest.length > 0 && <div className="px-3 pb-1 text-sm font-bold text-fg">{t('explore')}</div>}
       {rest.map((i) => (
         <div key={i.id}>
           <Item item={i} />
@@ -175,7 +179,7 @@ function VideoHeader({ general, appearance, items, footerItems, saved }) {
 
 /* ----------------------------- Streaming ----------------------------- */
 function StreamingHeader({ general, items, saved }) {
-  const pathname = usePathname();
+  const pathname = usePagePath();
   const scrolled = useScrolled();
   const [searching, setSearching] = useState(false);
   const [open, setOpen] = useState(false);
@@ -207,14 +211,14 @@ function StreamingHeader({ general, items, saved }) {
 /* ------------------- Overlay (restaurant) & minimal (studio) ------------------- */
 // Transparent with white text over the homepage hero; solid once scrolled or on inner pages.
 function useOverlay() {
-  const pathname = usePathname();
+  const pathname = usePagePath();
   const scrolled = useScrolled(40);
   return pathname === '/' && !scrolled;
 }
 
 function OverlayHeader({ general, appearance, items }) {
   const overlay = useOverlay();
-  const pathname = usePathname();
+  const pathname = usePagePath();
   const [open, setOpen] = useState(false);
   const cta = appearance.headerCta || {};
   const half = Math.ceil(items.length / 2);
@@ -251,7 +255,7 @@ function OverlayHeader({ general, appearance, items }) {
 
 function MinimalHeader({ general, items, social }) {
   const overlay = useOverlay();
-  const pathname = usePathname();
+  const pathname = usePagePath();
   const [open, setOpen] = useState(false);
   useEffect(() => { setOpen(false); }, [pathname]);
   useEffect(() => { document.body.style.overflow = open ? 'hidden' : ''; return () => { document.body.style.overflow = ''; }; }, [open]);
@@ -286,7 +290,8 @@ function MinimalHeader({ general, items, social }) {
 
 /* ----------------------------- Luxe ----------------------------- */
 function LuxeHeader({ general, appearance, items, social, contact, heroOverlay }) {
-  const pathname = usePathname();
+  const t = useT();
+  const pathname = usePagePath();
   const scrolled = useScrolled(40);
   const overlay = heroOverlay && pathname === '/' && !scrolled;
   const [open, setOpen] = useState(false);
@@ -301,7 +306,7 @@ function LuxeHeader({ general, appearance, items, social, contact, heroOverlay }
         <div className="mx-auto grid h-20 max-w-[1440px] grid-cols-[1fr_auto_1fr] items-center px-5 sm:px-10">
           <button onClick={() => setOpen(true)} className={cn('flex items-center gap-3 justify-self-start', small)} aria-label="Open menu">
             <span className="flex w-7 flex-col gap-1.5"><span className="h-px w-7 bg-current" /><span className="h-px w-4 bg-current" /></span>
-            <span className="hidden sm:inline">Menu</span>
+            <span className="hidden sm:inline">{t('menu')}</span>
           </button>
           <Link href="/" className="text-center">
             {general.logo ? <img src={general.logo} alt={general.siteName} className="mx-auto h-9" /> : (
@@ -332,7 +337,7 @@ function LuxeHeader({ general, appearance, items, social, contact, heroOverlay }
 
       {/* Full-screen menu */}
       <div className={cn('fixed inset-0 z-[70] grid bg-[#0c0b09] text-[#efe9df] transition-all duration-700 lg:grid-cols-[1.3fr_1fr]', open ? 'visible opacity-100' : 'invisible opacity-0')}>
-        <button onClick={() => setOpen(false)} className={cn('absolute right-6 top-7 z-10 flex items-center gap-3 sm:right-10', small)}>Close <X className="h-4 w-4" /></button>
+        <button onClick={() => setOpen(false)} className={cn('absolute right-6 top-7 z-10 flex items-center gap-3 sm:right-10', small)}>{t('close')} <X className="h-4 w-4" /></button>
         <div className="flex flex-col justify-center px-8 py-24 sm:px-20">
           <div className={cn('mb-10 text-[#c9a66b]', small)}>{general.siteName}</div>
           <nav className="max-h-[70vh] space-y-2 overflow-y-auto">
@@ -505,7 +510,7 @@ function FloatingHeader({ general, appearance, items, saved }) {
 // Athletic header: italic wordmark, slanted CTA and a full-screen numbered menu.
 function BoldHeader({ general, appearance, items, social, contact = {} }) {
   const overlay = useOverlay();
-  const pathname = usePathname();
+  const pathname = usePagePath();
   const [open, setOpen] = useState(false);
   const cta = appearance.headerCta || {};
   useEffect(() => { setOpen(false); }, [pathname]);
@@ -566,7 +571,7 @@ function BoldHeader({ general, appearance, items, social, contact = {} }) {
 /* ----------------------------- Sidebar ----------------------------- */
 // Fixed left column with large numbered links (desktop); compact top bar on smaller screens.
 function SidebarHeader({ general, appearance, items, social, contact = {} }) {
-  const pathname = usePathname();
+  const pathname = usePagePath();
   const [open, setOpen] = useState(false);
   const cta = appearance.headerCta || {};
   return (
@@ -618,7 +623,11 @@ function SidebarHeader({ general, appearance, items, social, contact = {} }) {
  * Site chrome: picks the header / sidebar / footer for the active theme. In the admin
  * "Theme preview" iframe, the parent can post a different theme to preview it live.
  */
-export default function SiteChrome({ settings, menus, theme, children }) {
+export default function SiteChrome({ locale, ...props }) {
+  return <I18nProvider value={locale}><SiteChromeInner {...props} /></I18nProvider>;
+}
+
+function SiteChromeInner({ settings, menus, theme, children }) {
   const [override, setOverride] = useState(null);
   useEffect(() => {
     if (window.parent === window) return undefined;
@@ -627,7 +636,7 @@ export default function SiteChrome({ settings, menus, theme, children }) {
     return () => window.removeEventListener('message', onMessage);
   }, []);
 
-  const pathname = usePathname();
+  const pathname = usePagePath();
   const t = override?.theme || theme;
   // Design language switch used by the CSS layer (e.g. body[data-style='luxe']).
   useEffect(() => { document.body.dataset.style = t?.layout?.style || 'modern'; }, [t]);

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { unprefix, usePagePath } from './I18n';
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, ChevronDown, ChevronRight } from 'lucide-react';
 import { ICONS } from '@/lib/icons';
@@ -15,7 +15,10 @@ import { cn } from '@/lib/utils';
  */
 
 // Homepage anchors ("/#pricing") point at a section, not a page, so they are never the active item.
-export const isActive = (pathname, url) => !!url && url !== '#' && !/^\/?#/.test(url) && (url === '/' ? pathname === '/' : pathname.startsWith(url.split('#')[0]));
+export const isActive = (pathname, rawUrl) => {
+  const url = unprefix(rawUrl); // /bn/about → /about (pathname is language-free too)
+  return !!url && url !== '#' && !/^\/?#/.test(url) && (url === '/' ? pathname === '/' : pathname.startsWith(url.split('#')[0]));
+};
 const hasKids = (item) => item.children?.length > 0;
 const isHeading = (item) => !item.url || item.url === '#';
 
@@ -125,7 +128,7 @@ function MegaPanel({ item, pathname, onNavigate }) {
  * nav itself must not be `relative`.
  */
 export function DesktopNav({ items, className, renderTop, megaClassName }) {
-  const pathname = usePathname();
+  const pathname = usePagePath();
   const [open, setOpen] = useState(null);
   const timer = useRef();
   useEffect(() => { setOpen(null); }, [pathname]);
@@ -184,7 +187,7 @@ export const Caret = ({ open, className }) => <ChevronDown className={cn('h-3.5 
 /* ------------------------------------ Mobile tree ------------------------------------ */
 // Accordion used by every mobile drawer. `size` controls the top-level text size.
 export function MobileNavTree({ items, onNavigate, size = 'md', className }) {
-  const pathname = usePathname();
+  const pathname = usePagePath();
   return <div className={cn('flex flex-col', className)}>{items.map((item) => <MobileNode key={item.id} item={item} depth={0} pathname={pathname} onNavigate={onNavigate} size={size} />)}</div>;
 }
 

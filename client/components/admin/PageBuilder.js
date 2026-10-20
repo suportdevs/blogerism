@@ -12,7 +12,7 @@ import {
   UserRound, IdCard, Wrench, Milestone, FolderKanban, GalleryThumbnails, MousePointerClick, LayoutDashboard, ToggleRight, UtensilsCrossed, Clock, CalendarCheck, MoveHorizontal,
   Zap, LayoutList, Columns3, PanelRight, MonitorPlay, GalleryHorizontal, Clapperboard, Trophy, Library, ListMusic,
   Users, Footprints, PanelsTopLeft, Table2, SplitSquareHorizontal, ListCollapse, GalleryHorizontalEnd, Briefcase, Timer, Disc3, LayoutTemplate,
-  PanelLeft, SearchCheck, BadgeCheck, CalendarDays, HandHeart, CalendarClock, RectangleHorizontal,
+  PanelLeft, SearchCheck, BadgeCheck, CalendarDays, HandHeart, CalendarClock, RectangleHorizontal, FolderGit2, Github, Presentation, Cpu,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { BLOCKS, BLOCK_CATEGORIES, DEFAULT_STYLE, STYLE_FIELDS } from '@/lib/blocks';
@@ -22,11 +22,12 @@ import { cn, slugify, uid } from '@/lib/utils';
 import { SchemaFields } from './FieldRenderer';
 import SeoPanel from './SeoPanel';
 import RevisionHistory from './RevisionHistory';
+import { Languages } from 'lucide-react';
 import { ImageField } from './Media';
 import { Field, PageLoader, Tabs } from './ui';
 import { useSiteTheme } from './SiteTheme';
 
-const BLOCK_ICONS = { Crown, ScrollText, Frame, ListOrdered, BookOpen, MessageSquareQuote, Gem, MoveHorizontal, GalleryThumbnails, MousePointerClick, LayoutDashboard, ToggleRight, UtensilsCrossed, Clock, CalendarCheck, UserRound, IdCard, Wrench, Milestone, FolderKanban, Zap, LayoutList, Columns3, PanelRight, MonitorPlay, GalleryHorizontal, Clapperboard, Trophy, Library, ListMusic, Sparkles, PanelTop, LayoutGrid, Columns2, Type, BarChart3, Building2, Images, PlayCircle, Newspaper, Quote, HelpCircle, CreditCard, Megaphone, Mail, Send, MoveVertical, Code2, Users, Footprints, PanelsTopLeft, Table2, SplitSquareHorizontal, ListCollapse, GalleryHorizontalEnd, Briefcase, Timer, Disc3, PanelLeft, SearchCheck, BadgeCheck, LayoutTemplate, CalendarDays, HandHeart, CalendarClock, RectangleHorizontal };
+const BLOCK_ICONS = { Crown, ScrollText, Frame, ListOrdered, BookOpen, MessageSquareQuote, Gem, MoveHorizontal, GalleryThumbnails, MousePointerClick, LayoutDashboard, ToggleRight, UtensilsCrossed, Clock, CalendarCheck, UserRound, IdCard, Wrench, Milestone, FolderKanban, Zap, LayoutList, Columns3, PanelRight, MonitorPlay, GalleryHorizontal, Clapperboard, Trophy, Library, ListMusic, Sparkles, PanelTop, LayoutGrid, Columns2, Type, BarChart3, Building2, Images, PlayCircle, Newspaper, Quote, HelpCircle, CreditCard, Megaphone, Mail, Send, MoveVertical, Code2, Users, Footprints, PanelsTopLeft, Table2, SplitSquareHorizontal, ListCollapse, GalleryHorizontalEnd, Briefcase, Timer, Disc3, PanelLeft, SearchCheck, BadgeCheck, LayoutTemplate, CalendarDays, HandHeart, CalendarClock, RectangleHorizontal, FolderGit2, Github, FileText, Presentation, Cpu, Layers };
 const DEVICES = { desktop: { icon: Monitor, width: '100%' }, tablet: { icon: Tablet, width: '820px' }, mobile: { icon: Smartphone, width: '390px' } };
 
 export const newBlock = (type, style = {}) => ({ id: uid(), type, data: structuredClone(BLOCKS[type].defaults), style: { ...DEFAULT_STYLE, ...style } });
@@ -325,6 +326,7 @@ export default function PageBuilder({ id }) {
         <button onClick={undo} disabled={!history.past.length} className="a-btn-ghost a-btn-icon" title="Undo (Ctrl+Z)"><Undo2 className="h-4 w-4" /></button>
         <button onClick={redo} disabled={!history.future.length} className="a-btn-ghost a-btn-icon" title="Redo (Ctrl+Shift+Z)"><Redo2 className="h-4 w-4" /></button>
         <button onClick={() => { setShowSettings(true); setSelected(null); }} className={cn('a-btn-ghost', showSettings && 'bg-ink-100 dark:bg-white/10')}><Settings2 className="h-4 w-4" /><span className="hidden md:inline">Page settings</span></button>
+        <Link href={`/admin/translations?type=page&id=${id}`} className="a-btn-secondary" title="Translate this page"><Languages className="h-4 w-4" /><span className="hidden md:inline">Translate</span></Link>
         <RevisionHistory
           entity="pages"
           id={id}

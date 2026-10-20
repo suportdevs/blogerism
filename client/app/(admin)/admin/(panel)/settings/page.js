@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { Code2, Globe, Heart, Loader2, Mail, Save, Search, Send, Settings, Share2, Facebook, Twitter, Instagram, Linkedin, Youtube, Github, AtSign, MessageCircle, PhoneCall } from 'lucide-react';
+import { Code2, Globe, Heart, Loader2, Mail, Save, Search, Send, Settings, Share2, Facebook, Twitter, Instagram, Linkedin, Youtube, Github, AtSign, MessageCircle, PhoneCall, Languages, Plus, X, Sparkles } from 'lucide-react';
+import Link from 'next/link';
+import { LANGUAGE_PRESETS } from '@/lib/i18n';
 import { api } from '@/lib/api';
 import { useApi, useSaveShortcut } from '@/lib/hooks';
 import { cn } from '@/lib/utils';
@@ -15,6 +17,7 @@ const TABS = [
   { key: 'social', label: 'Social', icon: Share2, description: 'Profiles linked in the header and footer' },
   { key: 'contact', label: 'Contact', icon: Mail, description: 'Details shown on contact blocks and footer' },
   { key: 'engagement', label: 'Engagement', icon: Heart, description: 'Comments, likes, sharing, saving and following on your site' },
+  { key: 'i18n', label: 'Languages', icon: Languages, description: 'Offer your site in several languages, with AI translation' },
   { key: 'email', label: 'Email', icon: AtSign, description: 'SMTP server for notifications, booking confirmations and replies' },
   { key: 'advanced', label: 'Advanced', icon: Code2, description: 'Cookie banner, custom code and feature toggles' },
 ];
@@ -148,6 +151,57 @@ export default function SettingsPage() {
                   </div>
                 )}
               </div>
+            </div>
+          )}
+
+          {tab === 'i18n' && (
+            <div className="space-y-6">
+              <div className={cn('rounded-xl border p-4', s.enabled ? 'border-emerald-200 bg-emerald-50/50 dark:border-emerald-500/20 dark:bg-emerald-500/5' : 'border-ink-200 dark:border-white/10')}>
+                <Toggle label="Multiple languages" description="Visitors can switch language; every language gets its own address (e.g. /bn/about) for search engines" checked={s.enabled} onChange={set('enabled')} />
+              </div>
+              <div>
+                <h4 className="mb-3 text-sm font-bold">Languages</h4>
+                <div className="flex flex-wrap gap-2">
+                  {s.languages.map((l) => (
+                    <span key={l.code} className={cn('flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm', l.code === s.defaultLanguage ? 'border-brand-300 bg-brand-50 text-brand-700 dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-200' : 'border-ink-200 dark:border-white/10')}>
+                      <b>{l.native}</b><span className="font-mono text-[11px] uppercase text-ink-400">{l.code}</span>
+                      {l.code === s.defaultLanguage ? <span className="text-[11px] font-semibold">Default</span> : (
+                        <>
+                          <button type="button" className="text-[11px] font-semibold text-ink-500 hover:text-brand-600" onClick={() => set('defaultLanguage')(l.code)}>Make default</button>
+                          <button type="button" aria-label={`Remove ${l.name}`} className="text-ink-400 hover:text-rose-500" onClick={() => set('languages')(s.languages.filter((x) => x.code !== l.code))}><X className="h-3.5 w-3.5" /></button>
+                        </>
+                      )}
+                    </span>
+                  ))}
+                  <select className="a-input w-56" value="" onChange={(e) => { const p = LANGUAGE_PRESETS.find((x) => x.code === e.target.value); if (p) set('languages')([...s.languages, p]); }}>
+                    <option value="">+ Add a language…</option>
+                    {LANGUAGE_PRESETS.filter((p) => !s.languages.some((l) => l.code === p.code)).map((p) => <option key={p.code} value={p.code}>{p.name} — {p.native}</option>)}
+                  </select>
+                </div>
+                <p className="mt-2 text-xs text-ink-400">The default language is the one you write content in. Changing it later does not convert existing content.</p>
+              </div>
+              <Toggle label="Language switcher in the header" description="Shown next to the light/dark toggle" checked={s.switcher} onChange={set('switcher')} />
+              <div className="border-t border-ink-100 pt-6 dark:border-white/5">
+                <h4 className="mb-1 flex items-center gap-2 text-sm font-bold"><Sparkles className="h-4 w-4 text-brand-500" />AI translation (Claude)</h4>
+                <p className="mb-4 text-xs text-ink-500">Translate pages, posts and menus in one click, then review. Get a key at console.anthropic.com — it is stored on the server only.</p>
+                <div className="grid gap-5 md:grid-cols-2">
+                  <Field label="Anthropic API key" hint={s.ai?.envKey ? 'ANTHROPIC_API_KEY is set on the server — leave empty to use it' : 'Starts with sk-ant-'}><input className="a-input" type="password" autoComplete="off" value={s.ai?.apiKey || ''} onChange={(e) => setNested('ai', 'apiKey')(e.target.value)} placeholder={s.ai?.envKey ? 'Using the server environment key' : 'sk-ant-…'} /></Field>
+                  <Field label="Model">
+                    <select className="a-input" value={s.ai?.model || 'claude-opus-5-5'} onChange={(e) => setNested('ai', 'model')(e.target.value)}>
+                      <option value="claude-opus-5-5">Claude Opus 5.5 — best quality (default)</option>
+                      <option value="claude-sonnet-5-5">Claude Sonnet 5.5 — fast, high quality</option>
+                      <option value="claude-haiku-5-5">Claude Haiku 5.5 — fastest, lowest cost</option>
+                    </select>
+                  </Field>
+                  <Field label="Effort" hint="Higher effort can improve tricky wording; lower is faster and cheaper">
+                    <select className="a-input" value={s.ai?.effort || 'medium'} onChange={(e) => setNested('ai', 'effort')(e.target.value)}>
+                      <option value="low">Low</option><option value="medium">Medium (recommended)</option><option value="high">High</option>
+                    </select>
+                  </Field>
+                  <Field label="Glossary (optional)" hint="One per line, e.g. “checkout = চেকআউট”. Always used by the AI." className="md:col-span-2"><textarea className="a-textarea" rows={3} value={s.ai?.glossary || ''} onChange={(e) => setNested('ai', 'glossary')(e.target.value)} /></Field>
+                </div>
+              </div>
+              {s.enabled && s.languages.length > 1 && <Link href="/admin/translations" className="a-btn-secondary"><Languages className="h-4 w-4" />Open Translations</Link>}
             </div>
           )}
 

@@ -1,13 +1,21 @@
 import { notFound } from 'next/navigation';
+import { headers } from 'next/headers';
 import { loadFeeds } from './blockData';
 
 // Server-side data access for the storefront (React Server Components).
 const API_URL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
+// The visitor's language, set by the middleware for /xx/… URLs (empty for the default language).
+export function currentLocale() {
+  try { return headers().get('x-locale') || ''; } catch { return ''; }
+}
+
 export async function fetchPublic(path, { revalidate = 30, allow404 = false } = {}) {
+  const lang = currentLocale();
+  const url = lang ? `${path}${path.includes('?') ? '&' : '?'}lang=${lang}` : path;
   let res;
   try {
-    res = await fetch(`${API_URL}/api/public${path}`, { next: { revalidate } });
+    res = await fetch(`${API_URL}/api/public${url}`, { next: { revalidate } });
   } catch {
     throw new Error(`Cannot reach the API at ${API_URL}. Is the server running?`);
   }
@@ -20,6 +28,12 @@ export async function fetchPublic(path, { revalidate = 30, allow404 = false } = 
 }
 
 export const getBootstrap = () => fetchPublic('/bootstrap', { revalidate: 10 });
+
+// Interface strings for server components: t('readMore') in the visitor's language.
+export async function getT() {
+  const { locale } = await getBootstrap();
+  return (key, fallback) => locale?.ui?.[key] || fallback || key;
+}
 
 // "&format=..." restricting archives to the content formats the active theme uses.
 export const themeFormats = (theme) => (theme?.features?.formats?.length ? `&format=${theme.features.formats.join(',')}` : '');

@@ -3,7 +3,7 @@
 export const FONT_OPTIONS = [
   'Inter', 'Plus Jakarta Sans', 'Manrope', 'DM Sans', 'Outfit', 'Sora', 'Space Grotesk', 'Poppins',
   'Lexend', 'Urbanist', 'Figtree', 'Nunito', 'Rubik', 'Work Sans', 'Bricolage Grotesque',
-  'Playfair Display', 'Cormorant Garamond', 'Bodoni Moda', 'Cinzel', 'Marcellus', 'Italiana', 'Jost', 'Fraunces', 'Noto Serif', 'Source Serif 4', 'Roboto', 'Open Sans', 'Oswald', 'Hind Siliguri', 'Noto Sans Bengali', 'Noto Serif Bengali', 'Baloo Da 2', 'Tiro Bangla', 'DM Serif Display', 'Lora', 'Merriweather', 'Instrument Serif', 'JetBrains Mono', 'Fugaz One',
+  'Playfair Display', 'Cormorant Garamond', 'Bodoni Moda', 'Cinzel', 'Marcellus', 'Italiana', 'Jost', 'Fraunces', 'Noto Serif', 'Source Serif 4', 'Roboto', 'Open Sans', 'Oswald', 'Hind Siliguri', 'Noto Sans Bengali', 'Noto Serif Bengali', 'Baloo Da 2', 'Tiro Bangla', 'DM Serif Display', 'Lora', 'Merriweather', 'Instrument Serif', 'JetBrains Mono', 'Fugaz One', 'Geist',
   'Montserrat', 'Syne', 'Unbounded', 'Archivo', 'EB Garamond', 'Barlow Condensed', 'Red Hat Display',
 ];
 
@@ -56,6 +56,15 @@ const toCss = (vars) => Object.entries(vars).map(([k, v]) => `${k}:${v};`).join(
 // Full stylesheet: light vars on :root, dark vars on .dark (class toggled by the mode script).
 export function themeCss(a) {
   return `:root{${toCss(themeVars(a, 'light'))}}html.dark{${toCss(themeVars(a, 'dark'))}}html{font-size:${a.baseFontSize || 16}px}${scriptCss(a)}`;
+}
+
+// Languages whose script the theme fonts may not cover get a matching fallback font (and no letter-spacing).
+const SCRIPT_FONTS = { bn: 'Hind Siliguri', hi: 'Noto Sans Devanagari', ne: 'Noto Sans Devanagari', ar: 'Noto Sans Arabic', ur: 'Noto Nastaliq Urdu', fa: 'Vazirmatn', zh: 'Noto Sans SC', ja: 'Noto Sans JP', ko: 'Noto Sans KR', th: 'Noto Sans Thai', ta: 'Noto Sans Tamil' };
+export const scriptFont = (lang) => SCRIPT_FONTS[lang] || null;
+export function localeCss(a, lang) {
+  const f = scriptFont(lang);
+  if (!f) return '';
+  return `:root,html.dark{--font-heading:'${a.headingFont}','${f}';--font-body:'${a.bodyFont}','${f}'}[class*="tracking-"]{letter-spacing:0!important}`;
 }
 
 export function googleFontsUrl(fonts) {

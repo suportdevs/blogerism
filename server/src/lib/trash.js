@@ -1,5 +1,6 @@
 const prisma = require('./prisma');
 const { deleteRevisions } = require('./revisions');
+const { deleteTranslations } = require('./i18n');
 
 /*
  * Trash for posts and pages. Deleting moves an item to the trash (status TRASH); it can be restored as a draft
@@ -16,6 +17,7 @@ const restore = (entity, ids) => prisma[MODELS[entity]].updateMany({ where: { id
 async function destroy(entity, ids) {
   const { count } = await prisma[MODELS[entity]].deleteMany({ where: { id: { in: ids } } });
   await deleteRevisions(entity, ids);
+  await deleteTranslations(entity, ids);
   return count;
 }
 

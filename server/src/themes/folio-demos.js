@@ -270,4 +270,131 @@ const glow = demo({
   ],
 });
 
-module.exports = [minimal, terminal, studio, corporate, swiss, freelancer, neon, brutal, story, gazette, glow];
+/* 12 ─ Bento */
+// A minimal software-engineer portfolio: bento hero (photo optional), filterable projects with case-study pages,
+// tech stack, expandable work history, live GitHub repos, testimonials, writing and a printable résumé at /resume.
+const { m: menuItem, face } = require('./helpers');
+const LOGO = (label, logo, color) => ({ label, logo, color, image: '' });
+const GH = folio.social.github;
+const CATEGORY = (c) => (/saas/i.test(c) ? 'SaaS' : /erp/i.test(c) ? 'ERP systems' : 'Side projects');
+const CASE = { 'Akboria Limited': '/akboria-erp-case-study', 'Tarek Bakery & Equator': '/tarek-saas-case-study' };
+const CODE = { 'Real-Time Private Chat': `${GH}/node-chat-application` };
+const bentoProjects = projects.items.map((p, i) => ({
+  title: p.title, category: CATEGORY(p.category), year: i < 4 ? '2024' : '2023', summary: p.description, image: un(SHOTS[i % SHOTS.length], 1400),
+  stack: p.tags.slice(0, 4), live: p.url || '', code: CODE[p.title] || '', caseStudy: CASE[p.title] || '', featured: !!CASE[p.title],
+}));
+const STACK = {
+  backend: [LOGO('Laravel', 'laravel', '#FF2D20'), LOGO('PHP', 'php', '#777BB4'), LOGO('Node.js', 'nodedotjs', '#5FA04E'), LOGO('Express', 'express', ''), LOGO('Django', 'django', '#44B78B'), LOGO('Python', 'python', '#3776AB')],
+  frontend: [LOGO('React', 'react', '#61DAFB'), LOGO('Next.js', 'nextdotjs', ''), LOGO('JavaScript', 'javascript', '#F7DF1E'), LOGO('Redux', 'redux', '#764ABC'), LOGO('Tailwind CSS', 'tailwindcss', '#06B6D4'), LOGO('Material UI', 'mui', '#007FFF'), LOGO('Bootstrap', 'bootstrap', '#7952B3')],
+  data: [LOGO('PostgreSQL', 'postgresql', '#4169E1'), LOGO('MySQL', 'mysql', '#4479A1'), LOGO('MongoDB', 'mongodb', '#47A248'), LOGO('Prisma', 'prisma', ''), LOGO('Socket.io', 'socketdotio', '')],
+  ops: [LOGO('Linux', 'linux', ''), LOGO('Ubuntu', 'ubuntu', '#E95420'), LOGO('Nginx', 'nginx', '#009639'), LOGO('PM2', 'pm2', ''), LOGO('Git', 'git', '#F05032'), LOGO('GitHub', 'github', ''), LOGO('Postman', 'postman', '#FF6C37')],
+};
+const plainBullet = (b) => b.replace(/^[^:]{3,40}:\s*/, '');
+
+const caseStudy = ({ slug, title, project, client, year, duration, stack, metrics, challenge, built, results, cover, gallery }) => ({
+  slug, title: `${title} — case study`, template: 'full-width', seoTitle: `${title} — case study | ${NAME}`,
+  blocks: [
+    B('caseStudyHero', { backLabel: 'All projects', backUrl: '/#projects', eyebrow: `Case study · ${project.category}`, title, summary: project.description, client, role: 'Lead full-stack developer', year, duration, stack, live: project.url, code: '', cover: un(cover, 2000), metrics }, { paddingY: 'lg', width: 'wide', animate: false }),
+    B('richText', { html: `<h2>The challenge</h2>${challenge}<h2>What I built</h2>${built}<h2>Results</h2>${results}` }, { paddingY: 'md', width: 'narrow' }),
+    B('gallery', { title: '', columns: 2, images: gallery.map((g) => ({ src: un(g, 1400), alt: title })) }, { paddingY: 'md', width: 'wide' }),
+    B('cta', { title: 'Have a similar project?', text: 'I build ERPs, SaaS platforms and APIs that teams rely on every day.', primaryLabel: 'Start a conversation', primaryUrl: '/#contact', secondaryLabel: 'More projects', secondaryUrl: '/#projects' }, { paddingY: 'lg' }),
+  ],
+});
+const akboria = projects.items.find((p) => p.title === 'Akboria Limited');
+const tarek = projects.items.find((p) => p.title === 'Tarek Bakery & Equator');
+
+const bento = demo({
+  id: 'folio-bento', name: 'Bento',
+  description: 'A minimal, modern software-engineer portfolio: bento hero with optional photo and live local time, filterable projects with case-study pages, tech stack, work history, live GitHub repos, writing and a printable résumé.',
+  layout: { header: 'floating' },
+  appearance: { primaryColor: '#3b5bfd', accentColor: '#14b8a6', backgroundColor: '#fafaf9', surfaceColor: '#ffffff', textColor: '#0c0c0d', darkBackgroundColor: '#09090b', darkSurfaceColor: '#131316', darkTextColor: '#ededef', headingFont: 'Geist', bodyFont: 'Geist', radius: 18, colorMode: 'light', footerStyle: 'simple', headerCta: { enabled: true, label: 'Let’s talk', url: '/#contact' } },
+  menus: {
+    header: { name: 'Main', items: [menuItem('Work', '/#projects'), menuItem('About', '/#about'), menuItem('Experience', '/#experience'), menuItem('Writing', '/blog'), menuItem('Résumé', '/resume')] },
+    footer: { name: 'Links', items: [menuItem('Work', '/#projects'), menuItem('Writing', '/blog'), menuItem('Résumé', '/resume'), menuItem('Contact', '/#contact')] },
+  },
+  home: () => [
+    B('devBento', {
+      availability: hero.availability, greeting: 'Hi, I’m', name: SHORT, role: `${hero.roles[0]} · ${hero.roles[2]}`,
+      intro: 'I design and ship ERPs, multi-tenant SaaS platforms and APIs that real businesses run on — 18+ systems in production, built to stay fast as they grow.',
+      photo: '', location: hero.location, timezone: 'Asia/Dhaka', currentlyLabel: 'Currently', currently: 'Application Developer at Legend IT Solution — scaling ERP and SaaS products.',
+      stats: [{ value: '3+', label: 'years shipping production code' }, { value: '18+', label: 'apps in production' }, { value: '<300ms', label: 'typical API response' }],
+      stackLabel: 'Daily stack', stack: [...STACK.backend.slice(0, 4), ...STACK.frontend.slice(0, 3), ...STACK.data.slice(0, 3), STACK.ops[2]],
+      primaryLabel: 'View projects', primaryUrl: '#projects', resumeLabel: 'Résumé', resumeUrl: '/resume', email: folio.contact.email,
+      socials: [{ icon: 'Github', url: GH, label: 'GitHub' }, { icon: 'Linkedin', url: folio.social.linkedin, label: 'LinkedIn' }, { icon: 'Mail', url: `mailto:${folio.contact.email}`, label: 'Email' }],
+    }, { paddingY: 'lg', width: 'wide', anchor: 'about', animate: false }),
+    B('projectShowcase', { eyebrow: '01 · Selected work', title: 'Systems I’ve built', subtitle: 'Production ERPs and SaaS platforms used every day — plus a few things I build for fun.', filters: true, buttonLabel: 'GitHub', buttonUrl: GH, items: bentoProjects }, { paddingY: 'md', width: 'wide', anchor: 'projects' }),
+    B('stackGrid', { eyebrow: '02 · Toolbox', title: 'The stack I reach for', subtitle: 'Picked for reliability first — then speed of delivery.', groups: [
+      { icon: 'Server', title: 'Backend & APIs', text: 'REST APIs, auth & RBAC, queues, microservices.', wide: true, items: STACK.backend },
+      { icon: 'Database', title: 'Data', text: 'Modelling, indexing, query tuning.', wide: false, items: STACK.data },
+      { icon: 'Code2', title: 'Frontend', text: 'Fast, accessible interfaces.', wide: true, items: STACK.frontend },
+      { icon: 'Terminal', title: 'Ops & tooling', text: 'Linux servers, deploys, CI.', wide: false, items: STACK.ops },
+    ] }, { paddingY: 'lg', width: 'wide', anchor: 'skills' }),
+    B('workHistory', { eyebrow: '03 · Experience', title: 'Where I’ve worked', subtitle: '', buttonLabel: 'Full résumé', buttonUrl: '/resume', items: [
+      ...experience.items.map((e) => ({ company: e.org, role: e.title, period: e.period, location: e.location, logo: '', summary: e.description || '', bullets: e.bullets, tags: e.tags || [] })),
+      ...education.items.slice(0, 2).map((e) => ({ company: e.org, role: e.title, period: e.period, location: e.location || '', logo: '', summary: '', bullets: e.bullets || [], tags: ['Education'] })),
+    ] }, { paddingY: 'lg', width: 'wide', anchor: 'experience' }),
+    B('githubRepos', { eyebrow: '04 · Open source', title: 'Recently on GitHub', subtitle: 'Experiments, starters and learning projects.', username: GH.split('/').pop(), sort: 'updated', count: 6, exclude: [GH.split('/').pop()], buttonLabel: 'All repositories' }, { paddingY: 'lg', width: 'wide' }),
+    B('testimonials', { eyebrow: '05 · Kind words', title: 'What people say' }, { paddingY: 'lg', width: 'wide' }),
+    B('latestPosts', { eyebrow: '06 · Writing', title: 'Notes from the work', count: 3, buttonLabel: 'All articles', buttonUrl: '/blog' }, { paddingY: 'lg', width: 'wide' }),
+    B('contactForm', { title: 'Let’s build something reliable.', text: `${hero.availability}. Tell me about your project — I reply within 24 hours.`, showInfo: true }, { paddingY: 'xl', width: 'wide', anchor: 'contact' }),
+  ],
+});
+
+const bentoBasePages = bento.pages;
+bento.pages = () => [
+  ...bentoBasePages(),
+  {
+    slug: 'resume', title: 'Résumé', template: 'full-width', seoTitle: `Résumé — ${NAME}`,
+    blocks: [B('resumeSheet', {
+      name: NAME, role: hero.roles[0], email: folio.contact.email, phone: folio.contact.phone, location: hero.location, website: '',
+      links: [{ label: GH.replace(/^https?:\/\//, ''), url: GH }, { label: folio.social.linkedin.replace(/^https?:\/\//, ''), url: folio.social.linkedin }],
+      summary: about.text.split(/\n\n/)[0],
+      experience: experience.items.map((e) => ({ role: e.title, company: e.org, period: e.period, location: e.location, bullets: e.bullets.slice(0, 6).map(plainBullet) })),
+      projects: projects.items.slice(0, 6).map((p) => ({ title: p.title, url: p.url || '', summary: p.description })),
+      skills: skills.groups.filter((g) => g.title !== 'Soft skills').map((g) => ({ title: g.title, items: g.items })),
+      education: education.items.map((e) => ({ title: e.title, org: e.org, period: e.period })),
+      printLabel: 'Download PDF', note: 'Always up to date — generated from this website.',
+    }, { paddingY: 'xl', width: 'wide', animate: false })],
+  },
+  caseStudy({
+    slug: 'akboria-erp-case-study', title: 'One ERP for six businesses', project: akboria, client: 'Akboria Limited', year: '2024', duration: 'Ongoing',
+    stack: ['Laravel', 'MySQL', 'Tailwind CSS', 'REST APIs', 'RBAC'], cover: IMG.analytics, gallery: [IMG.charts, IMG.laptop],
+    metrics: [{ value: '6+', label: 'business units on one system' }, { value: '30%', label: 'less manual operational work' }, { value: '1', label: 'shared POS, inventory & HR' }],
+    challenge: '<p>Akboria runs a bakery, a hotel, a restaurant and sweet production — each with its own spreadsheets, cash counts and stock lists. Managers could not see the group’s position without collecting reports by hand.</p>',
+    built: '<ul><li><strong>Centralised POS and inventory</strong> shared by every unit, with per-unit stock and transfers between them.</li><li><strong>HR and payroll workflows</strong> with role-based access so each manager sees only their unit.</li><li><strong>Reports for owners</strong> — sales, stock and staff across the whole group in one place.</li></ul><p>The system is modular: a new business unit is configuration, not new code.</p>',
+    results: '<p>Daily operations moved off spreadsheets, manual workflow time dropped by around 30%, and owners now see the whole group in real time.</p>',
+  }),
+  caseStudy({
+    slug: 'tarek-saas-case-study', title: 'Multi-tenant SaaS for food production', project: tarek, client: 'Tarek Bakery & Equator', year: '2024', duration: 'Ongoing',
+    stack: ['Laravel', 'PostgreSQL', 'Multi-tenancy', 'Queues', 'REST APIs'], cover: IMG.designer, gallery: [IMG.screen, IMG.code2],
+    metrics: [{ value: 'Multi', label: 'tenants on one platform' }, { value: '<300ms', label: 'API response after tuning' }, { value: '35%', label: 'faster page loads' }],
+    challenge: '<p>Several food-production locations needed one platform for production, supply chain and corporate reporting — while keeping each location’s data strictly separate.</p>',
+    built: '<ul><li><strong>Tenant isolation</strong> at the data layer, with central administration for head office.</li><li><strong>Production and supply-chain modules</strong> covering orders, batches and distribution.</li><li><strong>Performance work</strong> — indexing, eager loading and caching to keep responses fast as data grew.</li></ul>',
+    results: '<p>Locations work in their own space while head office sees consolidated numbers, and response times stay under 300ms under daily load.</p>',
+  }),
+];
+
+// Demo content: articles for the Writing section and testimonials. Replaces the Folio family's posts.
+bento.demo = async (prisma, { authors }) => {
+  const cats = {};
+  for (const [slug, name, color] of [['engineering', 'Engineering', '#3b5bfd'], ['performance', 'Performance', '#14b8a6'], ['laravel', 'Laravel', '#ff2d20']]) cats[slug] = await prisma.category.create({ data: { name, slug, color } });
+  const posts = [
+    ['How I cut API response times from 1.2s to under 300ms', 'performance', IMG.charts, 'Indexes, eager loading and caching — in the order that actually mattered.', '<p>Slow endpoints rarely have one cause. When an ERP report endpoint crept past a second, I worked through it in a fixed order: measure, fix queries, then cache.</p><h2>1. Measure first</h2><p>Laravel Telescope and the database slow-query log showed the real problem: hundreds of small queries per request — a classic N+1 pattern hidden behind innocent-looking relationships.</p><h2>2. Fix the queries</h2><ul><li><strong>Eager load</strong> relationships used in loops (<code>with()</code>), turning 400 queries into 6.</li><li><strong>Add composite indexes</strong> matching the real <code>WHERE</code> and <code>ORDER BY</code> clauses.</li><li><strong>Select only the columns</strong> the response needs.</li></ul><h2>3. Cache what is read often</h2><p>Lookup tables and dashboard aggregates went into Redis with short, explicit lifetimes and invalidation on write.</p><p>The result: the endpoint settled under 300ms, and pages built on it loaded about 35% faster.</p>'],
+    ['Designing role-based access control that doesn’t fall apart', 'engineering', IMG.code, 'Permissions as data, checked in one place — a pattern that scales from 3 roles to 30.', '<p>Every business app starts with “admin” and “user”. Six months later there are branch managers, cashiers and auditors — and permission checks scattered across controllers.</p><h2>Permissions are data</h2><p>Store permissions as named abilities (<code>sales.view</code>, <code>stock.adjust</code>) attached to roles, and let administrators edit roles without a deploy.</p><h2>Check in one place</h2><p>Use policies or middleware, never ad-hoc <code>if</code> statements in views. The UI should ask the same question the API does.</p><h2>Scope the data too</h2><p>In multi-unit ERPs a role is not enough — a branch manager must only see their branch. Add query scopes so the restriction is applied automatically.</p>'],
+    ['Multi-tenant SaaS in Laravel: the decisions that matter early', 'laravel', IMG.screen, 'Single database or many? How I decide, and what I set up on day one.', '<p>Multi-tenancy is easy to start and expensive to change. These are the decisions I make before writing the first feature.</p><h2>Isolation model</h2><p>A shared database with a <code>tenant_id</code> on every table is simplest to run. Separate databases give stronger isolation and easier per-tenant backups. For most SMB SaaS I start shared — with global scopes so a query can never forget the tenant.</p><h2>Identify the tenant once</h2><p>Resolve the tenant from the subdomain or token in middleware, then make it available everywhere. Jobs and scheduled tasks need it too.</p><h2>Plan for the noisy neighbour</h2><p>Rate limits, queues per tenant and indexes that start with <code>tenant_id</code> keep one large customer from slowing everyone else down.</p>'],
+  ];
+  for (const [i, [title, cat, img, excerpt, content]] of posts.entries()) {
+    const date = new Date(Date.now() - (i * 19 + 4) * 864e5);
+    await prisma.post.create({ data: {
+      title, slug: title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''), excerpt, content, coverImage: un(img, 1600), status: 'PUBLISHED',
+      featured: i === 0, publishedAt: date, createdAt: date, readingTime: 4 + i, views: 400 + i * 230, authorId: authors[0]?.id, categories: { connect: [{ id: cats[cat].id }] },
+    } });
+  }
+  await prisma.testimonial.createMany({ data: [
+    { name: 'Nusrat Jahan', position: 'Operations Manager', company: 'Retail group', avatar: face('w3', 200), content: 'He turned a pile of spreadsheets into one system our managers actually enjoy using. Requests were understood the first time and shipped quickly.', rating: 5, order: 0 },
+    { name: 'Arif Hossain', position: 'Product Owner', company: 'SaaS startup', avatar: face('m3', 200), content: 'Reliable, calm under deadlines and very strong on performance. Our slowest screens became our fastest.', rating: 5, order: 1 },
+    { name: 'Farhana Akter', position: 'Team Lead', company: 'Software agency', avatar: face('w5', 200), content: 'Clean code, clear documentation and great communication. He is the developer you hand the hard problems to.', rating: 5, order: 2 },
+  ] });
+};
+
+module.exports = [minimal, terminal, studio, corporate, swiss, freelancer, neon, brutal, story, gazette, glow, bento];

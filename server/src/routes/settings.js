@@ -13,7 +13,11 @@ router.use(authenticate);
 const groupPermission = (group) => (group === 'appearance' ? 'appearance' : 'settings');
 
 // The SMTP password is never sent back to the browser.
-const masked = (s) => ({ ...s, email: { ...s.email, pass: s.email.pass ? PASSWORD_MASK : '' } });
+const masked = (s) => ({
+  ...s,
+  email: { ...s.email, pass: s.email.pass ? PASSWORD_MASK : '' },
+  i18n: { ...s.i18n, ai: { ...s.i18n.ai, apiKey: s.i18n.ai?.apiKey ? PASSWORD_MASK : '', envKey: !!process.env.ANTHROPIC_API_KEY } },
+});
 
 router.get('/', authorize('settings', 'appearance'), asyncHandler(async (_req, res) => {
   res.json(masked(await getSettings()));
@@ -45,6 +49,18 @@ router.put('/:group', asyncHandler(async (req, res) => {
   const group = checkGroup(req);
   const body = { ...(req.body || {}) };
   if (group === 'email' && body.pass === PASSWORD_MASK) delete body.pass; // unchanged
+  if (group === 'i18n' && body.ai) {
+    body.ai = { ...body.ai };
+    if (body.ai.apiKey === PASSWORD_MASK) delete body.ai.apiKey;
+    delete body.ai.envKey;
+  }
+  if (group === 'i18n' && Array.isArray(body.languages)) {
+    // Languages replace (not merge) and must include the default language.
+    const current = (await getSettings()).i18n;
+    const def = body.defaultLanguage || current.defaultLanguage;
+    if (!body.languages.some((l) => l.code === def)) throw new HttpError(422, 'The default language must stay in the list');
+    await saveGroup('i18n', { languages: [] });
+  }
   await saveGroup(group, body);
   await logActivity(req, 'updated', 'Settings', group, `Updated ${group} settings`);
   res.json(masked(await getSettings()));

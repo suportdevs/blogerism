@@ -14,6 +14,7 @@ import { ImageField, MediaPicker, MediaUrlField } from './Media';
 import { Card, Field, PageLoader, StatusBadge, Toggle, useConfirm } from './ui';
 import { useSiteTheme } from './SiteTheme';
 import RevisionHistory from './RevisionHistory';
+import { Languages } from 'lucide-react';
 
 const EMPTY = {
   title: '', slug: '', excerpt: '', content: '', coverImage: '', status: 'DRAFT', featured: false, allowComments: true, categoryIds: [], tags: [], seoTitle: '', seoDescription: '', publishedAt: '',
@@ -297,6 +298,7 @@ export default function PostEditor({ id }) {
         </div>
         {!isNew && meta?.status === 'PUBLISHED' && <a href={`/${URL_PREFIX[meta.format] || 'blog'}/${meta.slug}`} target="_blank" rel="noreferrer" className="a-btn-secondary"><ExternalLink className="h-4 w-4" />View</a>}
         {!isNew && <RevisionHistory entity="posts" id={id} saved={meta} dirty={dirty} onRestored={loadPost} />}
+        {!isNew && <Link href={`/admin/translations?type=post&id=${id}`} className="a-btn-secondary" title="Translate this post"><Languages className="h-4 w-4" /><span className="hidden md:inline">Translate</span></Link>}
         <button onClick={() => save('DRAFT')} className="a-btn-secondary" disabled={saving}>Save draft</button>
         <button onClick={() => save(form.status === 'DRAFT' ? 'PUBLISHED' : form.status)} className="a-btn-primary" disabled={saving}>
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}

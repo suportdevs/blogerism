@@ -85,6 +85,15 @@ const DEFAULT_SETTINGS = {
     // Cookie banner; when on, analytics and pixels only load after the visitor accepts.
     cookieConsent: { enabled: false, text: 'We use cookies to understand how our site is used and to improve your experience.', acceptLabel: 'Accept', declineLabel: 'Decline', policyUrl: '/privacy-policy' },
   },
+  // Languages. The default language is the content you write; others are translations (see Translations).
+  i18n: {
+    enabled: false,
+    defaultLanguage: 'en',
+    languages: [{ code: 'en', name: 'English', native: 'English', dir: 'ltr' }],
+    switcher: true,
+    // AI translation with Claude. The key never leaves the server; ANTHROPIC_API_KEY works too.
+    ai: { apiKey: '', model: 'claude-opus-5-5', effort: 'medium', glossary: '' },
+  },
   // Outgoing email (SMTP). Never sent to the public site; shared by all themes.
   email: {
     enabled: false,
@@ -142,7 +151,8 @@ async function saveGroup(group, value) {
 // Settings safe to send to the public site (no email/SMTP credentials).
 function publicSettings(settings) {
   const { email, ...rest } = settings; // eslint-disable-line no-unused-vars
-  return rest;
+  const { ai, ...i18n } = settings.i18n || {}; // eslint-disable-line no-unused-vars
+  return { ...rest, i18n };
 }
 
 module.exports = { DEFAULT_SETTINGS, getSettings, saveGroup, publicSettings };

@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { LanguageSwitcher, useLocaleHref, usePagePath, useT } from './I18n';
 import { useEffect, useState } from 'react';
 import { ArrowRight, Menu, Moon, Search, Sun, X } from 'lucide-react';
 import { SavedLink } from './Engagement';
@@ -28,6 +29,7 @@ export function Logo({ general, className }) {
   );
 }
 
+// The theme toggle sits in every header style's toolbar, so the language switcher rides along with it.
 export function ThemeToggle({ className }) {
   const toggle = () => {
     const dark = !document.documentElement.classList.contains('dark');
@@ -35,16 +37,20 @@ export function ThemeToggle({ className }) {
     try { localStorage.setItem('site-theme', dark ? 'dark' : 'light'); } catch {}
   };
   return (
-    <button onClick={toggle} aria-label="Toggle theme" className={cn('grid h-10 w-10 place-items-center rounded-full text-fg/70 transition hover:bg-fg/5 hover:text-fg', className)}>
-      <Sun className="hidden h-[18px] w-[18px] dark:block" />
-      <Moon className="h-[18px] w-[18px] dark:hidden" />
-    </button>
+    <>
+      <LanguageSwitcher className={className} />
+      <button onClick={toggle} aria-label="Toggle theme" className={cn('grid h-10 w-10 place-items-center rounded-full text-fg/70 transition hover:bg-fg/5 hover:text-fg', className)}>
+        <Sun className="hidden h-[18px] w-[18px] dark:block" />
+        <Moon className="h-[18px] w-[18px] dark:hidden" />
+      </button>
+    </>
   );
 }
 
 
 export default function Header({ general, appearance, menu, saved }) {
-  const pathname = usePathname();
+  const href = useLocaleHref();
+  const pathname = usePagePath();
   const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -64,7 +70,7 @@ export default function Header({ general, appearance, menu, saved }) {
 
   const onSearch = (e) => {
     e.preventDefault();
-    if (q.trim()) router.push(`/search?q=${encodeURIComponent(q.trim())}`);
+    if (q.trim()) router.push(href(`/search?q=${encodeURIComponent(q.trim())}`));
   };
 
   return (

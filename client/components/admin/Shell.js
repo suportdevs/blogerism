@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   Activity, Bell, ChevronsLeft, ExternalLink, FileText, FolderTree, HelpCircle, Image as ImageIcon, Inbox, LayoutDashboard,
   LogOut, Mail, Menu as MenuIcon, MessageSquareQuote, Moon, Newspaper, Palette, Search, Settings, ShieldCheck, Sun, Tags,
-  UserCircle, Users, X, Command, Plus, CornerDownLeft, Clapperboard, Brush, PackageOpen, MessagesSquare, Route, DatabaseBackup,
+  UserCircle, Users, X, Command, Plus, CornerDownLeft, Clapperboard, Brush, PackageOpen, MessagesSquare, Route, DatabaseBackup, Languages,
 } from 'lucide-react';
 import { useAuth } from './AuthProvider';
 import { useSiteTheme } from './SiteTheme';
@@ -24,6 +24,7 @@ export const NAV = [
     { href: '/admin/series', label: 'Shows & podcasts', icon: Clapperboard, perm: 'series', needsSeries: true },
     { href: '/admin/pages', label: 'Pages', icon: FileText, perm: 'pages' },
     { href: '/admin/media', label: 'Media library', icon: ImageIcon, perm: 'media' },
+    { href: '/admin/translations', label: 'Translations', icon: Languages, perm: 'translations' },
   ] },
   { group: 'Appearance', items: [
     { href: '/admin/themes', label: 'Themes', icon: Brush, perm: 'appearance', builderOnly: true },

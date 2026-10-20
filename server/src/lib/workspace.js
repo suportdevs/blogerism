@@ -8,11 +8,11 @@ const { insertTree, resetSequences } = require('./snapshot');
  * Users, roles, media files, messages and subscribers are shared by all themes.
  */
 
-const GLOBAL_SETTINGS = ['theme', 'email'];
-const CONTENT_TABLES = ['Category', 'Tag', 'Series', 'Post', 'Comment', 'Page', 'Menu', 'MenuItem', 'Faq', 'Testimonial', 'Revision'];
+const GLOBAL_SETTINGS = ['theme', 'email', 'i18n'];
+const CONTENT_TABLES = ['Category', 'Tag', 'Series', 'Post', 'Comment', 'Page', 'Menu', 'MenuItem', 'Faq', 'Testimonial', 'Revision', 'Translation'];
 
 async function captureContent() {
-  const [categories, tags, series, posts, comments, pages, menus, menuItems, faqs, testimonials, revisions, settings] = await Promise.all([
+  const [categories, tags, series, posts, comments, pages, menus, menuItems, faqs, testimonials, revisions, translations, settings] = await Promise.all([
     prisma.category.findMany({ orderBy: { id: 'asc' } }),
     prisma.tag.findMany({ orderBy: { id: 'asc' } }),
     prisma.series.findMany({ orderBy: { id: 'asc' } }),
@@ -24,10 +24,11 @@ async function captureContent() {
     prisma.faq.findMany({ orderBy: { id: 'asc' } }),
     prisma.testimonial.findMany({ orderBy: { id: 'asc' } }),
     prisma.revision.findMany({ orderBy: { id: 'asc' } }),
+    prisma.translation.findMany({ orderBy: { id: 'asc' } }),
     prisma.setting.findMany({ where: { key: { notIn: GLOBAL_SETTINGS } } }),
   ]);
   return {
-    categories, tags, series, comments, pages, menus, menuItems, faqs, testimonials, revisions,
+    categories, tags, series, comments, pages, menus, menuItems, faqs, testimonials, revisions, translations,
     posts: posts.map(({ categories: c, tags: t, ...p }) => ({ ...p, categoryIds: c.map((x) => x.id), tagIds: t.map((x) => x.id) })),
     settings: settings.map(({ key, value }) => ({ key, value })),
   };
@@ -37,7 +38,7 @@ async function clearContent() {
   await prisma.$transaction([
     prisma.menuItem.deleteMany(), prisma.menu.deleteMany(), prisma.comment.deleteMany(), prisma.post.deleteMany(), prisma.series.deleteMany(),
     prisma.tag.deleteMany(), prisma.category.deleteMany(), prisma.page.deleteMany(), prisma.faq.deleteMany(), prisma.testimonial.deleteMany(),
-    prisma.revision.deleteMany(), prisma.setting.deleteMany({ where: { key: { notIn: GLOBAL_SETTINGS } } }),
+    prisma.revision.deleteMany(), prisma.translation.deleteMany(), prisma.setting.deleteMany({ where: { key: { notIn: GLOBAL_SETTINGS } } }),
   ]);
 }
 
@@ -66,6 +67,7 @@ async function restoreContent(d) {
   for (const t of d.testimonials) await prisma.testimonial.create({ data: t });
   // Revision history belongs to this content (ids match); workspaces saved before revisions existed have none.
   if (d.revisions?.length) await prisma.revision.createMany({ data: d.revisions });
+  if (d.translations?.length) await prisma.translation.createMany({ data: d.translations });
   for (const s of d.settings) await prisma.setting.create({ data: s });
   await resetSequences(CONTENT_TABLES);
 }

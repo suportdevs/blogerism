@@ -28,6 +28,7 @@ A modern, fully customizable content management system inspired by Botble CMS.
 | **Email** | SMTP set-up in Settings → Email (presets for Gmail, Outlook, Zoho, cPanel, Brevo; test button). Notifies you about messages, bookings, comments and subscribers, sends visitors an automatic confirmation, and lets you reply from Messages. Failures never block a visitor and are written to the activity log |
 | **Bookings** | Appointment, reservation, consultation, valuation and donation forms save structured details (date, time, guests, amount…) into Messages → Bookings; confirm or decline with ready-made emails. Listing cards and search/donate buttons pass their context to the contact form |
 | **Client essentials** | Floating WhatsApp / call button, cookie consent banner (analytics, Tag Manager and Meta Pixel load only after Accept), Google Search Console & Bing verification, spam honeypot on every public form, and business structured data typed by theme (Restaurant, MedicalClinic, LegalService, Hotel, RealEstateAgent…) |
+| **Multilingual + AI translation** | Settings → Languages: pick languages (24 presets incl. বাংলা, हिन्दी, العربية with RTL). Every page gets a language address (/bn/about), a header switcher, hreflang tags and sitemap alternates. Admin → Translations shows progress per language for pages (text inside every block), posts, menus, categories, tags, series, FAQs, testimonials, site text and interface labels; edit side by side or click **AI translate** (Claude — key in settings or ANTHROPIC_API_KEY). Changed originals are flagged as outdated; untranslated text falls back to the original |
 | **Feeds** | `/feed.xml` (filter with `?category=` or `?tag=`), and `/series/:slug/feed.xml` per series â€” podcasts get iTunes tags for Apple Podcasts / Spotify |
 
 ## Quick start
@@ -101,7 +102,7 @@ The site is one kind of website at a time, chosen under **Admin â†’ Appeara
 | **Herald** | Daily, Broadsheet, Tech, Business, Sports, Culture, City, Live, Reader, Investigations |
 | **Vidora** | Creators, Toons, Festival, Academy, Neon, Newsroom, Gallery, Shorts, Studio, Live, **Porda** |
 | **Marquee** | Prime, Kids, Docs, Anime, Premiere, Binge, Indie, Landing, Noir, Family |
-| **Folio** | Minimal, Terminal, Studio, Corporate, Swiss, Freelancer, Neon, Brutal, Story, Gazette, **Glow** |
+| **Folio** | Minimal, Terminal, Studio, Corporate, Swiss, Freelancer, Neon, Brutal, Story, Gazette, **Glow**, **Bento** |
 | **Forge** | Zen, Box, Fight, Coach, Club, Her, Run, App, Dojo, Chain |
 
 **Porda** (Vidora) is a Bengali OTT streaming demo â€” Bengali fonts and menus, top-10 row, series rails, à§³ subscription plans. It is the one demo that brings its own content: *Install demo & activate* adds Bengali series, episodes, categories and FAQs (this replaces the Vidora family's content, so the other Vidora versions will show it too).

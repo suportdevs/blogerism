@@ -40,6 +40,7 @@ app.use('/api/admin/users', users);
 app.use('/api/admin/roles', roles);
 app.use('/api/admin/system', require('./routes/system'));
 app.use('/api/admin/redirects', require('./routes/redirects'));
+app.use('/api/admin/translations', require('./routes/translations'));
 app.use('/api/admin/backups', require('./routes/backups'));
 
 app.use('/api/admin/faqs', crud({
