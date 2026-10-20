@@ -5,10 +5,14 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { ArrowRight, CalendarCheck, Check, Clock, Heart, Loader2, MapPin, Search, Star, User } from 'lucide-react';
 import { API_URL } from '@/lib/api';
+import { Honeypot } from './forms';
 import { ICONS } from '@/lib/icons';
 import { cn, slugify } from '@/lib/utils';
 
 const fieldName = (f, i) => slugify(f.label || '') || `field-${i}`;
+
+// Listings that point at the contact page carry their name along, so the enquiry says what it is about.
+const listingHref = (it) => (it.url && /^\/contact\/?$/.test(it.url) ? `/contact?item=${encodeURIComponent(it.title || '')}` : it.url || '#');
 
 /* ------------------------------ Search hero bar ------------------------------ */
 export function SearchBar({ d, className }) {
@@ -100,7 +104,7 @@ function ListingCard({ it, SubIcon }) {
   const meta = (it.meta || []).filter(Boolean);
   return (
     <article className="group flex flex-col overflow-hidden rounded-theme-lg border border-fg/10 bg-bg transition duration-500 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-black/10">
-      <Link href={it.url || '#'} className="relative block aspect-[4/3] overflow-hidden">
+      <Link href={listingHref(it)} className="relative block aspect-[4/3] overflow-hidden">
         {it.image && <img src={it.image} alt={it.title} loading="lazy" className="h-full w-full object-cover transition duration-700 group-hover:scale-110" />}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/10" />
         {it.badge && <span className="absolute left-4 top-4 rounded-full bg-primary px-3 py-1 text-xs font-bold text-white shadow-glow">{it.badge}</span>}
@@ -112,7 +116,7 @@ function ListingCard({ it, SubIcon }) {
           <span>{it.category}</span>
           {it.rating && <span className="flex items-center gap-1 text-sm normal-case tracking-normal text-fg/70"><Star className="h-4 w-4 fill-amber-400 text-amber-400" />{it.rating}</span>}
         </div>
-        <h3 className="mt-2 font-heading text-lg font-bold leading-snug text-fg transition group-hover:text-primary"><Link href={it.url || '#'}>{it.title}</Link></h3>
+        <h3 className="mt-2 font-heading text-lg font-bold leading-snug text-fg transition group-hover:text-primary"><Link href={listingHref(it)}>{it.title}</Link></h3>
         {it.subtitle && <p className="mt-1.5 flex items-center gap-1.5 text-sm text-fg/55"><SubIcon className="h-4 w-4 shrink-0" />{it.subtitle}</p>}
         <div className="min-h-4 flex-1" />
         {meta.length > 0 && <div className="flex flex-wrap gap-x-5 gap-y-2 border-t border-fg/10 pt-4 text-sm text-fg/70">{meta.map((x, i) => <Meta key={i} value={x} />)}</div>}
@@ -123,7 +127,7 @@ function ListingCard({ it, SubIcon }) {
 
 function ListingOverlay({ it, SubIcon }) {
   return (
-    <Link href={it.url || '#'} className="group relative block aspect-[3/4] overflow-hidden rounded-theme-lg">
+    <Link href={listingHref(it)} className="group relative block aspect-[3/4] overflow-hidden rounded-theme-lg">
       {it.image && <img src={it.image} alt={it.title} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-110" />}
       <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
       <div className="absolute inset-x-4 top-4 flex items-start justify-between gap-2">
@@ -271,7 +275,10 @@ export function DonationWidget({ d }) {
 const toMin = (t) => { const [h, m] = String(t).split(':').map(Number); return (h || 0) * 60 + (m || 0); };
 const fmt = (m) => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
 
+const REQUEST_BUTTON = { appointment: 'Request appointment', reservation: 'Request reservation', consultation: 'Request consultation', valuation: 'Book my valuation', booking: 'Request booking', enquiry: 'Send enquiry', enrolment: 'Request enrolment' };
+
 export function AppointmentForm({ d }) {
+  const kind = REQUEST_BUTTON[d.requestType] ? d.requestType : 'appointment';
   const services = (d.services || []).filter(Boolean);
   const step = Math.max(10, Number(d.interval) || 30);
   const slots = [];
@@ -286,13 +293,17 @@ export function AppointmentForm({ d }) {
     if (!form.time) { setState({ status: 'error', message: 'Please choose a time.' }); return; }
     setState({ status: 'loading' });
     try {
+      const title = kind.charAt(0).toUpperCase() + kind.slice(1);
       const res = await fetch(`${API_URL}/api/public/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: form.name, email: form.email, phone: form.phone,
-          subject: `Appointment request — ${form.service || 'General'}, ${form.date} at ${form.time}`,
-          message: `Appointment request\n${d.serviceLabel || 'Service'}: ${form.service || '—'}\nDate: ${form.date}\nTime: ${form.time}\n\nNotes: ${form.notes || '—'}`,
+          kind,
+          subject: `${title} request — ${form.service || 'General'}, ${form.date} at ${form.time}`,
+          details: { ...(services.length ? { [d.serviceLabel || 'Service']: form.service } : {}), Date: form.date, Time: form.time },
+          message: form.notes || `${title} request for ${form.date} at ${form.time}.`,
+          website: e.currentTarget.elements.namedItem('website')?.value || '',
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -315,7 +326,8 @@ export function AppointmentForm({ d }) {
   }
 
   return (
-    <form onSubmit={submit} className="grid gap-5 rounded-theme-lg border border-fg/10 bg-bg p-6 text-left shadow-2xl shadow-black/5 sm:grid-cols-2 sm:p-8">
+    <form onSubmit={submit} className="relative grid gap-5 rounded-theme-lg border border-fg/10 bg-bg p-6 text-left shadow-2xl shadow-black/5 sm:grid-cols-2 sm:p-8">
+      <Honeypot />
       {services.length > 0 && (
         <label className="sm:col-span-2"><span className={label}>{d.serviceLabel || 'Service'}</span>
           <select className="site-input" value={form.service} onChange={set('service')}>{services.map((s) => <option key={s}>{s}</option>)}</select>
@@ -336,7 +348,7 @@ export function AppointmentForm({ d }) {
       <textarea className="site-input min-h-[90px] sm:col-span-2" placeholder="Anything we should know?" value={form.notes} onChange={set('notes')} />
       {state.status === 'error' && <p className="text-sm text-rose-500 sm:col-span-2">{state.message}</p>}
       <button disabled={state.status === 'loading'} className="btn-site-primary !py-4 sm:col-span-2">
-        {state.status === 'loading' ? <Loader2 className="h-4 w-4 animate-spin" /> : <CalendarCheck className="h-4 w-4" />}Request appointment
+        {state.status === 'loading' ? <Loader2 className="h-4 w-4 animate-spin" /> : <CalendarCheck className="h-4 w-4" />}{d.buttonLabel || REQUEST_BUTTON[kind]}
       </button>
     </form>
   );

@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowRight, CalendarCheck, Check, ChevronLeft, ChevronRight, Clock, Expand, Loader2, Minus, Plus, X } from 'lucide-react';
 import { API_URL } from '@/lib/api';
 import { cn } from '@/lib/utils';
+import { Honeypot } from './forms';
 
 /* ------------------------------------------------------------------------
  * Reveal-on-scroll for page-builder sections (adds .revealed to .reveal).
@@ -461,8 +462,11 @@ export function ReservationForm({ d }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: form.name, email: form.email, phone: form.phone,
+          kind: 'reservation',
           subject: `Table reservation — ${form.date} at ${form.time}, ${form.guests} guest${form.guests > 1 ? 's' : ''}`,
-          message: `Reservation request\nDate: ${form.date}\nTime: ${form.time}\nGuests: ${form.guests}\n\nNotes: ${form.notes || '—'}`,
+          details: { Date: form.date, Time: form.time, Guests: form.guests },
+          message: form.notes || `Table for ${form.guests} on ${form.date} at ${form.time}.`,
+          website: e.currentTarget.elements.namedItem('website')?.value || '',
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -486,7 +490,8 @@ export function ReservationForm({ d }) {
 
   const input = 'site-input bg-bg';
   return (
-    <form onSubmit={submit} className="grid gap-4 rounded-theme-lg border border-fg/10 bg-bg p-6 text-left shadow-xl sm:grid-cols-2 sm:p-8">
+    <form onSubmit={submit} className="relative grid gap-4 rounded-theme-lg border border-fg/10 bg-bg p-6 text-left shadow-xl sm:grid-cols-2 sm:p-8">
+      <Honeypot />
       <label className="sm:col-span-2">
         <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-fg/50">Guests</span>
         <div className="flex items-center gap-4">

@@ -96,7 +96,7 @@ const corporate = demo({
     B('timeline', experience, { background: 'surface', paddingY: 'xl', width: 'narrow', anchor: 'experience' }),
     B('skills', skills, { paddingY: 'xl', anchor: 'skills' }),
     B('projects', projectsWithImages(), { background: 'surface', paddingY: 'xl', anchor: 'projects', ...W }),
-    B('appointment', { eyebrow: 'Contact', title: 'Book a 30-minute call', text: 'Pick a time — I will send a meeting link by email.', serviceLabel: 'Topic', services: ['Full-time role', 'Freelance project', 'Consulting', 'Something else'], firstSlot: '10:00', lastSlot: '19:00', interval: 60, image: '', phone: folio.contact.phone, bullets: ['Based in Dhaka (GMT+6)', 'Remote-friendly', 'English & Bengali'] }, { paddingY: 'xl', anchor: 'contact' }),
+    B('appointment', { requestType: 'consultation', eyebrow: 'Contact', title: 'Book a 30-minute call', text: 'Pick a time — I will send a meeting link by email.', serviceLabel: 'Topic', services: ['Full-time role', 'Freelance project', 'Consulting', 'Something else'], firstSlot: '10:00', lastSlot: '19:00', interval: 60, image: '', phone: folio.contact.phone, bullets: ['Based in Dhaka (GMT+6)', 'Remote-friendly', 'English & Bengali'] }, { paddingY: 'xl', anchor: 'contact' }),
   ],
 });
 

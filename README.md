@@ -25,6 +25,9 @@ A modern, fully customizable content management system inspired by Botble CMS.
 | **Content safety** | **Trash** for posts and pages (restore as draft, auto-purged after 30 days, undo on delete) and **revision history** â€” every save is kept (latest 30), compare with the saved version and restore in one click |
 | **Redirects & 404 monitor** | 301/302/307/308 redirects with hit counts, `/old/*` wildcard rules, automatic 301 when a published post or page changes its URL, and a log of missing addresses visitors hit (one click to redirect them) |
 | **Backup & restore** | One-click backups of all content, settings, media records, subscribers, messages, redirects and every theme's workspace; download, upload, restore (a safety copy is taken first). Users and passwords are never touched |
+| **Email** | SMTP set-up in Settings → Email (presets for Gmail, Outlook, Zoho, cPanel, Brevo; test button). Notifies you about messages, bookings, comments and subscribers, sends visitors an automatic confirmation, and lets you reply from Messages. Failures never block a visitor and are written to the activity log |
+| **Bookings** | Appointment, reservation, consultation, valuation and donation forms save structured details (date, time, guests, amount…) into Messages → Bookings; confirm or decline with ready-made emails. Listing cards and search/donate buttons pass their context to the contact form |
+| **Client essentials** | Floating WhatsApp / call button, cookie consent banner (analytics, Tag Manager and Meta Pixel load only after Accept), Google Search Console & Bing verification, spam honeypot on every public form, and business structured data typed by theme (Restaurant, MedicalClinic, LegalService, Hotel, RealEstateAgent…) |
 | **Feeds** | `/feed.xml` (filter with `?category=` or `?tag=`), and `/series/:slug/feed.xml` per series â€” podcasts get iTunes tags for Apple Podcasts / Spotify |
 
 ## Quick start

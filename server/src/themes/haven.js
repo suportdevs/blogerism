@@ -153,7 +153,7 @@ module.exports = {
           { icon: 'Camera', title: 'Go to market', text: 'Photography, video and a launch to our buyer network.' },
           { icon: 'Key', title: 'Hand over the keys', text: 'We negotiate, manage the paperwork and get you to closing.' },
         ] }, { paddingY: 'xl' }),
-        B('appointment', { eyebrow: 'Book online', title: 'Request your free valuation', text: 'Choose a time and one of our agents will visit your home.', serviceLabel: 'I would like', services: ['A free valuation', 'Advice on selling', 'A viewing of a listed home', 'Mortgage advice'], firstSlot: '09:00', lastSlot: '18:00', interval: 60, image: '', phone: '+1 (310) 555-0172', bullets: ['Accurate pricing based on live market data', 'A marketing plan tailored to your home', 'No fees unless we sell'] }, { background: 'surface', paddingY: 'xl', anchor: 'book' }),
+        B('appointment', { requestType: 'valuation', eyebrow: 'Book online', title: 'Request your free valuation', text: 'Choose a time and one of our agents will visit your home.', serviceLabel: 'I would like', services: ['A free valuation', 'Advice on selling', 'A viewing of a listed home', 'Mortgage advice'], firstSlot: '09:00', lastSlot: '18:00', interval: 60, image: '', phone: '+1 (310) 555-0172', bullets: ['Accurate pricing based on live market data', 'A marketing plan tailored to your home', 'No fees unless we sell'] }, { background: 'surface', paddingY: 'xl', anchor: 'book' }),
         B('faq', { eyebrow: 'FAQ', title: 'Selling questions, answered' }, { paddingY: 'xl' }),
       ],
     },

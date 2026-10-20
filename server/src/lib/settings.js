@@ -53,6 +53,10 @@ const DEFAULT_SETTINGS = {
     twitterHandle: '',
     allowIndexing: true,
     googleAnalyticsId: '',
+    googleTagManagerId: '',
+    facebookPixelId: '',
+    googleVerification: '',
+    bingVerification: '',
   },
   social: {
     facebook: 'https://facebook.com',
@@ -68,6 +72,9 @@ const DEFAULT_SETTINGS = {
     address: '221B Market Street, San Francisco, CA',
     mapEmbedUrl: '',
     workingHours: 'Mon – Fri, 9:00 – 18:00',
+    whatsapp: '',
+    // Floating WhatsApp / call button shown on every page.
+    floatingButton: { enabled: false, whatsapp: true, call: true, message: 'Hello! I have a question.' },
   },
   advanced: {
     customCss: '',
@@ -75,6 +82,27 @@ const DEFAULT_SETTINGS = {
     footerScripts: '',
     enableNewsletter: true,
     enableContactForm: true,
+    // Cookie banner; when on, analytics and pixels only load after the visitor accepts.
+    cookieConsent: { enabled: false, text: 'We use cookies to understand how our site is used and to improve your experience.', acceptLabel: 'Accept', declineLabel: 'Decline', policyUrl: '/privacy-policy' },
+  },
+  // Outgoing email (SMTP). Never sent to the public site; shared by all themes.
+  email: {
+    enabled: false,
+    host: '',
+    port: 587,
+    secure: false,
+    user: '',
+    pass: '',
+    fromName: '',
+    fromEmail: '',
+    notifyTo: '',
+    notifyMessages: true,
+    notifyBookings: true,
+    notifyComments: false,
+    notifySubscribers: false,
+    autoReply: true,
+    autoReplySubject: 'We received your {request}',
+    autoReplyText: 'Hi {name},\n\nThank you for contacting {site}. We have received your {request} and will get back to you shortly.\n\nIf it is urgent, call us on {phone}.\n\n— {site}',
   },
   // Reader engagement on posts and series.
   engagement: {
@@ -111,4 +139,10 @@ async function saveGroup(group, value) {
   await prisma.setting.upsert({ where: { key: group }, update: { value: merged }, create: { key: group, value: merged } });
 }
 
-module.exports = { DEFAULT_SETTINGS, getSettings, saveGroup };
+// Settings safe to send to the public site (no email/SMTP credentials).
+function publicSettings(settings) {
+  const { email, ...rest } = settings; // eslint-disable-line no-unused-vars
+  return rest;
+}
+
+module.exports = { DEFAULT_SETTINGS, getSettings, saveGroup, publicSettings };

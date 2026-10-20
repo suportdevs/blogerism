@@ -106,7 +106,7 @@ const coach = demo({
       { name: 'Hybrid', price: '$249', period: '/month', description: 'Best results', features: ['Everything in Online', '4 in-person sessions', 'Nutrition plan'], buttonLabel: 'Start', buttonUrl: '#book', highlighted: true },
       { name: '1:1 in person', price: '$65', period: '/session', description: 'Pay as you go', features: ['60-minute session', 'Form coaching'], buttonLabel: 'Book', buttonUrl: '#book', highlighted: false },
     ] }, { paddingY: 'xl' }),
-    B('appointment', { eyebrow: 'Free consultation', title: 'Let’s talk about your goals', text: 'A relaxed 20-minute call — no pressure, no sales pitch.', serviceLabel: 'I’m interested in', services: ['Online coaching', 'Hybrid coaching', 'In-person sessions', 'Nutrition only'], firstSlot: '07:00', lastSlot: '20:00', interval: 60, image: '', phone: '+1 (646) 555-0119', bullets: ['Free and without obligation', 'Video or phone', 'Reply within 24 hours'] }, { background: 'surface', paddingY: 'xl', anchor: 'book' }),
+    B('appointment', { requestType: 'consultation', eyebrow: 'Free consultation', title: 'Let’s talk about your goals', text: 'A relaxed 20-minute call — no pressure, no sales pitch.', serviceLabel: 'I’m interested in', services: ['Online coaching', 'Hybrid coaching', 'In-person sessions', 'Nutrition only'], firstSlot: '07:00', lastSlot: '20:00', interval: 60, image: '', phone: '+1 (646) 555-0119', bullets: ['Free and without obligation', 'Video or phone', 'Reply within 24 hours'] }, { background: 'surface', paddingY: 'xl', anchor: 'book' }),
     testimonials('What clients say'),
   ],
 });

@@ -8,6 +8,8 @@ import { PreviewListener } from '@/components/site/Extras';
 import InjectHtml from '@/components/site/InjectHtml';
 import { AudioProvider } from '@/components/site/AudioPlayer';
 import { RevealObserver } from '@/components/site/ShowcaseClient';
+import SiteWidgets from '@/components/site/SiteWidgets';
+import { JsonLd, siteJsonLd } from '@/components/site/StructuredData';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
@@ -24,6 +26,7 @@ export async function generateMetadata() {
     openGraph: { siteName: general.siteName, type: 'website', images: seo.ogImage ? [seo.ogImage] : undefined },
     twitter: { card: 'summary_large_image', site: seo.twitterHandle || undefined },
     alternates: { types: { 'application/rss+xml': [{ url: '/feed.xml', title: general.siteName }] } },
+    verification: { google: seo.googleVerification || undefined, other: seo.bingVerification ? { 'msvalidate.01': seo.bingVerification } : undefined },
   };
 }
 
@@ -44,12 +47,7 @@ export default async function SiteLayout({ children }) {
         <style dangerouslySetInnerHTML={{ __html: themeCss(a) }} />
         {advanced.customCss && <style id="nova-custom-css" dangerouslySetInnerHTML={{ __html: advanced.customCss }} />}
         <script dangerouslySetInnerHTML={{ __html: modeScript }} />
-        {seo.googleAnalyticsId && (
-          <>
-            <script async src={`https://www.googletagmanager.com/gtag/js?id=${seo.googleAnalyticsId}`} />
-            <script dangerouslySetInnerHTML={{ __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${seo.googleAnalyticsId}');` }} />
-          </>
-        )}
+        <JsonLd data={siteJsonLd(settings, theme)} />
       </head>
       <body data-theme={theme?.id} data-style={theme?.layout?.style || 'modern'} className="flex min-h-screen flex-col bg-bg font-body text-fg transition-colors duration-300">
         {general.maintenanceMode ? (
@@ -69,6 +67,7 @@ export default async function SiteLayout({ children }) {
         <RevealObserver />
         <noscript><style>{'.reveal{opacity:1!important;transform:none!important}'}</style></noscript>
         <Toaster position="bottom-center" richColors />
+        {!general.maintenanceMode && <SiteWidgets seo={seo} contact={settings.contact} consent={advanced.cookieConsent} />}
         {advanced.headerScripts && <InjectHtml html={advanced.headerScripts} target="head" />}
         {advanced.footerScripts && <InjectHtml html={advanced.footerScripts} target="body" />}
       </body>

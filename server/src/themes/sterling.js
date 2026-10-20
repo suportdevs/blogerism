@@ -99,7 +99,7 @@ module.exports = {
         ] }, { background: 'surface', paddingY: 'xl', anchor: 'results' }),
         B('team', { eyebrow: 'Partners', title: 'The attorneys behind your case', subtitle: '', variant: 'portrait', columns: 4, members: PARTNERS }, { paddingY: 'xl' }),
         B('testimonials', { eyebrow: 'Client testimonials', title: 'In our clients’ words' }, { background: 'surface', paddingY: 'xl' }),
-        B('appointment', { eyebrow: 'Free consultation', title: 'Speak with an attorney', text: 'Tell us briefly about your matter. A partner will review it and call you back — usually the same day.', serviceLabel: 'Practice area', services: PRACTICE.map(([, t]) => t), firstSlot: '09:00', lastSlot: '17:30', interval: 30, image: '', phone: '+1 (312) 555-0190', bullets: ['First 30 minutes free', 'Strictly confidential', 'No obligation to instruct us'] }, { paddingY: 'xl', anchor: 'consultation' }),
+        B('appointment', { requestType: 'consultation', eyebrow: 'Free consultation', title: 'Speak with an attorney', text: 'Tell us briefly about your matter. A partner will review it and call you back — usually the same day.', serviceLabel: 'Practice area', services: PRACTICE.map(([, t]) => t), firstSlot: '09:00', lastSlot: '17:30', interval: 30, image: '', phone: '+1 (312) 555-0190', bullets: ['First 30 minutes free', 'Strictly confidential', 'No obligation to instruct us'] }, { paddingY: 'xl', anchor: 'consultation' }),
         B('latestPosts', { eyebrow: 'Insights', title: 'Legal updates & guides', count: 3, buttonLabel: 'All insights', buttonUrl: '/blog' }, { background: 'surface', paddingY: 'xl' }),
       ],
     },
@@ -128,7 +128,7 @@ module.exports = {
       slug: 'consultation', title: 'Consultation', template: 'default', seoTitle: 'Request a consultation — Sterling & Vale',
       blocks: [
         B('pageHeader', { title: 'Request a consultation', subtitle: 'Your first 30 minutes are free and completely confidential.' }, { background: 'surface', paddingY: 'lg', animate: false }),
-        B('appointment', { eyebrow: '', title: 'Tell us how we can help', text: 'A partner will review your request and contact you, usually the same working day.', serviceLabel: 'Practice area', services: PRACTICE.map(([, t]) => t), firstSlot: '09:00', lastSlot: '17:30', interval: 30, image: un(P.justice, 1000), phone: '+1 (312) 555-0190', bullets: ['First 30 minutes free', 'Strictly confidential', 'No obligation to instruct us'] }, { paddingY: 'xl' }),
+        B('appointment', { requestType: 'consultation', eyebrow: '', title: 'Tell us how we can help', text: 'A partner will review your request and contact you, usually the same working day.', serviceLabel: 'Practice area', services: PRACTICE.map(([, t]) => t), firstSlot: '09:00', lastSlot: '17:30', interval: 30, image: un(P.justice, 1000), phone: '+1 (312) 555-0190', bullets: ['First 30 minutes free', 'Strictly confidential', 'No obligation to instruct us'] }, { paddingY: 'xl' }),
       ],
     },
     commonPages.about('Sterling & Vale', 'A Chicago law firm serving businesses and families since 1987.'),

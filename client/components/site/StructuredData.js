@@ -41,3 +41,30 @@ export function seriesJsonLd(series, episodes = []) {
     ...(series.year ? { startDate: String(series.year) } : {}),
   };
 }
+
+// Site-level structured data: the business (or person) behind the site, typed by the active theme so Google can show
+// it as a restaurant, clinic, law firm… with address, phone and social profiles.
+const BUSINESS_TYPE = {
+  saffron: 'Restaurant', vitalis: 'MedicalClinic', sterling: 'LegalService', haven: 'RealEstateAgent', forge: 'ExerciseGym',
+  aurelia: 'Hotel', wanderly: 'TravelAgency', scholar: 'EducationalOrganization', evergreen: 'NGO', atlas: 'ProfessionalService',
+  kinetic: 'ProfessionalService', lens: 'ProfessionalService', herald: 'NewsMediaOrganization', folio: 'Person',
+};
+const LOCAL = new Set(['Restaurant', 'MedicalClinic', 'LegalService', 'RealEstateAgent', 'ExerciseGym', 'Hotel', 'TravelAgency', 'ProfessionalService']);
+
+export function siteJsonLd(settings, theme) {
+  const { general = {}, contact = {}, social = {}, seo = {} } = settings;
+  const type = BUSINESS_TYPE[theme?.variantOf || theme?.id] || 'Organization';
+  const sameAs = Object.values(social).filter((u) => typeof u === 'string' && /^https?:\/\//.test(u));
+  const base = { '@context': 'https://schema.org', '@type': type, name: general.siteName, url: SITE_URL, sameAs: sameAs.length ? sameAs : undefined };
+  if (type === 'Person') return { ...base, email: contact.email || undefined, image: abs(seo.ogImage) };
+  return {
+    ...base,
+    description: general.tagline || seo.metaDescription || undefined,
+    logo: abs(general.logo) || undefined,
+    image: abs(seo.ogImage || general.logo) || undefined,
+    email: contact.email || undefined,
+    telephone: contact.phone || undefined,
+    address: contact.address ? { '@type': 'PostalAddress', streetAddress: contact.address } : undefined,
+    ...(LOCAL.has(type) && contact.mapEmbedUrl ? { hasMap: contact.mapEmbedUrl } : {}),
+  };
+}

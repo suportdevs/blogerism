@@ -8,7 +8,7 @@ const { insertTree, resetSequences } = require('./snapshot');
  * Users, roles, media files, messages and subscribers are shared by all themes.
  */
 
-const GLOBAL_SETTINGS = ['theme'];
+const GLOBAL_SETTINGS = ['theme', 'email'];
 const CONTENT_TABLES = ['Category', 'Tag', 'Series', 'Post', 'Comment', 'Page', 'Menu', 'MenuItem', 'Faq', 'Testimonial', 'Revision'];
 
 async function captureContent() {

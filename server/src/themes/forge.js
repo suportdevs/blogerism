@@ -130,7 +130,7 @@ module.exports = {
           { group: 'Coaching', feature: 'Nutrition plan', values: ['no', 'no', 'yes'] },
           { group: 'Price', feature: 'Monthly', values: ['$59', '$129', '$349'] },
         ], buttons: [{ label: 'Join', url: '/contact' }, { label: 'Join', url: '/contact' }, { label: 'Book a consult', url: '/contact' }] }, { paddingY: 'xl' }),
-        B('appointment', { eyebrow: 'Free week', title: 'Book your free trial', text: 'Choose your first session and we will have a coach ready to welcome you.', serviceLabel: 'First session', services: ['Gym induction', 'Group class', 'Personal training consult', 'Boxing taster'], firstSlot: '06:00', lastSlot: '20:00', interval: 60, image: un(P.dumbbells, 1000), phone: '+1 (646) 555-0119', bullets: ['7 days unlimited access', 'No card, no contract', 'Free body composition scan'] }, { background: 'surface', paddingY: 'xl' }),
+        B('appointment', { requestType: 'booking', buttonLabel: 'Book my free trial', eyebrow: 'Free week', title: 'Book your free trial', text: 'Choose your first session and we will have a coach ready to welcome you.', serviceLabel: 'First session', services: ['Gym induction', 'Group class', 'Personal training consult', 'Boxing taster'], firstSlot: '06:00', lastSlot: '20:00', interval: 60, image: un(P.dumbbells, 1000), phone: '+1 (646) 555-0119', bullets: ['7 days unlimited access', 'No card, no contract', 'Free body composition scan'] }, { background: 'surface', paddingY: 'xl' }),
         B('faq', { eyebrow: 'FAQ', title: 'Good to know' }, { paddingY: 'xl' }),
       ],
     },

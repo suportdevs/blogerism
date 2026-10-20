@@ -920,6 +920,8 @@ export const BLOCKS = {
     defaults: { eyebrow: 'Appointments', title: 'Book a visit', text: 'Pick a time that suits you — we will confirm by email.', serviceLabel: 'Service', services: ['Consultation', 'Follow-up'], firstSlot: '09:00', lastSlot: '17:00', interval: 30, image: '', phone: '', bullets: [] },
     fields: [
       ...heading, { name: 'text', label: 'Text', type: 'textarea' },
+      { name: 'requestType', label: 'Request type (shown in Messages → Bookings)', type: 'select', half: true, options: [['appointment', 'Appointment'], ['reservation', 'Reservation'], ['consultation', 'Consultation'], ['valuation', 'Valuation'], ['booking', 'Booking'], ['enquiry', 'Enquiry'], ['enrolment', 'Enrolment']] },
+      { name: 'buttonLabel', label: 'Button text (optional)', type: 'text', half: true },
       { name: 'serviceLabel', label: 'Service field label', type: 'text', half: true }, { name: 'phone', label: 'Phone shown beside the form', type: 'text', half: true },
       { name: 'services', label: 'Services', type: 'stringList' },
       { name: 'firstSlot', label: 'First slot', type: 'text', half: true }, { name: 'lastSlot', label: 'Last slot', type: 'text', half: true },

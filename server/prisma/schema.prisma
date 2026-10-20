@@ -39,6 +39,8 @@ enum MessageStatus {
   UNREAD
   READ
   REPLIED
+  CONFIRMED // bookings
+  CANCELLED // bookings
 }
 
 model Role {
@@ -253,8 +255,11 @@ model Comment {
   @@index([status])
 }
 
+// Contact form messages and booking requests (appointments, reservations, consultations…).
 model ContactMessage {
   id        Int           @id @default(autoincrement())
+  kind      String        @default("contact") // contact | appointment | reservation | consultation | valuation | booking | enquiry
+  details   Json? // structured booking fields, e.g. { Service, Date, Time, Guests }
   name      String
   email     String
   phone     String?

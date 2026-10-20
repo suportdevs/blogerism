@@ -100,7 +100,7 @@ module.exports = {
           { group: '', feature: 'Spa access', values: ['yes', 'yes', 'yes', 'yes'] },
           { group: '', feature: 'Butler service', values: ['no', 'no', 'no', 'yes'] },
         ], buttons: [] }, { background: 'surface', paddingY: 'xl', width: 'wide' }),
-        B('appointment', { eyebrow: 'Reservations', title: 'Request your stay', text: 'Tell us your arrival date and preferred room — our reservations team will confirm availability within the hour.', serviceLabel: 'Room', services: ROOMS.map((r) => r.title), firstSlot: '14:00', lastSlot: '22:00', interval: 60, image: un(P.courtyard, 1000), phone: '+41 91 555 01 98', bullets: ['Best rate guaranteed when you book direct', 'Breakfast and spa access included', 'Free cancellation up to 7 days before arrival'] }, { paddingY: 'xl', anchor: 'book' }),
+        B('appointment', { requestType: 'reservation', eyebrow: 'Reservations', title: 'Request your stay', text: 'Tell us your arrival date and preferred room — our reservations team will confirm availability within the hour.', serviceLabel: 'Room', services: ROOMS.map((r) => r.title), firstSlot: '14:00', lastSlot: '22:00', interval: 60, image: un(P.courtyard, 1000), phone: '+41 91 555 01 98', bullets: ['Best rate guaranteed when you book direct', 'Breakfast and spa access included', 'Free cancellation up to 7 days before arrival'] }, { paddingY: 'xl', anchor: 'book' }),
       ],
     },
     {

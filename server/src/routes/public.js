@@ -3,7 +3,8 @@ const rateLimit = require('express-rate-limit');
 const { z } = require('zod');
 const prisma = require('../lib/prisma');
 const { asyncHandler, paginate, pageMeta, HttpError } = require('../lib/utils');
-const { getSettings } = require('../lib/settings');
+const { getSettings, publicSettings } = require('../lib/settings');
+const { notifyOwner, autoReply } = require('../lib/mailer');
 const { toTree } = require('./menus');
 const { publicTheme } = require('../themes');
 const { normalizePath } = require('../lib/redirects');
@@ -45,7 +46,7 @@ router.get('/bootstrap', asyncHandler(async (_req, res) => {
     getSettings(),
     prisma.menu.findMany({ include: { items: true } }),
   ]);
-  res.json({ settings, theme: publicTheme(settings.theme.active), menus: Object.fromEntries(menus.map((m) => [m.location, { name: m.name, items: toTree(m.items) }])) });
+  res.json({ settings: publicSettings(settings), theme: publicTheme(settings.theme.active), menus: Object.fromEntries(menus.map((m) => [m.location, { name: m.name, items: toTree(m.items) }])) });
 }));
 
 router.get('/home', asyncHandler(async (_req, res) => {
@@ -140,7 +141,7 @@ const publicComment = (c) => ({
 
 router.get('/posts/:slug/comments', asyncHandler(async (req, res) => {
   const { engagement } = await getSettings();
-  const post = await prisma.post.findFirst({ where: { ...live(), slug: req.params.slug }, select: { id: true, allowComments: true } });
+  const post = await prisma.post.findFirst({ where: { ...live(), slug: req.params.slug }, select: { id: true, title: true, allowComments: true } });
   if (!post) throw new HttpError(404, 'Post not found');
   const rows = await prisma.comment.findMany({
     where: { postId: post.id, status: 'APPROVED' },
@@ -185,6 +186,14 @@ router.post('/posts/:slug/comments', commentLimiter, asyncHandler(async (req, re
   const status = engagement.moderation || links > 2 ? 'PENDING' : 'APPROVED';
   const comment = await prisma.comment.create({
     data: { postId: post.id, parentId: data.parentId || null, name: data.name, email: data.email.toLowerCase(), content: data.content, status, ip: req.ip },
+  });
+  notifyOwner('comment', {
+    subject: `New comment on "${post.title}"${status === 'PENDING' ? ' (awaiting approval)' : ''}`,
+    text: `${data.name} <${data.email}> wrote:
+
+${data.content}
+
+Moderate it in the admin: Comments.`,
   });
   res.status(201).json({
     comment: publicComment(comment),
@@ -302,23 +311,40 @@ router.post('/not-found', notFoundLimiter, asyncHandler(async (req, res) => {
   res.status(204).end();
 }));
 
+// Contact messages and booking requests. `kind` marks bookings (appointment, reservation…) and `details` holds their fields.
+const KINDS = ['contact', 'appointment', 'reservation', 'consultation', 'valuation', 'booking', 'enquiry', 'enrolment', 'donation'];
 router.post('/contact', formLimiter, asyncHandler(async (req, res) => {
   if (!(await getSettings()).advanced.enableContactForm) throw new HttpError(403, 'The contact form is currently disabled.');
-  const data = z.object({
+  const { website, ...data } = z.object({
     name: z.string().min(2, 'Please enter your name').max(120),
     email: z.string().email('Please enter a valid email'),
     phone: z.string().max(40).optional().nullable(),
     subject: z.string().max(200).optional().nullable(),
-    message: z.string().min(10, 'Message must be at least 10 characters').max(5000),
+    message: z.string().min(2, 'Please write a short message').max(5000),
+    kind: z.enum(KINDS).default('contact'),
+    details: z.record(z.string().max(60), z.union([z.string().max(300), z.number()])).refine((d) => Object.keys(d).length <= 20, 'Too many details').optional().nullable(),
+    website: z.string().optional(), // honeypot: humans never see this field
   }).parse(req.body);
-  await prisma.contactMessage.create({ data: { ...data, ip: req.ip } });
-  res.status(201).json({ message: 'Thanks! Your message has been sent.' });
+  if (website) return res.status(201).json({ message: 'Thanks! Your message has been sent.' }); // bot
+  const msg = await prisma.contactMessage.create({ data: { ...data, ip: req.ip } });
+  const isBooking = data.kind !== 'contact';
+  const lines = Object.entries(data.details || {}).map(([k, v]) => `${k}: ${v}`);
+  notifyOwner(isBooking ? 'booking' : 'message', {
+    subject: isBooking ? `New ${data.kind} request from ${data.name}` : `New message from ${data.name}${data.subject ? ` — ${data.subject}` : ''}`,
+    text: [`From: ${data.name} <${data.email}>`, data.phone && `Phone: ${data.phone}`, ...lines, '', data.message, '', `Open it in the admin: Messages → #${msg.id}`].filter((l) => l !== null && l !== undefined && l !== false).join('\n'),
+    replyTo: data.email,
+  });
+  autoReply({ to: data.email, name: data.name, kind: data.kind });
+  res.status(201).json({ message: isBooking ? 'Thanks! Your request has been received.' : 'Thanks! Your message has been sent.' });
 }));
 
 router.post('/subscribe', formLimiter, asyncHandler(async (req, res) => {
   if (!(await getSettings()).advanced.enableNewsletter) throw new HttpError(403, 'Newsletter sign-ups are currently disabled.');
-  const { email, name } = z.object({ email: z.string().email('Please enter a valid email'), name: z.string().optional() }).parse(req.body);
+  const { email, name, website } = z.object({ email: z.string().email('Please enter a valid email'), name: z.string().optional(), website: z.string().optional() }).parse(req.body);
+  if (website) return res.status(201).json({ message: 'You are subscribed. Welcome aboard!' }); // honeypot: a bot
+  const existing = await prisma.subscriber.findUnique({ where: { email: email.toLowerCase() } });
   await prisma.subscriber.upsert({ where: { email: email.toLowerCase() }, update: { isActive: true }, create: { email: email.toLowerCase(), name } });
+  if (!existing) notifyOwner('subscriber', { subject: `New subscriber: ${email.toLowerCase()}`, text: `${email.toLowerCase()}${name ? ` (${name})` : ''} subscribed to the newsletter.` });
   res.status(201).json({ message: 'You are subscribed. Welcome aboard!' });
 }));
 
