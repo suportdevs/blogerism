@@ -41,6 +41,8 @@ module.exports = {
         'scale-in': { from: { opacity: 0, transform: 'scale(.96)' }, to: { opacity: 1, transform: 'none' } },
         marquee: { from: { transform: 'translateX(0)' }, to: { transform: 'translateX(-50%)' } },
         float: { '0%,100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } },
+        draw: { from: { strokeDashoffset: 1 }, to: { strokeDashoffset: 0 } },
+        wiggle: { '0%,100%': { transform: 'rotate(-6deg)' }, '50%': { transform: 'rotate(6deg)' } },
       },
       animation: {
         'fade-up': 'fade-up .6s cubic-bezier(.2,.7,.2,1) both',
@@ -48,6 +50,8 @@ module.exports = {
         'scale-in': 'scale-in .18s ease-out both',
         marquee: 'marquee 30s linear infinite',
         float: 'float 6s ease-in-out infinite',
+        draw: 'draw 1.1s cubic-bezier(.65,0,.35,1) .35s both',
+        wiggle: 'wiggle 1.2s ease-in-out infinite',
       },
     },
   },

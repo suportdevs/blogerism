@@ -406,6 +406,7 @@ bento.demo = async (prisma, { authors }) => {
 // skill meters, contact with a subject dropdown and an "end of file" sign-off. The lime accent is a highlighter.
 const LOOP_CATEGORY = (c) => (/saas/i.test(c) ? 'SaaS' : /erp/i.test(c) ? 'ERP systems' : 'Side projects');
 const SKILL = (label, level) => ({ label, level });
+const CV_PDF = '/Md_Mamunur_Rashid_CV.pdf'; // client/public
 const LOOP_SOCIALS = [{ icon: 'Github', url: GH, label: 'GitHub' }, { icon: 'Linkedin', url: folio.social.linkedin, label: 'LinkedIn' }, { icon: 'Mail', url: `mailto:${folio.contact.email}`, label: 'Email' }];
 const loop = demo({
   id: 'folio-loop', name: 'Loop',
@@ -420,7 +421,7 @@ const loop = demo({
     B('loopHero', {
       file: 'hello_world.tsx', status: hero.availability, location: hero.location, greeting: `Hi, I’m ${SHORT} —`,
       headline: 'I build *software* that businesses run on.', intro: hero.intro,
-      primaryLabel: 'View projects', primaryUrl: '#projects', secondaryLabel: 'Download résumé', secondaryUrl: '/resume', socials: LOOP_SOCIALS,
+      primaryLabel: 'View projects', primaryUrl: '#projects', secondaryLabel: 'Download résumé', secondaryUrl: CV_PDF, socials: LOOP_SOCIALS,
       loop: ['Build', 'Learn', 'Improve', 'Repeat'], center: SHORT.split(' ').map((w) => w[0]).join(''), caption: 'while (curious) {…}', photo: '',
       terminal: ['git commit -m "faster reports"', 'php artisan test', '18 apps live · 99.9% uptime'], badge: '18+ systems running in production',
       marquee: ['Build', 'Learn', 'Improve', 'Repeat', 'Laravel', 'Node.js', 'React', 'Next.js', 'PostgreSQL'], scrollLabel: 'Scroll to explore',
@@ -462,7 +463,7 @@ const loop = demo({
     }, { paddingY: 'xl', width: 'wide', anchor: 'contact' }),
     B('loopOutro', {
       eyebrow: '// end of file', title: 'Thanks for *scrolling*.', text: 'Every project is another lap around the loop — I’d love the next one to be yours.',
-      triad: ['Ideas', 'Code', 'Impact'], links: [{ label: 'About', url: '#about' }, { label: 'Projects', url: '#projects' }, { label: 'Skills', url: '#skills' }, { label: 'Résumé', url: '/resume' }],
+      triad: ['Ideas', 'Code', 'Impact'], links: [{ label: 'About', url: '#about' }, { label: 'Projects', url: '#projects' }, { label: 'Skills', url: '#skills' }, { label: 'Résumé (PDF)', url: CV_PDF }],
       socials: LOOP_SOCIALS, topLabel: 'Back to top', topUrl: '#home',
     }, { paddingY: 'lg', width: 'wide' }),
   ],
@@ -470,4 +471,63 @@ const loop = demo({
 const loopBasePages = loop.pages;
 loop.pages = () => [...loopBasePages(), resumePage()];
 
-module.exports = [minimal, terminal, studio, corporate, swiss, freelancer, neon, brutal, story, gazette, glow, bento, loop];
+/* 14 ─ Scrapbook */
+// A warm, personal paper portfolio: polaroid hero with tape, stickers and a spinning "open to work" stamp, a ruled
+// notebook bio with skill sticky notes, project spreads with a shuffling photo deck, journal-style articles,
+// work and education as ticket stubs, and an airmail postcard for contact.
+const SHOT_SETS = [[IMG.analytics, IMG.charts, IMG.office], [IMG.workspace, IMG.screen, IMG.team], [IMG.designer, IMG.wireframes, IMG.laptop], [IMG.charts, IMG.desk, IMG.analytics], [IMG.code2, IMG.code, IMG.matrix], [IMG.laptop, IMG.code3, IMG.wireframes], [IMG.code, IMG.circuit, IMG.screen]];
+const SCRAP_SOCIALS = [{ icon: 'Linkedin', url: folio.social.linkedin, label: 'LinkedIn' }, { icon: 'Github', url: GH, label: 'GitHub' }, { icon: 'Mail', url: `mailto:${folio.contact.email}`, label: 'Email' }];
+const scrapbook = demo({
+  id: 'folio-scrapbook', name: 'Scrapbook',
+  description: 'A warm, playful paper portfolio: polaroid hero with tape, stickers and a spinning stamp, notebook bio with skill sticky notes, shuffling photo-deck projects, journal articles, ticket-stub history and an airmail postcard contact.',
+  layout: { header: 'floating' },
+  appearance: { primaryColor: '#f0532d', accentColor: '#ffd84d', backgroundColor: '#f6f0e4', surfaceColor: '#fffcf5', textColor: '#1c1a17', darkBackgroundColor: '#17150f', darkSurfaceColor: '#221f18', darkTextColor: '#f3ede1', headingFont: 'Bricolage Grotesque', bodyFont: 'DM Sans', radius: 18, colorMode: 'light', footerStyle: 'simple', headerCta: { enabled: true, label: 'Resume', url: CV_PDF } },
+  menus: {
+    header: { name: 'Main', items: [menuItem('About', '/#about'), menuItem('Projects', '/#projects'), menuItem('Blog', '/#blog'), menuItem('History', '/#history'), menuItem('Let’s talk', '/#contact')] },
+    footer: { name: 'Links', items: [menuItem('Projects', '/#projects'), menuItem('Blog', '/blog'), menuItem('Resume', CV_PDF), menuItem('Contact', '/#contact')] },
+  },
+  home: () => [
+    B('scrapHero', {
+      status: 'Open to work', greeting: 'Hello! I’m 👋', name: SHORT, role: `A _${hero.roles[0]}_`,
+      intro: 'I build ERPs, multi-tenant SaaS platforms and APIs with Laravel, Node.js, React and Next.js — software that real teams use every single day.',
+      primaryLabel: 'Let’s connect', primaryUrl: '#contact', secondaryLabel: 'About me', secondaryUrl: '#about',
+      photo: face('m3', 900), caption: 'Dhaka, 2026 ☀️', photos: [{ src: un(IMG.workspace, 700) }, { src: un(IMG.code, 700) }],
+      stamp: 'Open to work', stampEmoji: '👋', stickers: ['Laravel', 'React', 'Node.js', 'Next.js', 'PostgreSQL'], note: 'that’s me!', socials: SCRAP_SOCIALS,
+    }, { paddingY: 'lg', width: 'wide', anchor: 'home', animate: false }),
+    B('scrapAbout', {
+      label: '01 · About me', title: 'A little bit *about* me', subtitle: '',
+      text: about.text, facts: [{ label: '📍', value: hero.location }, { label: '💼', value: '3+ years' }, { label: '🚀', value: '18+ apps live' }, { label: '🗣️', value: 'Bengali · English' }], signature: SHORT.split(' ')[0],
+      groups: [
+        { title: 'Frontend', color: 'yellow', items: [LOGO('React', 'react', '#087EA4'), LOGO('Next.js', 'nextdotjs', '#000000'), LOGO('JavaScript', 'javascript', '#C9A600'), LOGO('Redux', 'redux', '#764ABC'), LOGO('Tailwind', 'tailwindcss', '#06B6D4'), LOGO('MUI', 'mui', '#007FFF')] },
+        { title: 'Backend', color: 'pink', items: [LOGO('Laravel', 'laravel', '#FF2D20'), LOGO('PHP', 'php', '#777BB4'), LOGO('Node.js', 'nodedotjs', '#5FA04E'), LOGO('Express', 'express', '#000000'), LOGO('Django', 'django', '#092E20'), LOGO('Socket.io', 'socketdotio', '#010101')] },
+        { title: 'Databases', color: 'blue', items: [LOGO('MySQL', 'mysql', '#4479A1'), LOGO('PostgreSQL', 'postgresql', '#4169E1'), LOGO('MongoDB', 'mongodb', '#47A248'), LOGO('Prisma', 'prisma', '#2D3748')] },
+        { title: 'Tools', color: 'green', items: [LOGO('Git', 'git', '#F05032'), LOGO('GitHub', 'github', '#181717'), LOGO('Ubuntu', 'ubuntu', '#E95420'), LOGO('Nginx', 'nginx', '#009639'), LOGO('Postman', 'postman', '#FF6C37')] },
+      ],
+    }, { paddingY: 'xl', width: 'wide', anchor: 'about' }),
+    B('scrapProjects', {
+      label: '02 · Projects', title: 'Featured *projects*', subtitle: 'Production systems businesses run on — plus a few things I build for fun. Tap a photo to flip through it.',
+      liveLabel: 'Live demo', codeLabel: 'Source', shuffleLabel: 'Next photo',
+      items: projects.items.slice(0, 5).map((p, i) => ({ title: p.title, category: p.category, summary: p.description, images: SHOT_SETS[i % SHOT_SETS.length].map((id) => ({ src: un(id, 1200) })), stack: p.tags, live: p.url || '', code: CODE[p.title] || '' })),
+    }, { paddingY: 'xl', width: 'wide', anchor: 'projects' }),
+    B('scrapNotes', { label: '03 · Writing', title: 'Latest *articles*', subtitle: 'Notes on performance, architecture and the things I learn shipping software.', count: 3, readLabel: 'Read more', buttonLabel: 'All articles', buttonUrl: '/blog' }, { paddingY: 'xl', width: 'wide', anchor: 'blog' }),
+    B('scrapHistory', {
+      label: '04 · History', title: 'Where I’ve *been*', subtitle: '', workTitle: 'Work history', workAnchor: 'experience', educationTitle: 'Education', educationAnchor: 'education', linkLabel: 'View certificate',
+      work: experience.items.map((e, i) => ({ title: e.title, org: e.org, location: e.location || '', period: e.period, current: i === 0, text: e.description || '', bullets: e.bullets.slice(0, 4).map(plainBullet), url: '' })),
+      education: education.items.map((e, i) => ({ title: e.title, org: e.org, location: e.location || '', period: e.period, current: i === 0, text: '', bullets: [], url: '' })),
+    }, { paddingY: 'xl', width: 'wide', anchor: 'history' }),
+    B('scrapContact', {
+      label: '05 · Contact', title: 'Let’s *talk*!', subtitle: `${hero.availability}. I usually reply within a day.`,
+      message: 'Got an idea, a role or just want to say _hi_? Drop me a note.', subjects: ['Job opportunity', 'Freelance project', 'ERP / SaaS consultation', 'Just saying hi'],
+      stampEmoji: '✉️', postmark: `${hero.location}`,
+      rows: [
+        { icon: 'MapPin', label: 'Location', value: hero.location, url: `https://maps.google.com/?q=${encodeURIComponent(hero.location)}` },
+        { icon: 'Mail', label: 'Email', value: folio.contact.email, url: `mailto:${folio.contact.email}` },
+        { icon: 'Phone', label: 'Phone', value: folio.contact.phone, url: `tel:${folio.contact.phone}` },
+      ],
+      socials: SCRAP_SOCIALS, signoff: 'Built with passion & lots of tea ☕',
+    }, { paddingY: 'xl', width: 'wide', anchor: 'contact' }),
+  ],
+});
+scrapbook.demo = bento.demo;
+
+module.exports = [minimal, terminal, studio, corporate, swiss, freelancer, neon, brutal, story, gazette, glow, bento, loop, scrapbook];

@@ -399,6 +399,104 @@ export const BLOCKS = {
       { name: 'metrics', label: 'Key results', type: 'list', itemLabel: 'label', defaults: { value: '', label: '' }, fields: [{ name: 'value', label: 'Value', type: 'text', half: true }, { name: 'label', label: 'Label', type: 'text', half: true }] },
     ],
   },
+  scrapHero: {
+    label: 'Scrapbook hero', category: 'Portfolio', icon: 'Images', description: 'Polaroid photo stack with tape, stickers, a spinning stamp and a hand-drawn underline under your name',
+    defaults: { status: 'Open to work', greeting: 'Hello! I’m 👋', name: 'Your Name', role: 'A _Software Engineer_', intro: 'A short line about what you build.', primaryLabel: 'Let’s connect', primaryUrl: '#contact', secondaryLabel: 'About me', secondaryUrl: '#about', photo: '', caption: 'hi there!', photos: [], stamp: 'Open to work', stampEmoji: '👋', stickers: ['React', 'Next.js', 'Node.js'], note: 'that’s me!', socials: [{ icon: 'Github', url: 'https://github.com', label: 'GitHub' }, { icon: 'Linkedin', url: 'https://linkedin.com', label: 'LinkedIn' }] },
+    fields: [
+      { name: 'status', label: 'Status badge (empty to hide)', type: 'text', half: true }, { name: 'greeting', label: 'Greeting', type: 'text', half: true },
+      { name: 'name', label: 'Name', type: 'text', half: true }, { name: 'role', label: 'Role (_word_ = highlighter, *word* = circled)', type: 'text', half: true },
+      { name: 'intro', label: 'Intro', type: 'textarea', rows: 3 },
+      { name: 'primaryLabel', label: 'Primary button', type: 'text', half: true }, { name: 'primaryUrl', label: 'Primary link', type: 'url', half: true },
+      { name: 'secondaryLabel', label: 'Second button', type: 'text', half: true }, { name: 'secondaryUrl', label: 'Second link', type: 'url', half: true },
+      { name: 'photo', label: 'Your photo (polaroid)', type: 'image' }, { name: 'caption', label: 'Polaroid caption', type: 'text' },
+      { name: 'photos', label: 'Photos peeking behind (up to 2)', type: 'list', itemLabel: 'src', defaults: { src: '' }, fields: [{ name: 'src', label: 'Photo', type: 'image' }] },
+      { name: 'stamp', label: 'Spinning stamp text (empty to hide)', type: 'text', half: true }, { name: 'stampEmoji', label: 'Stamp emoji', type: 'text', half: true },
+      { name: 'stickers', label: 'Stickers around the photo (up to 5)', type: 'stringList' },
+      { name: 'note', label: 'Hand-drawn note next to the photo', type: 'text' },
+      { name: 'socials', label: 'Social links', type: 'list', itemLabel: 'label', defaults: { icon: 'Globe', url: '', label: '' }, fields: [
+        { name: 'icon', label: 'Icon', type: 'icon', options: ICON_NAMES, half: true }, { name: 'label', label: 'Label', type: 'text', half: true }, { name: 'url', label: 'Link', type: 'url' },
+      ] },
+    ],
+  },
+  scrapAbout: {
+    label: 'Scrapbook about', category: 'Portfolio', icon: 'IdCard', description: 'Bio on ruled notebook paper beside skill groups as pinned sticky notes with logos',
+    defaults: { label: '01 · About me', title: 'A little bit *about* me', subtitle: '', text: 'Write your story here.', facts: [{ label: '📍', value: 'Your city' }], signature: '', groups: [{ title: 'Frontend', color: 'yellow', items: [{ label: 'React', logo: 'react', color: '', image: '' }] }] },
+    fields: [
+      { name: 'label', label: 'Label sticker', type: 'text', half: true }, { name: 'title', label: 'Title (*word* = circled)', type: 'text', half: true },
+      { name: 'subtitle', label: 'Subtitle', type: 'textarea', rows: 2 }, { name: 'text', label: 'Bio (blank line between paragraphs)', type: 'textarea', rows: 6 },
+      { name: 'facts', label: 'Quick facts', type: 'list', itemLabel: 'value', defaults: { label: '', value: '' }, fields: [{ name: 'label', label: 'Label / emoji', type: 'text', half: true }, { name: 'value', label: 'Value', type: 'text', half: true }] },
+      { name: 'signature', label: 'Signature (optional)', type: 'text' },
+      { name: 'groups', label: 'Skill sticky notes', type: 'list', itemLabel: 'title', defaults: { title: 'Group', color: 'yellow', items: [] }, fields: [
+        { name: 'title', label: 'Title', type: 'text', half: true },
+        { name: 'color', label: 'Note colour', type: 'select', options: [['yellow', 'Yellow'], ['pink', 'Pink'], ['blue', 'Blue'], ['green', 'Green'], ['orange', 'Orange'], ['purple', 'Purple']], half: true },
+        { name: 'items', label: 'Skills', type: 'list', itemLabel: 'label', defaults: { label: 'Tech', logo: '', color: '', image: '' }, fields: [
+          { name: 'label', label: 'Name', type: 'text', half: true }, { name: 'logo', label: 'simpleicons.org slug', type: 'text', half: true },
+          { name: 'color', label: 'Logo colour', type: 'color', half: true }, { name: 'image', label: 'Or own logo', type: 'image', half: true },
+        ] },
+      ] },
+    ],
+  },
+  scrapProjects: {
+    label: 'Scrapbook projects', category: 'Portfolio', icon: 'FolderGit2', description: 'Alternating project spreads with a three-photo deck you can shuffle, tech list and Live / Source buttons',
+    defaults: { label: '02 · Projects', title: 'Things I’ve *made*', subtitle: '', liveLabel: 'Live demo', codeLabel: 'Source', shuffleLabel: 'Next photo', items: [{ title: 'Project', category: 'Web app', summary: 'What it does and why it matters.', images: [], stack: ['React'], live: '', code: '' }] },
+    fields: [
+      { name: 'label', label: 'Label sticker', type: 'text', half: true }, { name: 'title', label: 'Title (*word* = circled)', type: 'text', half: true },
+      { name: 'subtitle', label: 'Subtitle', type: 'textarea', rows: 2 },
+      { name: 'liveLabel', label: 'Live button', type: 'text', half: true }, { name: 'codeLabel', label: 'Source button', type: 'text', half: true },
+      { name: 'items', label: 'Projects', type: 'list', itemLabel: 'title', defaults: { title: 'Project', category: '', summary: '', images: [], stack: [], live: '', code: '' }, fields: [
+        { name: 'title', label: 'Title', type: 'text', half: true }, { name: 'category', label: 'Category sticker', type: 'text', half: true },
+        { name: 'summary', label: 'Summary', type: 'textarea', rows: 2 },
+        { name: 'images', label: 'Screenshots (up to 3)', type: 'list', itemLabel: 'src', defaults: { src: '' }, fields: [{ name: 'src', label: 'Screenshot', type: 'image' }] },
+        { name: 'stack', label: 'Tech used', type: 'stringList' },
+        { name: 'live', label: 'Live URL', type: 'url', half: true }, { name: 'code', label: 'Source code URL', type: 'url', half: true },
+      ] },
+    ],
+  },
+  scrapNotes: {
+    label: 'Scrapbook articles', category: 'Portfolio', icon: 'Newspaper', description: 'Latest blog posts as taped journal cards with a postmark date',
+    defaults: { label: '03 · Writing', title: 'Latest *articles*', subtitle: '', count: 3, readLabel: 'Read more', buttonLabel: 'All articles', buttonUrl: '/blog' },
+    fields: [
+      { name: 'label', label: 'Label sticker', type: 'text', half: true }, { name: 'title', label: 'Title (*word* = circled)', type: 'text', half: true },
+      { name: 'subtitle', label: 'Subtitle', type: 'textarea', rows: 2 },
+      { name: 'count', label: 'Number of posts', type: 'number', half: true }, { name: 'readLabel', label: '“Read more” text', type: 'text', half: true },
+      { name: 'buttonLabel', label: 'Button', type: 'text', half: true }, { name: 'buttonUrl', label: 'Button link', type: 'url', half: true },
+    ],
+  },
+  scrapHistory: {
+    label: 'Scrapbook history', category: 'Portfolio', icon: 'Milestone', description: 'Work and education side by side as ticket-stub cards on a dashed path',
+    defaults: { label: '04 · History', title: 'Where I’ve *been*', subtitle: '', workTitle: 'Work history', workAnchor: 'experience', educationTitle: 'Education', educationAnchor: 'education', linkLabel: 'View certificate', work: [{ title: 'Role', org: 'Company', location: 'Remote', period: '2024 – Present', current: true, text: '', bullets: [], url: '' }], education: [{ title: 'B.Sc. in Computer Science', org: 'University', location: '', period: '2020 – 2024', current: false, text: '', bullets: [], url: '' }] },
+    fields: [
+      { name: 'label', label: 'Label sticker', type: 'text', half: true }, { name: 'title', label: 'Title (*word* = circled)', type: 'text', half: true },
+      { name: 'subtitle', label: 'Subtitle', type: 'textarea', rows: 2 },
+      { name: 'workTitle', label: 'Work column title', type: 'text', half: true }, { name: 'workAnchor', label: 'Work anchor', type: 'text', half: true },
+      { name: 'educationTitle', label: 'Education column title', type: 'text', half: true }, { name: 'educationAnchor', label: 'Education anchor', type: 'text', half: true },
+      { name: 'linkLabel', label: 'Certificate link text', type: 'text' },
+      ...['work', 'education'].map((name) => ({ name, label: name === 'work' ? 'Work entries' : 'Education entries', type: 'list', itemLabel: 'title', defaults: { title: '', org: '', location: '', period: '', current: false, text: '', bullets: [], url: '' }, fields: [
+        { name: 'title', label: name === 'work' ? 'Role' : 'Degree', type: 'text', half: true }, { name: 'org', label: name === 'work' ? 'Company' : 'Institution', type: 'text', half: true },
+        { name: 'location', label: 'Location (“Remote” shows a badge)', type: 'text', half: true }, { name: 'period', label: 'Period', type: 'text', half: true },
+        { name: 'current', label: 'Current', type: 'toggle' }, { name: 'text', label: 'Description', type: 'textarea', rows: 2 },
+        { name: 'bullets', label: 'Highlights', type: 'stringList' }, { name: 'url', label: 'Certificate / link (optional)', type: 'url' },
+      ] })),
+    ],
+  },
+  scrapContact: {
+    label: 'Scrapbook contact', category: 'Portfolio', icon: 'Send', description: 'Airmail postcard: message form on one side, stamp, postmark and contact lines on the other',
+    defaults: { label: '05 · Contact', title: 'Let’s *talk*!', subtitle: '', message: 'Got an idea, a role or just want to say hi? Drop me a note.', subjects: ['Job opportunity', 'Freelance project', 'Just saying hi'], stampEmoji: '✉️', postmark: 'Your city', rows: [{ icon: 'MapPin', label: 'Location', value: 'Your city', url: '' }, { icon: 'Mail', label: 'Email', value: 'you@example.com', url: 'mailto:you@example.com' }], socials: [], signoff: '' },
+    fields: [
+      { name: 'label', label: 'Label sticker', type: 'text', half: true }, { name: 'title', label: 'Title (*word* = circled)', type: 'text', half: true },
+      { name: 'subtitle', label: 'Subtitle', type: 'textarea', rows: 2 }, { name: 'message', label: 'Postcard message', type: 'textarea', rows: 2 },
+      { name: 'subjects', label: 'Subject dropdown options (empty = free text)', type: 'stringList' },
+      { name: 'stampEmoji', label: 'Stamp emoji', type: 'text', half: true }, { name: 'postmark', label: 'Postmark text', type: 'text', half: true },
+      { name: 'rows', label: 'Contact lines', type: 'list', itemLabel: 'label', defaults: { icon: 'Globe', label: '', value: '', url: '' }, fields: [
+        { name: 'icon', label: 'Icon', type: 'icon', options: ICON_NAMES, half: true }, { name: 'label', label: 'Label', type: 'text', half: true },
+        { name: 'value', label: 'Shown text', type: 'text', half: true }, { name: 'url', label: 'Link (optional, e.g. map / mailto: / tel:)', type: 'url', half: true },
+      ] },
+      { name: 'socials', label: 'Social links', type: 'list', itemLabel: 'label', defaults: { icon: 'Globe', url: '', label: '' }, fields: [
+        { name: 'icon', label: 'Icon', type: 'icon', options: ICON_NAMES, half: true }, { name: 'label', label: 'Label', type: 'text', half: true }, { name: 'url', label: 'Link', type: 'url' },
+      ] },
+      { name: 'signoff', label: 'Sign-off line', type: 'text' },
+    ],
+  },
   loopHero: {
     label: 'Loop hero', category: 'Portfolio', icon: 'RefreshCw', description: 'Headline with a highlighted word, animated Build → Learn → Improve → Repeat ring and a fixed section rail',
     defaults: { file: 'hello_world.tsx', status: 'Open to opportunities', location: 'Your city', greeting: 'Hi, I’m …', headline: 'I build *software* for a better tomorrow.', intro: 'A short line about what you do.', primaryLabel: 'View projects', primaryUrl: '#projects', secondaryLabel: 'Download résumé', secondaryUrl: '/resume', socials: [{ icon: 'Github', url: 'https://github.com', label: 'GitHub' }, { icon: 'Linkedin', url: 'https://linkedin.com', label: 'LinkedIn' }], loop: ['Build', 'Learn', 'Improve', 'Repeat'], center: 'YN', caption: 'while (curious)', photo: '', terminal: ['git commit -m "ship it"', 'npm run deploy', 'deployed in 42s'], badge: 'Open to new projects', marquee: ['Build', 'Learn', 'Improve', 'Repeat'], scrollLabel: 'Scroll to explore', rail: [{ label: 'Home', anchor: 'home' }, { label: 'About', anchor: 'about' }, { label: 'Projects', anchor: 'projects' }, { label: 'Skills', anchor: 'skills' }, { label: 'Contact', anchor: 'contact' }] },

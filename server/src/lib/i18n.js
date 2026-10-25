@@ -127,7 +127,8 @@ async function i18nConfig() {
   return (await getSettings()).i18n;
 }
 
-const isInternal = (url) => typeof url === 'string' && url.startsWith('/') && !url.startsWith('//') && !/^\/(uploads|api|admin)(\/|$)/.test(url);
+// Files (/cv.pdf, /logo.png) are not pages, so they never get a language prefix.
+const isInternal = (url) => typeof url === 'string' && url.startsWith('/') && !url.startsWith('//') && !/^\/(uploads|api|admin)(\/|$)/.test(url) && !/\.\w{2,5}([?#].*)?$/.test(url);
 
 /**
  * Returns a localized copy of an API response body. Entities found anywhere in the body get their translations;

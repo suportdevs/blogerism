@@ -25,6 +25,7 @@ export function Marked({ text = '' }) {
 }
 
 const ext = (url = '') => /^(https?:)?\/\//.test(url);
+const isFile = (url = '') => /\.\w{2,5}([?#].*)?$/.test(url);
 
 function Social({ s, className }) {
   const Icon = ICONS[s.icon] || Globe;
@@ -136,7 +137,7 @@ function LoopHero({ d }) {
                 <span className="relative">{d.primaryLabel}</span><ArrowRight className="relative h-4 w-4 transition group-hover:translate-x-1" />
               </Link>
             )}
-            {d.secondaryLabel && <a href={d.secondaryUrl || '#'} {...(ext(d.secondaryUrl) || /\.pdf$/i.test(d.secondaryUrl || '') ? { target: '_blank', rel: 'noreferrer' } : {})} className="inline-flex items-center gap-2 rounded-full border border-fg/15 bg-fg/[.04] px-7 py-4 text-sm font-semibold text-fg backdrop-blur transition hover:-translate-y-0.5 hover:border-fg/40"><Download className="h-4 w-4" />{d.secondaryLabel}</a>}
+            {d.secondaryLabel && <a href={d.secondaryUrl || '#'} {...(ext(d.secondaryUrl) || isFile(d.secondaryUrl) ? { target: '_blank', rel: 'noreferrer' } : {})} className="inline-flex items-center gap-2 rounded-full border border-fg/15 bg-fg/[.04] px-7 py-4 text-sm font-semibold text-fg backdrop-blur transition hover:-translate-y-0.5 hover:border-fg/40"><Download className="h-4 w-4" />{d.secondaryLabel}</a>}
           </div>
           {socials.length > 0 && <div className="mt-8 flex animate-fade-up gap-2.5 [animation-delay:.24s]">{socials.map((s, i) => <Social key={i} s={s} />)}</div>}
         </div>
@@ -357,7 +358,9 @@ function LoopOutro({ d }) {
         </div>
       )}
       <div className="relative mt-14 flex flex-wrap items-center justify-between gap-6 border-t border-white/20 pt-7">
-        {links.length > 0 && <nav className="flex flex-wrap gap-x-7 gap-y-2 font-mono text-sm text-white/75">{links.map((l, i) => <Link key={i} href={l.url} className="transition hover:text-white">{l.label}</Link>)}</nav>}
+        {links.length > 0 && <nav className="flex flex-wrap gap-x-7 gap-y-2 font-mono text-sm text-white/75">{links.map((l, i) => (isFile(l.url) || ext(l.url)
+          ? <a key={i} href={l.url} target="_blank" rel="noreferrer" className="transition hover:text-white">{l.label}</a>
+          : <Link key={i} href={l.url} className="transition hover:text-white">{l.label}</Link>))}</nav>}
         <div className="flex items-center gap-2.5">
           {socials.map((s, i) => <Social key={i} s={s} className="border-white/25 bg-white/10 text-white" />)}
           {d.topLabel && <a href={d.topUrl || '#'} className="ml-2 inline-flex items-center gap-1.5 rounded-full bg-white px-5 py-3 text-sm font-semibold text-[#0b0b0e] shadow-[0_14px_30px_-10px_rgb(0_0_0/0.4)] transition hover:-translate-y-0.5 hover:bg-accent"><ArrowUp className="h-4 w-4" />{d.topLabel}</a>}

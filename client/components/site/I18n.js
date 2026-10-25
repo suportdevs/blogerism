@@ -47,7 +47,8 @@ export function usePagePath() {
   return stripLocale(pathname, lang, defaultLanguage);
 }
 
-export const localeHref = (href, lang, def) => (lang && lang !== def && typeof href === 'string' && href.startsWith('/') && !href.startsWith(`/${lang}/`) && href !== `/${lang}` ? `/${lang}${href === '/' ? '' : href}` : href);
+const isFile = (href) => /\.\w{2,5}([?#].*)?$/.test(href) || href.startsWith('/uploads/');
+export const localeHref = (href, lang, def) => (lang && lang !== def && typeof href === 'string' && href.startsWith('/') && !isFile(href) && !href.startsWith(`/${lang}/`) && href !== `/${lang}` ? `/${lang}${href === '/' ? '' : href}` : href);
 
 // Same-language link target for an internal path.
 export function useLocaleHref() {
