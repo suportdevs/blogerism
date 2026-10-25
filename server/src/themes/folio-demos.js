@@ -19,6 +19,7 @@ const projects = data('projects');
 const stats = data('stats');
 const NAME = hero.name;
 const SHORT = NAME.replace(/^md\.?\s+/i, ''); // "Mamunur Rashid"
+const CV_PDF = '/Md_Mamunur_Rashid_CV.pdf'; // client/public
 
 const IMG = { desk: '1498050108023-c5249f4df085', code: '1555066931-4365d14bab8c', code2: '1587620962725-abab7fe55159', code3: '1461749280684-dccba630e2f6', screen: '1488590528505-98d2b5aba04b', laptop: '1517694712202-14dd9538aa97', analytics: '1460925895917-afdab827c52f', charts: '1551288049-bebda4e38f71', team: '1522071820081-009f0129c71c', workspace: '1497032628192-86f99bcd76bc', wireframes: '1522542550221-31fd19575a2d', designer: '1542744094-3a31f272c490', circuit: '1518770660439-4636190af475', matrix: '1526374965328-7f61d4dc18c5', mountain: '1492691527719-9d1e07e534b4', lake: '1493246507139-91e8fad9978e', office: '1497366811353-6870744d04b2' };
 const SHOTS = [IMG.analytics, IMG.charts, IMG.designer, IMG.screen, IMG.code2, IMG.wireframes, IMG.laptop];
@@ -53,17 +54,39 @@ const minimal = demo({
 /* 2 ─ Terminal */
 const terminal = demo({
   id: 'folio-terminal', name: 'Terminal',
-  description: 'A hacker-green terminal aesthetic: monospace everything, code-card hero, scrolling stack marquee, skills, experience and projects.',
+  description: 'A working terminal on a macOS / Ubuntu desktop: type or click commands (about, skills, projects, git log, contact) to explore, with a file tree, dock, themes, Tab completion and an in-terminal contact form.',
   layout: { header: 'default' },
-  appearance: { primaryColor: '#16a34a', accentColor: '#22d3ee', backgroundColor: '#f6fbf7', surfaceColor: '#e9f3ec', textColor: '#08120b', darkBackgroundColor: '#030805', darkSurfaceColor: '#0b140e', darkTextColor: '#d7f5df', headingFont: 'JetBrains Mono', bodyFont: 'JetBrains Mono', radius: 6, colorMode: 'dark', headerStyle: 'solid', footerStyle: 'simple' },
+  appearance: { primaryColor: '#5af78e', accentColor: '#57c7ff', backgroundColor: '#f4f6f8', surfaceColor: '#e8ecf0', textColor: '#0b0f14', darkBackgroundColor: '#0b0d12', darkSurfaceColor: '#14171f', darkTextColor: '#e6e8ee', headingFont: 'JetBrains Mono', bodyFont: 'JetBrains Mono', radius: 8, colorMode: 'dark', headerStyle: 'solid', footerStyle: 'simple', headerCta: { enabled: true, label: 'resume.pdf', url: CV_PDF } },
+  // Header links (#about, #projects …) run the matching terminal command.
   home: () => [
-    B('profileHero', { ...hero, greeting: '$ whoami →' }, { paddingY: 'xl', ...W, anchor: 'home', animate: false }),
-    B('textMarquee', { items: ['Laravel', 'Node.js', 'Django', 'React', 'Next.js', 'PostgreSQL'], speed: 34, twoRows: false }, { background: 'surface', paddingY: 'sm', width: 'full' }),
-    B('aboutMe', about, { paddingY: 'xl', anchor: 'about' }),
-    B('skills', skills, { background: 'surface', paddingY: 'xl', anchor: 'skills' }),
-    B('timeline', experience, { paddingY: 'xl', width: 'narrow', anchor: 'experience' }),
-    B('projects', projects, { background: 'surface', paddingY: 'xl', anchor: 'projects', ...W }),
-    contact('./contact --now'),
+    B('termShell', {
+      user: 'mamun', host: 'portfolio', theme: 'macos', name: NAME, role: hero.roles[0],
+      motd: 'Last login: on ttys001 — welcome back 👋', welcome: `Hi, I’m ${SHORT}. ${hero.availability}.`,
+      ascii: [
+        '███╗   ███╗██████╗ ',
+        '████╗ ████║██╔══██╗',
+        '██╔████╔██║██████╔╝',
+        '██║╚██╔╝██║██╔══██╗',
+        '██║ ╚═╝ ██║██║  ██║',
+        '╚═╝     ╚═╝╚═╝  ╚═╝',
+      ].join('\n'),
+      info: [
+        { label: 'OS', value: 'Portfolio OS 26.10 (full-stack)' }, { label: 'Uptime', value: '3+ years shipping code' }, { label: 'Packages', value: '18+ apps in production' },
+        { label: 'Shell', value: 'zsh · Laravel · Node.js · Django' }, { label: 'Frontend', value: 'React · Next.js · Tailwind' }, { label: 'Location', value: hero.location }, { label: 'Status', value: hero.availability },
+      ],
+      about: about.text, facts: about.facts.filter((f) => !/email|phone/i.test(f.label)),
+      skills: [
+        { title: 'backend', items: [SKILL('Laravel / PHP', 92), SKILL('Node.js & Express', 85), SKILL('REST API design', 90), SKILL('Django / Python', 70), SKILL('Microservices', 65)] },
+        { title: 'frontend', items: [SKILL('JavaScript (ES6+)', 88), SKILL('React', 84), SKILL('Next.js', 78), SKILL('Tailwind CSS', 90), SKILL('Redux Toolkit', 72)] },
+        { title: 'databases', items: [SKILL('MySQL', 90), SKILL('PostgreSQL', 82), SKILL('MongoDB', 70), SKILL('Prisma', 75), SKILL('Query optimisation', 86)] },
+        { title: 'devops', items: [SKILL('Linux / Ubuntu', 80), SKILL('Nginx', 74), SKILL('Git & GitHub', 90), SKILL('PM2 & deployments', 76)] },
+      ],
+      projects: projects.items.map((p, i) => ({ title: p.title, category: p.category, year: i < 4 ? '2024' : '2023', summary: p.description, stack: p.tags, live: p.url || '', code: CODE[p.title] || '' })),
+      experience: experience.items.map((e) => ({ title: e.title, org: e.org, location: e.location || '', period: e.period, bullets: e.bullets.slice(0, 5).map(plainBullet) })),
+      education: education.items.map((e) => ({ title: e.title, org: e.org, period: e.period })),
+      email: folio.contact.email, phone: folio.contact.phone, location: hero.location, resumeUrl: CV_PDF,
+      socials: [{ icon: 'Github', url: GH, label: 'github' }, { icon: 'Linkedin', url: folio.social.linkedin, label: 'linkedin' }, { icon: 'Mail', url: `mailto:${folio.contact.email}`, label: 'email' }],
+    }, { paddingY: 'none', width: 'full', anchor: 'home', animate: false }),
   ],
 });
 
@@ -406,7 +429,6 @@ bento.demo = async (prisma, { authors }) => {
 // skill meters, contact with a subject dropdown and an "end of file" sign-off. The lime accent is a highlighter.
 const LOOP_CATEGORY = (c) => (/saas/i.test(c) ? 'SaaS' : /erp/i.test(c) ? 'ERP systems' : 'Side projects');
 const SKILL = (label, level) => ({ label, level });
-const CV_PDF = '/Md_Mamunur_Rashid_CV.pdf'; // client/public
 const LOOP_SOCIALS = [{ icon: 'Github', url: GH, label: 'GitHub' }, { icon: 'Linkedin', url: folio.social.linkedin, label: 'LinkedIn' }, { icon: 'Mail', url: `mailto:${folio.contact.email}`, label: 'Email' }];
 const loop = demo({
   id: 'folio-loop', name: 'Loop',

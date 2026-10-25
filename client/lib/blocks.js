@@ -399,6 +399,41 @@ export const BLOCKS = {
       { name: 'metrics', label: 'Key results', type: 'list', itemLabel: 'label', defaults: { value: '', label: '' }, fields: [{ name: 'value', label: 'Value', type: 'text', half: true }, { name: 'label', label: 'Label', type: 'text', half: true }] },
     ],
   },
+  termShell: {
+    label: 'Terminal desktop', category: 'Portfolio', icon: 'Code2', description: 'A working terminal on a macOS / Ubuntu desktop: type or click commands (about, skills, projects, git log, contact, message …) to explore',
+    defaults: { user: 'guest', host: 'portfolio', theme: 'macos', name: 'Your Name', role: 'Software Engineer', motd: 'Last login on ttys001', welcome: 'Welcome to my portfolio 👋', ascii: '', info: [{ label: 'Location', value: 'Your city' }], about: 'Write your story here.', facts: [], skills: [{ title: 'Frontend', items: [{ label: 'React', level: 90 }] }], projects: [{ title: 'Project', category: 'Web app', year: '2025', summary: 'What it does.', stack: ['React'], live: '', code: '' }], experience: [{ title: 'Role', org: 'Company', location: 'Remote', period: '2024 – Present', bullets: [] }], education: [], email: 'you@example.com', phone: '', location: '', resumeUrl: '', socials: [{ icon: 'Github', url: 'https://github.com', label: 'GitHub' }] },
+    fields: [
+      { name: 'user', label: 'Prompt user', type: 'text', half: true }, { name: 'host', label: 'Prompt host', type: 'text', half: true },
+      { name: 'theme', label: 'Default theme', type: 'select', options: [['macos', 'macOS'], ['ubuntu', 'Ubuntu'], ['dracula', 'Dracula'], ['matrix', 'Matrix']] },
+      { name: 'name', label: 'Name', type: 'text', half: true }, { name: 'role', label: 'Role', type: 'text', half: true },
+      { name: 'motd', label: 'First line (e.g. Last login…)', type: 'text', half: true }, { name: 'welcome', label: 'Welcome line', type: 'text', half: true },
+      { name: 'ascii', label: 'ASCII art for neofetch (optional)', type: 'textarea', rows: 6 },
+      { name: 'info', label: 'neofetch rows', type: 'list', itemLabel: 'label', defaults: { label: 'Key', value: '' }, fields: [{ name: 'label', label: 'Key', type: 'text', half: true }, { name: 'value', label: 'Value', type: 'text', half: true }] },
+      { name: 'about', label: 'About (blank line between paragraphs)', type: 'textarea', rows: 6 },
+      { name: 'facts', label: 'About facts', type: 'list', itemLabel: 'label', defaults: { label: '', value: '' }, fields: [{ name: 'label', label: 'Label', type: 'text', half: true }, { name: 'value', label: 'Value', type: 'text', half: true }] },
+      { name: 'skills', label: 'Skill groups', type: 'list', itemLabel: 'title', defaults: { title: 'Group', items: [] }, fields: [
+        { name: 'title', label: 'Group', type: 'text' },
+        { name: 'items', label: 'Skills', type: 'list', itemLabel: 'label', defaults: { label: 'Skill', level: 75 }, fields: [{ name: 'label', label: 'Skill', type: 'text', half: true }, { name: 'level', label: 'Level (0–100)', type: 'number', half: true }] },
+      ] },
+      { name: 'projects', label: 'Projects', type: 'list', itemLabel: 'title', defaults: { title: 'Project', category: '', year: '', summary: '', stack: [], live: '', code: '' }, fields: [
+        { name: 'title', label: 'Title', type: 'text', half: true }, { name: 'category', label: 'Type', type: 'text', half: true },
+        { name: 'year', label: 'Year', type: 'text', half: true }, { name: 'summary', label: 'Summary', type: 'textarea', rows: 2 },
+        { name: 'stack', label: 'Tech used', type: 'stringList' },
+        { name: 'live', label: 'Live URL', type: 'url', half: true }, { name: 'code', label: 'Source code URL', type: 'url', half: true },
+      ] },
+      { name: 'experience', label: 'Experience (shown as git log)', type: 'list', itemLabel: 'title', defaults: { title: '', org: '', location: '', period: '', bullets: [] }, fields: [
+        { name: 'title', label: 'Role', type: 'text', half: true }, { name: 'org', label: 'Company', type: 'text', half: true },
+        { name: 'location', label: 'Location', type: 'text', half: true }, { name: 'period', label: 'Period', type: 'text', half: true },
+        { name: 'bullets', label: 'Highlights', type: 'stringList' },
+      ] },
+      { name: 'education', label: 'Education', type: 'list', itemLabel: 'title', defaults: { title: '', org: '', period: '' }, fields: [{ name: 'title', label: 'Degree', type: 'text' }, { name: 'org', label: 'Institution', type: 'text', half: true }, { name: 'period', label: 'Period', type: 'text', half: true }] },
+      { name: 'email', label: 'Email', type: 'text', half: true }, { name: 'phone', label: 'Phone', type: 'text', half: true },
+      { name: 'location', label: 'Location', type: 'text', half: true }, { name: 'resumeUrl', label: 'Résumé link (PDF)', type: 'url', half: true },
+      { name: 'socials', label: 'Social links (GitHub / LinkedIn also appear in the dock)', type: 'list', itemLabel: 'label', defaults: { icon: 'Globe', url: '', label: '' }, fields: [
+        { name: 'icon', label: 'Icon', type: 'icon', options: ICON_NAMES, half: true }, { name: 'label', label: 'Label (used by “open <label>”)', type: 'text', half: true }, { name: 'url', label: 'Link', type: 'url' },
+      ] },
+    ],
+  },
   scrapHero: {
     label: 'Scrapbook hero', category: 'Portfolio', icon: 'Images', description: 'Polaroid photo stack with tape, stickers, a spinning stamp and a hand-drawn underline under your name',
     defaults: { status: 'Open to work', greeting: 'Hello! I’m 👋', name: 'Your Name', role: 'A _Software Engineer_', intro: 'A short line about what you build.', primaryLabel: 'Let’s connect', primaryUrl: '#contact', secondaryLabel: 'About me', secondaryUrl: '#about', photo: '', caption: 'hi there!', photos: [], stamp: 'Open to work', stampEmoji: '👋', stickers: ['React', 'Next.js', 'Node.js'], note: 'that’s me!', socials: [{ icon: 'Github', url: 'https://github.com', label: 'GitHub' }, { icon: 'Linkedin', url: 'https://linkedin.com', label: 'LinkedIn' }] },

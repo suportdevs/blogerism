@@ -58,7 +58,7 @@ const set = (o, path, value) => {
 
 /* ---------------- Page blocks: which strings are text worth translating ---------------- */
 
-const NON_TEXT_KEY = /(url|href|link|image|img|src|photo|avatar|logo|icon|color|colour|anchor|slug|video|audio|poster|backdrop|cover|email|phone|whatsapp|code|timezone|username|variant|layout|align|position|size|kind|requesttype|sort|format|source|style|map|embed|action|domain|background|file|id|type|mode|interval|slot|count|columns|height|overlay|width|padding|target|lang|filter)$/i;
+const NON_TEXT_KEY = /(url|href|link|image|img|src|photo|avatar|logo|icon|color|colour|anchor|slug|video|audio|poster|backdrop|cover|email|phone|whatsapp|code|timezone|username|variant|layout|align|position|size|kind|requesttype|sort|format|source|style|map|embed|action|domain|background|file|id|type|mode|interval|slot|count|columns|height|overlay|width|padding|target|lang|filter|theme|user|host|ascii)$/i;
 const FILTER_KEYS = new Set(['category', 'categories', 'series', 'tag', 'tags', 'playlist', 'show', 'exclude', 'slugs']);
 const isText = (key, value, parentKey) => {
   if (typeof value !== 'string' || !value.trim()) return false;

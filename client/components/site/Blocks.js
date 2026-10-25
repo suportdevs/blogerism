@@ -14,6 +14,7 @@ import { GLOW_RENDERERS } from './GlowBlocks';
 import { DEV_RENDERERS } from './DevBlocks';
 import { LOOP_RENDERERS } from './LoopBlocks';
 import { SCRAP_RENDERERS } from './ScrapBlocks';
+import { TERM_RENDERERS } from './TermBlocks';
 import { CountUp } from './ShowcaseClient';
 
 /* ---------------------------------------------------------------------------
@@ -401,17 +402,20 @@ const RENDERERS = {
   ...DEV_RENDERERS,
   ...LOOP_RENDERERS,
   ...SCRAP_RENDERERS,
+  ...TERM_RENDERERS,
 };
 
 // Sticky titles need a clipping (not scrolling) section.
 const STICKY_BLOCKS = new Set(['glowAbout', 'glowTech', 'loopSkills']);
+// Edge-to-edge blocks: no section padding around them.
+const BLEED_BLOCKS = new Set(['termShell']);
 
 export default function Blocks({ blocks = [], ctx = {}, settings }) {
   return blocks.filter((b) => !b.style?.hidden).map((block) => {
     const Comp = RENDERERS[block.type];
     if (!Comp) return null;
     return (
-      <Section key={block.id} style={block.style} className={block.type === 'spacer' ? '!py-0' : STICKY_BLOCKS.has(block.type) ? '!overflow-clip' : businessSectionClass(block)}>
+      <Section key={block.id} style={block.style} className={block.type === 'spacer' ? '!py-0' : BLEED_BLOCKS.has(block.type) ? '!py-0 [&>div]:!max-w-none [&>div]:!px-0' : STICKY_BLOCKS.has(block.type) ? '!overflow-clip' : businessSectionClass(block)}>
         <span data-block-id={block.id} className="hidden" />
         <Comp d={block.data || {}} block={block} ctx={ctx} settings={settings} />
       </Section>
