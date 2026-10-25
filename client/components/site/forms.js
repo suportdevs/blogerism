@@ -75,7 +75,8 @@ function contextFromUrl() {
   return { kind: 'enquiry', details, subject: item ? `Enquiry — ${item}` : 'Enquiry', intro: 'Your enquiry includes:' };
 }
 
-export function ContactForm() {
+// subjects: optional list of topics; when given, the subject becomes a dropdown.
+export function ContactForm({ subjects = [] }) {
   const t = useT();
   const empty = { name: '', email: '', phone: '', subject: '', message: '' };
   const [form, setForm] = useState(empty);
@@ -122,7 +123,12 @@ export function ContactForm() {
       <input className="site-input" placeholder={t('yourName')} required value={form.name} onChange={set('name')} />
       <input className="site-input" type="email" placeholder={t('emailAddress')} required value={form.email} onChange={set('email')} />
       <input className="site-input" placeholder={t('phoneOptional')} value={form.phone} onChange={set('phone')} />
-      <input className="site-input" placeholder={t('subject')} value={form.subject} onChange={set('subject')} />
+      {subjects.length > 0 && !context ? (
+        <select className={cn('site-input', !form.subject && 'text-fg/40')} value={form.subject} onChange={set('subject')}>
+          <option value="">{t('subject')}</option>
+          {subjects.map((s) => <option key={s} value={s} className="text-fg">{s}</option>)}
+        </select>
+      ) : <input className="site-input" placeholder={t('subject')} value={form.subject} onChange={set('subject')} />}
       <textarea className="site-input min-h-[140px] sm:col-span-2" placeholder={t('howCanWeHelp')} required value={form.message} onChange={set('message')} />
       {state.status === 'error' && <p className="text-sm text-rose-500 sm:col-span-2">{state.message}</p>}
       <button className="btn-site-primary sm:col-span-2" disabled={state.status === 'loading'}>

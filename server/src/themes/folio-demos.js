@@ -340,22 +340,25 @@ const bento = demo({
   ],
 });
 
+// Printable résumé at /resume, generated from the same CV data (Bento and Loop).
+const resumePage = () => ({
+  slug: 'resume', title: 'Résumé', template: 'full-width', seoTitle: `Résumé — ${NAME}`,
+  blocks: [B('resumeSheet', {
+    name: NAME, role: hero.roles[0], email: folio.contact.email, phone: folio.contact.phone, location: hero.location, website: '',
+    links: [{ label: GH.replace(/^https?:\/\//, ''), url: GH }, { label: folio.social.linkedin.replace(/^https?:\/\//, ''), url: folio.social.linkedin }],
+    summary: about.text.split(/\n\n/)[0],
+    experience: experience.items.map((e) => ({ role: e.title, company: e.org, period: e.period, location: e.location, bullets: e.bullets.slice(0, 6).map(plainBullet) })),
+    projects: projects.items.slice(0, 6).map((p) => ({ title: p.title, url: p.url || '', summary: p.description })),
+    skills: skills.groups.filter((g) => g.title !== 'Soft skills').map((g) => ({ title: g.title, items: g.items })),
+    education: education.items.map((e) => ({ title: e.title, org: e.org, period: e.period })),
+    printLabel: 'Download PDF', note: 'Always up to date — generated from this website.',
+  }, { paddingY: 'xl', width: 'wide', animate: false })],
+});
+
 const bentoBasePages = bento.pages;
 bento.pages = () => [
   ...bentoBasePages(),
-  {
-    slug: 'resume', title: 'Résumé', template: 'full-width', seoTitle: `Résumé — ${NAME}`,
-    blocks: [B('resumeSheet', {
-      name: NAME, role: hero.roles[0], email: folio.contact.email, phone: folio.contact.phone, location: hero.location, website: '',
-      links: [{ label: GH.replace(/^https?:\/\//, ''), url: GH }, { label: folio.social.linkedin.replace(/^https?:\/\//, ''), url: folio.social.linkedin }],
-      summary: about.text.split(/\n\n/)[0],
-      experience: experience.items.map((e) => ({ role: e.title, company: e.org, period: e.period, location: e.location, bullets: e.bullets.slice(0, 6).map(plainBullet) })),
-      projects: projects.items.slice(0, 6).map((p) => ({ title: p.title, url: p.url || '', summary: p.description })),
-      skills: skills.groups.filter((g) => g.title !== 'Soft skills').map((g) => ({ title: g.title, items: g.items })),
-      education: education.items.map((e) => ({ title: e.title, org: e.org, period: e.period })),
-      printLabel: 'Download PDF', note: 'Always up to date — generated from this website.',
-    }, { paddingY: 'xl', width: 'wide', animate: false })],
-  },
+  resumePage(),
   caseStudy({
     slug: 'akboria-erp-case-study', title: 'One ERP for six businesses', project: akboria, client: 'Akboria Limited', year: '2024', duration: 'Ongoing',
     stack: ['Laravel', 'MySQL', 'Tailwind CSS', 'REST APIs', 'RBAC'], cover: IMG.analytics, gallery: [IMG.charts, IMG.laptop],
@@ -397,4 +400,74 @@ bento.demo = async (prisma, { authors }) => {
   ] });
 };
 
-module.exports = [minimal, terminal, studio, corporate, swiss, freelancer, neon, brutal, story, gazette, glow, bento];
+/* 13 ─ Loop */
+// A dark, code-flavoured portfolio built around a Build → Learn → Improve → Repeat cycle: animated loop-ring hero with
+// a fixed section rail, numbered "// 01. about_me" headings, a profile.json card, filterable projects, segmented
+// skill meters, contact with a subject dropdown and an "end of file" sign-off. The lime accent is a highlighter.
+const LOOP_CATEGORY = (c) => (/saas/i.test(c) ? 'SaaS' : /erp/i.test(c) ? 'ERP systems' : 'Side projects');
+const SKILL = (label, level) => ({ label, level });
+const LOOP_SOCIALS = [{ icon: 'Github', url: GH, label: 'GitHub' }, { icon: 'Linkedin', url: folio.social.linkedin, label: 'LinkedIn' }, { icon: 'Mail', url: `mailto:${folio.contact.email}`, label: 'Email' }];
+const loop = demo({
+  id: 'folio-loop', name: 'Loop',
+  description: 'A dark, code-flavoured developer portfolio: animated Build → Learn → Improve → Repeat ring, fixed section rail, numbered comment-style headings, profile.json card, filterable projects, segmented skill meters and an “end of file” sign-off.',
+  layout: { header: 'minimal' },
+  appearance: { primaryColor: '#6c5cff', accentColor: '#c8f53b', backgroundColor: '#f4f2ec', surfaceColor: '#ffffff', textColor: '#111114', darkBackgroundColor: '#0b0b0e', darkSurfaceColor: '#141418', darkTextColor: '#ecebe4', headingFont: 'Space Grotesk', bodyFont: 'Inter', radius: 14, colorMode: 'dark', footerStyle: 'simple', headerCta: { enabled: true, label: 'Let’s connect', url: folio.social.linkedin } },
+  menus: {
+    header: { name: 'Main', items: [menuItem('Home', '/#home'), menuItem('About', '/#about'), menuItem('Projects', '/#projects'), menuItem('Skills', '/#skills'), menuItem('Contact', '/#contact')] },
+    footer: { name: 'Links', items: [menuItem('Projects', '/#projects'), menuItem('Résumé', '/resume'), menuItem('Blog', '/blog'), menuItem('Contact', '/#contact')] },
+  },
+  home: () => [
+    B('loopHero', {
+      file: 'hello_world.tsx', status: hero.availability, location: hero.location, greeting: `Hi, I’m ${SHORT} —`,
+      headline: 'I build *software* that businesses run on.', intro: hero.intro,
+      primaryLabel: 'View projects', primaryUrl: '#projects', secondaryLabel: 'Download résumé', secondaryUrl: '/resume', socials: LOOP_SOCIALS,
+      loop: ['Build', 'Learn', 'Improve', 'Repeat'], center: SHORT.split(' ').map((w) => w[0]).join(''), caption: 'while (curious) {…}', photo: '',
+      terminal: ['git commit -m "faster reports"', 'php artisan test', '18 apps live · 99.9% uptime'], badge: '18+ systems running in production',
+      marquee: ['Build', 'Learn', 'Improve', 'Repeat', 'Laravel', 'Node.js', 'React', 'Next.js', 'PostgreSQL'], scrollLabel: 'Scroll to explore',
+      rail: [{ label: 'Home', anchor: 'home' }, { label: 'About', anchor: 'about' }, { label: 'Projects', anchor: 'projects' }, { label: 'Skills', anchor: 'skills' }, { label: 'Contact', anchor: 'contact' }],
+    }, { paddingY: 'lg', width: 'wide', anchor: 'home', animate: false }),
+    B('loopAbout', {
+      index: '01', file: 'about_me', title: 'Turning messy workflows into *fast, reliable* software.', subtitle: '',
+      text: about.text, quote: 'Good software disappears — people just get their work done.', quoteBy: SHORT,
+      cardFile: 'profile.json', education: education.items.slice(0, 2).map((e) => ({ title: e.title, org: e.org, period: e.period })),
+      interests: ['System design', 'Performance tuning', 'Open source', 'Mentoring'], currently: 'Application Developer @ Legend IT Solution',
+      stats: [...stats.items.slice(0, 3), { value: '∞', label: 'Always curious' }],
+    }, { paddingY: 'xl', width: 'wide', anchor: 'about' }),
+    B('loopProjects', {
+      index: '02', file: 'projects', title: 'Things I’ve *shipped*', subtitle: 'Production ERPs and SaaS platforms used every day — plus a few things I build for fun.',
+      allLabel: 'All', viewLabel: 'View project', codeLabel: 'Source code', featuredLabel: 'Featured', buttonLabel: 'More on GitHub', buttonUrl: GH,
+      items: projects.items.map((p, i) => ({ title: p.title, category: LOOP_CATEGORY(p.category), year: i < 4 ? '2024' : '2023', summary: p.description, image: un(SHOTS[i % SHOTS.length], 1400), stack: p.tags.slice(0, 4), live: p.url || '', code: CODE[p.title] || '', featured: i === 0 })),
+    }, { paddingY: 'xl', width: 'wide', anchor: 'projects' }),
+    B('loopSkills', {
+      index: '03', file: 'toolbox', title: 'My *toolbox*', subtitle: 'What I reach for when something has to work in production.',
+      allLabel: 'All', limit: 8, showingLabel: 'Showing', moreLabel: 'Show all', lessLabel: 'Show less',
+      quote: 'Tools change every year. Curiosity, fundamentals and good habits don’t.',
+      stats: [{ value: '20+', label: 'Technologies' }, { value: '150+', label: 'REST APIs built' }],
+      groups: [
+        { title: 'Backend', items: [SKILL('Laravel / PHP', 92), SKILL('Node.js & Express', 85), SKILL('REST API design', 90), SKILL('Django / Python', 70), SKILL('Microservices', 65)] },
+        { title: 'Frontend', items: [SKILL('JavaScript (ES6+)', 88), SKILL('React', 84), SKILL('Next.js', 78), SKILL('Tailwind CSS', 90), SKILL('Redux Toolkit', 72)] },
+        { title: 'Databases', items: [SKILL('MySQL', 90), SKILL('PostgreSQL', 82), SKILL('MongoDB', 70), SKILL('Prisma', 75), SKILL('Query optimisation', 86)] },
+        { title: 'DevOps', items: [SKILL('Linux / Ubuntu', 80), SKILL('Nginx', 74), SKILL('Git & GitHub', 90), SKILL('PM2 & deployments', 76), SKILL('Socket.io', 70)] },
+      ],
+    }, { paddingY: 'xl', width: 'wide', anchor: 'skills' }),
+    B('loopContact', {
+      index: '04', file: 'contact', title: 'Let’s build something *together*', subtitle: `${hero.availability}. I usually reply within 24 hours.`,
+      cards: [
+        { icon: 'Mail', label: 'Email', value: folio.contact.email, url: `mailto:${folio.contact.email}` },
+        { icon: 'Github', label: 'GitHub', value: GH.replace(/^https?:\/\//, ''), url: GH },
+        { icon: 'Linkedin', label: 'LinkedIn', value: folio.social.linkedin.replace(/^https?:\/\//, ''), url: folio.social.linkedin },
+        { icon: 'MapPin', label: 'Location', value: `${hero.location} · GMT+6`, url: '' },
+      ],
+      note: '', subjects: ['Full-time role', 'Freelance project', 'ERP / SaaS consultation', 'Collaboration', 'Just saying hi'],
+    }, { paddingY: 'xl', width: 'wide', anchor: 'contact' }),
+    B('loopOutro', {
+      eyebrow: '// end of file', title: 'Thanks for *scrolling*.', text: 'Every project is another lap around the loop — I’d love the next one to be yours.',
+      triad: ['Ideas', 'Code', 'Impact'], links: [{ label: 'About', url: '#about' }, { label: 'Projects', url: '#projects' }, { label: 'Skills', url: '#skills' }, { label: 'Résumé', url: '/resume' }],
+      socials: LOOP_SOCIALS, topLabel: 'Back to top', topUrl: '#home',
+    }, { paddingY: 'lg', width: 'wide' }),
+  ],
+});
+const loopBasePages = loop.pages;
+loop.pages = () => [...loopBasePages(), resumePage()];
+
+module.exports = [minimal, terminal, studio, corporate, swiss, freelancer, neon, brutal, story, gazette, glow, bento, loop];

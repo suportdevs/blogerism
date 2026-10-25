@@ -239,7 +239,8 @@ function ResumeSheet({ d }) {
   return (
     <div>
       {/* Only the sheet is printed; links print as plain text. */}
-      <style>{'@page{size:A4;margin:14mm}@media print{header,footer,nav,.fixed,.print\\:hidden{display:none!important}html,body,main,section{background:#fff!important;padding:0!important;margin:0!important;overflow:visible!important;min-height:0!important}section>div{max-width:none!important;padding:0!important}.reveal{opacity:1!important;transform:none!important}#resume-sheet{max-width:none!important;border:0!important;box-shadow:none!important;padding:0!important;background:#fff!important;color:#111!important}#resume-sheet a{color:#111!important;text-decoration:none}#resume-sheet .break-inside-avoid{break-inside:avoid}}'}</style>
+      {/* Raw CSS: as a text child, React escapes ">" on the server and hydration fails. */}
+      <style dangerouslySetInnerHTML={{ __html: '@page{size:A4;margin:14mm}@media print{header,footer,nav,.fixed,.print\\:hidden{display:none!important}html,body,main,section{background:#fff!important;padding:0!important;margin:0!important;overflow:visible!important;min-height:0!important}section>div{max-width:none!important;padding:0!important}.reveal{opacity:1!important;transform:none!important}#resume-sheet{max-width:none!important;border:0!important;box-shadow:none!important;padding:0!important;background:#fff!important;color:#111!important}#resume-sheet a{color:#111!important;text-decoration:none}#resume-sheet .break-inside-avoid{break-inside:avoid}}' }} />
       <div className="mx-auto mb-6 flex max-w-[860px] flex-wrap items-center justify-between gap-3 print:hidden">
         <p className="text-sm text-fg/55">{d.note || 'Always up to date — generated from this website.'}</p>
         <PrintButton label={d.printLabel || 'Download PDF'} />

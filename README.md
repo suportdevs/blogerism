@@ -102,7 +102,7 @@ The site is one kind of website at a time, chosen under **Admin â†’ Appeara
 | **Herald** | Daily, Broadsheet, Tech, Business, Sports, Culture, City, Live, Reader, Investigations |
 | **Vidora** | Creators, Toons, Festival, Academy, Neon, Newsroom, Gallery, Shorts, Studio, Live, **Porda** |
 | **Marquee** | Prime, Kids, Docs, Anime, Premiere, Binge, Indie, Landing, Noir, Family |
-| **Folio** | Minimal, Terminal, Studio, Corporate, Swiss, Freelancer, Neon, Brutal, Story, Gazette, **Glow**, **Bento** |
+| **Folio** | Minimal, Terminal, Studio, Corporate, Swiss, Freelancer, Neon, Brutal, Story, Gazette, **Glow**, **Bento**, **Loop** |
 | **Forge** | Zen, Box, Fight, Coach, Club, Her, Run, App, Dojo, Chain |
 
 **Porda** (Vidora) is a Bengali OTT streaming demo â€” Bengali fonts and menus, top-10 row, series rails, à§³ subscription plans. It is the one demo that brings its own content: *Install demo & activate* adds Bengali series, episodes, categories and FAQs (this replaces the Vidora family's content, so the other Vidora versions will show it too).

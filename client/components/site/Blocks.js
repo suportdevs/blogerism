@@ -12,6 +12,7 @@ import { INTERACTIVE_RENDERERS } from './InteractiveBlocks';
 import { BUSINESS_RENDERERS, businessSectionClass } from './BusinessBlocks';
 import { GLOW_RENDERERS } from './GlowBlocks';
 import { DEV_RENDERERS } from './DevBlocks';
+import { LOOP_RENDERERS } from './LoopBlocks';
 import { CountUp } from './ShowcaseClient';
 
 /* ---------------------------------------------------------------------------
@@ -397,10 +398,11 @@ const RENDERERS = {
   ...BUSINESS_RENDERERS,
   ...GLOW_RENDERERS,
   ...DEV_RENDERERS,
+  ...LOOP_RENDERERS,
 };
 
 // Sticky titles need a clipping (not scrolling) section.
-const STICKY_BLOCKS = new Set(['glowAbout', 'glowTech']);
+const STICKY_BLOCKS = new Set(['glowAbout', 'glowTech', 'loopSkills']);
 
 export default function Blocks({ blocks = [], ctx = {}, settings }) {
   return blocks.filter((b) => !b.style?.hidden).map((block) => {
