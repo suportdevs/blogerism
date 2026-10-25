@@ -1,13 +1,22 @@
 import '../globals.css';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import { Toaster } from 'sonner';
+import { fetchPublic } from '@/lib/server';
+import { EDITION } from '@/lib/edition';
 
 const font = Plus_Jakarta_Sans({ subsets: ['latin'], variable: '--font-admin', display: 'swap' });
 
-export const metadata = {
-  title: { default: 'Themewright Admin', template: '%s · Themewright' },
-  robots: { index: false, follow: false },
-};
+// Tab title and favicon follow Settings → Admin panel; the admin still loads if the API is down.
+export async function generateMetadata() {
+  let brand = {};
+  try { brand = (await fetchPublic('/admin-brand', { revalidate: 10, allow404: true })) || {}; } catch { /* API unreachable */ }
+  const name = brand.name || EDITION.brand;
+  return {
+    title: { default: `${name} Admin`, template: `%s · ${name}` },
+    robots: { index: false, follow: false },
+    ...(brand.favicon ? { icons: { icon: brand.favicon } } : {}),
+  };
+}
 
 const themeScript = `(function(){try{var m=localStorage.getItem('admin-theme');if(m==='dark'||(!m&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark')}catch(e){}})()`;
 

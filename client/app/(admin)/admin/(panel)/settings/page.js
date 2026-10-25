@@ -2,17 +2,20 @@
 
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { Code2, Globe, Heart, Loader2, Mail, Save, Search, Send, Settings, Share2, Facebook, Twitter, Instagram, Linkedin, Youtube, Github, AtSign, MessageCircle, PhoneCall, Languages, Plus, X, Sparkles } from 'lucide-react';
+import { Code2, Globe, Heart, Loader2, Mail, Save, Search, Send, Settings, Share2, Facebook, Twitter, Instagram, Linkedin, Youtube, Github, AtSign, MessageCircle, PhoneCall, Languages, Plus, X, Sparkles, LayoutDashboard } from 'lucide-react';
 import Link from 'next/link';
 import { LANGUAGE_PRESETS } from '@/lib/i18n';
 import { api } from '@/lib/api';
 import { useApi, useSaveShortcut } from '@/lib/hooks';
 import { cn } from '@/lib/utils';
 import { ImageField } from '@/components/admin/Media';
+import AdminLogo from '@/components/admin/AdminLogo';
+import { ADMIN_BRAND_DEFAULTS, setAdminBrand, withBrandDefaults } from '@/lib/adminBrand';
 import { Card, Field, PageHeader, PageLoader, Toggle } from '@/components/admin/ui';
 
 const TABS = [
   { key: 'general', label: 'General', icon: Settings, description: 'Site identity, homepage and reading options' },
+  { key: 'admin', label: 'Admin panel', icon: LayoutDashboard, description: 'Name, logo and login screen of this admin panel' },
   { key: 'seo', label: 'SEO', icon: Search, description: 'Default meta tags, indexing and analytics' },
   { key: 'social', label: 'Social', icon: Share2, description: 'Profiles linked in the header and footer' },
   { key: 'contact', label: 'Contact', icon: Mail, description: 'Details shown on contact blocks and footer' },
@@ -44,7 +47,9 @@ export default function SettingsPage() {
   const save = async () => {
     setSaving(true);
     try {
-      setAll(await api.put(`/admin/settings/${tab}`, all[tab]));
+      const saved = await api.put(`/admin/settings/${tab}`, all[tab]);
+      setAll(saved);
+      if (tab === 'admin') setAdminBrand(saved.admin);
       toast.success('Settings saved');
     } catch (e) { toast.error(e.message); } finally { setSaving(false); }
   };
@@ -78,6 +83,54 @@ export default function SettingsPage() {
         </nav>
 
         <Card title={meta.label} description={meta.description}>
+          {tab === 'admin' && (() => {
+            const brand = withBrandDefaults(s);
+            const ph = (k) => ({ placeholder: ADMIN_BRAND_DEFAULTS[k] });
+            return (
+              <div className="space-y-8">
+                {/* Live preview of the sidebar header and the login screen */}
+                <div className="grid gap-4 md:grid-cols-[260px_1fr]">
+                  <div className="flex items-center gap-3 rounded-2xl bg-ink-950 p-4">
+                    <AdminLogo brand={brand} className="h-9 w-9" />
+                    <div className="min-w-0 leading-tight">
+                      <div className="truncate font-extrabold text-white">{brand.name}</div>
+                      <div className="truncate text-[11px] font-medium text-ink-500">{brand.subtitle || 'Theme name'}</div>
+                    </div>
+                  </div>
+                  <div className="relative overflow-hidden rounded-2xl bg-ink-950 p-5 text-white">
+                    {brand.loginImage && <img src={brand.loginImage} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />}
+                    <div className="absolute -left-10 -top-10 h-40 w-40 rounded-full bg-brand-500/40 blur-3xl" />
+                    <div className="relative">
+                      {brand.loginBadge && <span className="mb-2 inline-flex rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-semibold">{brand.loginBadge}</span>}
+                      <div className="text-xl font-extrabold leading-tight">{brand.loginTitle} <span className="bg-gradient-to-r from-brand-300 to-fuchsia-300 bg-clip-text text-transparent">{brand.loginHighlight}</span></div>
+                      <div className="mt-1 line-clamp-2 text-xs text-ink-300">{brand.loginText}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid gap-5 md:grid-cols-2">
+                  <Field label="Admin panel name" hint="Sidebar, login screen and browser tab.">{input('name', ph('name'))}</Field>
+                  <Field label="Subtitle" hint="Under the name in the sidebar. Empty shows the active theme.">{input('subtitle', { placeholder: 'e.g. Portfolio dashboard' })}</Field>
+                  <Field label="Logo" hint="Square works best. Empty shows the first letter of the name."><ImageField value={s.logo} onChange={set('logo')} aspect="aspect-square w-24" /></Field>
+                  <Field label="Admin favicon" hint="Browser-tab icon for the admin panel."><ImageField value={s.favicon} onChange={set('favicon')} aspect="aspect-square w-24" /></Field>
+                </div>
+
+                <div>
+                  <h3 className="mb-4 text-sm font-bold text-ink-900 dark:text-white">Login screen</h3>
+                  <div className="grid gap-5 md:grid-cols-2">
+                    <Field label="Badge" hint="Small pill above the headline.">{input('loginBadge', ph('loginBadge'))}</Field>
+                    <Field label="Footer text" hint="Empty shows © year and the panel name.">{input('footerText', { placeholder: `© ${new Date().getFullYear()} ${brand.name}` })}</Field>
+                    <Field label="Headline">{input('loginTitle', ph('loginTitle'))}</Field>
+                    <Field label="Headline highlight" hint="Shown in gradient after the headline.">{input('loginHighlight', ph('loginHighlight'))}</Field>
+                    <Field label="Description" className="md:col-span-2"><textarea className="a-textarea" rows={2} value={s.loginText || ''} placeholder={ADMIN_BRAND_DEFAULTS.loginText} onChange={(e) => set('loginText')(e.target.value)} /></Field>
+                    <Field label="Welcome title">{input('welcomeTitle', ph('welcomeTitle'))}</Field>
+                    <Field label="Welcome text">{input('welcomeText', ph('welcomeText'))}</Field>
+                    <Field label="Background image (optional)" hint="Shown behind the left side of the login screen." className="md:col-span-2"><ImageField value={s.loginImage} onChange={set('loginImage')} /></Field>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
           {tab === 'general' && (
             <div className="grid gap-5 md:grid-cols-2">
               <Field label="Site name">{input('siteName')}</Field>

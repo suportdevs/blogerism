@@ -1,38 +1,48 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Battery, ChevronDown, ChevronRight, FileCode2, FileJson, FileText, Folder, FolderOpen, Github, Linkedin, Mail, Minus, ScrollText, Square, Terminal as TermIcon, Wifi, X } from 'lucide-react';
 import { API_URL } from '@/lib/api';
 import { cn } from '@/lib/utils';
 
 /*
- * A working terminal for the "Terminal" portfolio: macOS / Ubuntu / Dracula / Matrix themes, a desktop with a dock,
- * a file-tree sidebar, typed or clicked commands (help, about, skills, projects, git log …), Tab completion, history,
- * and an in-terminal contact form. All content comes from the block's data (see TermBlocks.js).
+ * A working, animated terminal for the "Terminal" portfolio: a boot sequence, commands that type themselves when
+ * clicked, a spinner before each output, output that streams in line by line and progress-bar skills. macOS /
+ * Ubuntu / Dracula / Matrix themes, a desktop with a dock, a file-tree sidebar, Tab completion, history and an
+ * in-terminal contact form. All content comes from the block's data (see TermBlocks.js).
  */
 
 const THEMES = {
   macos: {
     label: 'macOS', chrome: 'mac', bg: 'rgba(24,24,27,0.84)', bar: 'rgba(48,48,52,0.9)', side: 'rgba(36,36,40,0.62)', border: 'rgba(255,255,255,0.12)',
     fg: '#e7e7ea', dim: '#8d8d96', user: '#5af78e', path: '#57c7ff', accent: '#ff6ac1', warn: '#f3f99d', err: '#ff5c57', sel: 'rgba(87,199,255,0.28)',
-    wall: 'radial-gradient(at 18% 22%, #ff7a59 0, transparent 42%), radial-gradient(at 82% 12%, #7b5cff 0, transparent 48%), radial-gradient(at 55% 95%, #1fb6ff 0, transparent 52%), linear-gradient(135deg, #1b1340, #0b1838)',
+    wall: 'linear-gradient(135deg, #1b1340, #0b1838)', blobs: ['#ff7a59', '#7b5cff', '#1fb6ff'],
   },
   ubuntu: {
     label: 'Ubuntu', chrome: 'gnome', bg: 'rgba(48,10,36,0.96)', bar: '#2b2b2b', side: 'rgba(28,6,21,0.85)', border: 'rgba(255,255,255,0.08)',
     fg: '#ffffff', dim: '#b58bb0', user: '#8ae234', path: '#729fcf', accent: '#e95420', warn: '#fce94f', err: '#ef2929', sel: 'rgba(233,84,32,0.35)',
-    wall: 'radial-gradient(at 72% 28%, #e95420 0, transparent 38%), radial-gradient(at 18% 82%, #9b2c86 0, transparent 52%), linear-gradient(135deg, #2c001e, #5e2750 60%, #2c001e)',
+    wall: 'linear-gradient(135deg, #2c001e, #5e2750 60%, #2c001e)', blobs: ['#e95420', '#9b2c86', '#f99b11'],
   },
   dracula: {
     label: 'Dracula', chrome: 'mac', bg: 'rgba(40,42,54,0.92)', bar: 'rgba(33,34,44,0.95)', side: 'rgba(33,34,44,0.75)', border: 'rgba(189,147,249,0.18)',
     fg: '#f8f8f2', dim: '#7c83a8', user: '#50fa7b', path: '#bd93f9', accent: '#ff79c6', warn: '#f1fa8c', err: '#ff5555', sel: 'rgba(189,147,249,0.3)',
-    wall: 'radial-gradient(at 25% 25%, #ff79c6 0, transparent 40%), radial-gradient(at 80% 70%, #8be9fd 0, transparent 40%), linear-gradient(135deg, #191a21, #44275a)',
+    wall: 'linear-gradient(135deg, #191a21, #44275a)', blobs: ['#ff79c6', '#8be9fd', '#bd93f9'],
   },
   matrix: {
-    label: 'Matrix', chrome: 'gnome', bg: 'rgba(0,8,2,0.94)', bar: '#020c04', side: 'rgba(0,14,4,0.85)', border: 'rgba(0,255,102,0.16)',
+    label: 'Matrix', chrome: 'gnome', bg: 'rgba(0,8,2,0.9)', bar: '#020c04', side: 'rgba(0,14,4,0.85)', border: 'rgba(0,255,102,0.16)',
     fg: '#b6ffcc', dim: '#3f9a5b', user: '#00ff66', path: '#00d1ff', accent: '#00ff66', warn: '#d4ff4f', err: '#ff4d4d', sel: 'rgba(0,255,102,0.25)',
-    wall: 'radial-gradient(at 50% 40%, #0b3d1a 0, transparent 60%), repeating-linear-gradient(90deg, rgba(0,255,102,0.05) 0 1px, transparent 1px 22px), #000',
+    wall: '#000', blobs: [], rain: true,
   },
 };
+
+// Commands that "work" for a moment before printing, with the spinner label shown meanwhile.
+const SPIN = {
+  about: 'reading about.md', whoami: 'reading about.md', skills: 'parsing skills.json', projects: 'scanning ~/portfolio/projects', experience: 'git log --decorate',
+  work: 'git log --decorate', git: 'git log --decorate', education: 'reading education.log', contact: 'sourcing contact.sh', neofetch: 'collecting system info',
+  cat: 'reading file', social: 'resolving links',
+};
+const BOOT = ['Started portfolio.service — personal site daemon', 'Mounted /home/~/projects', 'Loaded skills.json (4 groups)', 'Reached target Developer Mode'];
+const SPINNER = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
 
 const slug = (s = '') => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 const hash7 = (s = '') => {
@@ -42,6 +52,92 @@ const hash7 = (s = '') => {
 };
 const ext = (url = '') => /^(https?:|mailto:|tel:)/.test(url) || /\.\w{2,5}([?#].*)?$/.test(url);
 const SECTION_HASHES = { about: 'about', skills: 'skills', experience: 'git log', projects: 'projects', education: 'education', contact: 'contact', home: null };
+const reducedMotion = () => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+const useIsoLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+
+/* ------------------------------ Animated pieces ------------------------------ */
+
+// Streams an output in: every leaf line fades and slides in, one after another.
+function Reveal({ children }) {
+  const ref = useRef();
+  useIsoLayoutEffect(() => {
+    const root = ref.current;
+    if (!root) return;
+    const leaves = [...root.querySelectorAll('div, p')].filter((el) => !el.querySelector('div, p'));
+    (leaves.length ? leaves : [root]).forEach((el, i) => {
+      el.style.animation = 'term-line .32s cubic-bezier(.2,.7,.2,1) backwards';
+      el.style.animationDelay = `${Math.min(i, 60) * 32}ms`;
+    });
+  }, []);
+  return <div ref={ref}>{children}</div>;
+}
+
+function Spinner({ label }) {
+  const [f, setF] = useState(0);
+  useEffect(() => { const t = setInterval(() => setF((x) => x + 1), 80); return () => clearInterval(t); }, []);
+  return <span style={{ color: 'var(--t-dim)' }}><span style={{ color: 'var(--t-accent)' }}>{SPINNER[f % SPINNER.length]}</span> {label}…</span>;
+}
+
+// A progress bar that fills up to the skill level.
+function Bar({ level }) {
+  const n = Math.round(level / 5);
+  const [shown, setShown] = useState(0);
+  useEffect(() => {
+    if (reducedMotion()) { setShown(n); return undefined; }
+    let i = 0;
+    const t = setInterval(() => { i += 1; setShown(Math.min(i, n)); if (i >= n) clearInterval(t); }, 28);
+    return () => clearInterval(t);
+  }, [n]);
+  // Real segments instead of █░ glyphs, which many fonts draw at uneven widths.
+  return (
+    <>
+      <span className="flex gap-[2px]">
+        {Array.from({ length: 20 }, (_, i) => (
+          <span key={i} className="h-[0.85em] w-[0.42em] rounded-[1px] transition-colors duration-150 sm:w-[0.55em]"
+            style={{ background: i < shown ? 'var(--t-user)' : 'var(--t-sel)', boxShadow: i === shown - 1 ? '0 0 8px var(--t-user)' : undefined }} />
+        ))}
+      </span>
+      <span className="text-right tabular-nums" style={{ color: 'var(--t-warn)' }}>{Math.round((shown / 20) * 100)}%</span>
+    </>
+  );
+}
+
+// Falling glyphs behind the Matrix theme.
+function MatrixRain() {
+  const ref = useRef();
+  useEffect(() => {
+    if (reducedMotion()) return undefined;
+    const canvas = ref.current;
+    const ctx = canvas.getContext('2d');
+    const glyphs = 'アイウエオカキクケコサシスセソタチツテトナニヌネノ0123456789<>/{}=+*';
+    let drops = [];
+    let raf;
+    let last = 0;
+    const size = () => {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+      drops = Array.from({ length: Math.ceil(canvas.width / 16) }, () => Math.random() * -50);
+    };
+    const draw = (time) => {
+      raf = requestAnimationFrame(draw);
+      if (time - last < 55) return;
+      last = time;
+      ctx.fillStyle = 'rgba(0,0,0,0.08)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.font = '15px monospace';
+      drops.forEach((y, i) => {
+        ctx.fillStyle = Math.random() > 0.96 ? '#d4ffe0' : '#00ff66';
+        ctx.fillText(glyphs[Math.floor(Math.random() * glyphs.length)], i * 16, y * 16);
+        drops[i] = y * 16 > canvas.height && Math.random() > 0.975 ? 0 : y + 1;
+      });
+    };
+    size();
+    raf = requestAnimationFrame(draw);
+    window.addEventListener('resize', size);
+    return () => { cancelAnimationFrame(raf); window.removeEventListener('resize', size); };
+  }, []);
+  return <canvas ref={ref} aria-hidden className="absolute inset-0 h-full w-full opacity-60" />;
+}
 
 /* ------------------------------ Output helpers ------------------------------ */
 
@@ -49,15 +145,6 @@ const C = ({ c, b, children }) => <span style={{ color: `var(--t-${c})` }} class
 
 function A({ href, children }) {
   return <a href={href} target={/^(mailto:|tel:)/.test(href) ? undefined : '_blank'} rel="noreferrer" className="underline decoration-dotted underline-offset-4 hover:decoration-solid" style={{ color: 'var(--t-path)' }}>{children}</a>;
-}
-
-function Section({ title, children }) {
-  return (
-    <div className="mt-1">
-      <div><C c="accent" b>{'## '}{title}</C></div>
-      <div className="mt-1">{children}</div>
-    </div>
-  );
 }
 
 /* ------------------------------ Terminal ------------------------------ */
@@ -78,20 +165,35 @@ export default function Terminal({ d }) {
   const [treeOpen, setTreeOpen] = useState(true);
   const [activeFile, setActiveFile] = useState('');
   const [clock, setClock] = useState('');
+  const [booting, setBooting] = useState(true);
+  const [typing, setTyping] = useState(false);
+  const [entries, setEntries] = useState([]);
   const idRef = useRef(1);
   const inputRef = useRef();
   const scrollRef = useRef();
   const rootRef = useRef();
+  const runRef = useRef();
+  const typeRef = useRef();
+  const timers = useRef([]);
+  const bootAlive = useRef(false);
+
+  const later = (fn, ms) => { const id = setTimeout(fn, ms); timers.current.push(id); return id; };
+  const sleep = (ms) => new Promise((r) => later(r, ms));
+  const push = (...items) => {
+    const made = items.map((it) => ({ id: idRef.current++, ...it }));
+    setEntries((e) => [...e, ...made]);
+    return made;
+  };
+  const setEntry = (id, patch) => setEntries((e) => e.map((x) => (x.id === id ? { ...x, ...patch } : x)));
 
   const FILES = useMemo(() => ({
     'about.md': 'about', 'skills.json': 'skills', 'experience.log': 'git log', 'education.log': 'education', 'contact.sh': 'contact', ...(d.resumeUrl ? { 'resume.pdf': 'resume' } : {}),
   }), [d.resumeUrl]);
   const PATHS = useMemo(() => [...Object.keys(FILES), 'projects/', ...projects.map((p) => `projects/${p.file}`)], [FILES, projects]);
 
-  /* ---- clickable command ---- */
-  const runRef = useRef();
+  // Clickable command: types itself into the prompt, then runs.
   const Cmd = ({ children, cmd }) => (
-    <button type="button" onClick={() => runRef.current(cmd || String(children))} className="rounded px-0.5 underline decoration-dotted underline-offset-4 transition hover:bg-[var(--t-sel)] hover:decoration-solid" style={{ color: 'var(--t-warn)' }}>{children}</button>
+    <button type="button" onClick={() => typeRef.current(cmd || String(children))} className="rounded px-0.5 underline decoration-dotted underline-offset-4 transition hover:bg-[var(--t-sel)] hover:decoration-solid" style={{ color: 'var(--t-warn)' }}>{children}</button>
   );
 
   /* ---- outputs ---- */
@@ -99,7 +201,8 @@ export default function Terminal({ d }) {
     const info = (d.info || []).filter((r) => r.label && r.value);
     return (
       <div className="flex flex-col gap-x-8 gap-y-3 sm:flex-row">
-        {d.ascii && <pre className="shrink-0 overflow-hidden text-[10px] leading-[1.15] sm:text-[11px]" style={{ color: 'var(--t-user)' }}>{d.ascii}</pre>}
+        {/* System monospace fonts carry the box-drawing glyphs that web fonts often subset away. */}
+        {d.ascii && <div className="shrink-0 overflow-hidden text-[11px] leading-[1.05] tracking-normal sm:text-[14px]" style={{ color: 'var(--t-user)', fontFamily: 'Consolas, "Cascadia Mono", Menlo, "DejaVu Sans Mono", "Liberation Mono", monospace' }}>{d.ascii.split('\n').map((l, i) => <div key={i} className="whitespace-pre">{l}</div>)}</div>}
         <div className="min-w-0">
           <div><C c="user" b>{user}</C><C c="dim">@</C><C c="user" b>{host}</C></div>
           <div style={{ color: 'var(--t-dim)' }}>{'-'.repeat(Math.min(28, user.length + host.length + 1))}</div>
@@ -123,7 +226,7 @@ export default function Terminal({ d }) {
       <div className="space-y-3">
         <div><C c="dim">Explore by typing a command or clicking one.</C></div>
         <div>{rows.map(Row)}</div>
-        <div><C c="accent" b>built-ins</C>{tools.map(Row)}</div>
+        <div><div><C c="accent" b>built-ins</C></div>{tools.map(Row)}</div>
         <div><C c="dim">Tip: <C c="fg">Tab</C> completes, <C c="fg">↑ ↓</C> walk history.</C></div>
       </div>
     );
@@ -148,17 +251,12 @@ export default function Terminal({ d }) {
       {(d.skills || []).filter((g) => g.title).map((g, i) => (
         <div key={i} className="pl-4">
           <div><C c="path">&quot;{g.title}&quot;</C><C c="dim">: [</C></div>
-          {(g.items || []).filter((s) => s.label).map((s, j) => {
-            const lv = Math.max(0, Math.min(100, Number(s.level) || 0));
-            const n = Math.round(lv / 5);
-            return (
-              <div key={j} className="grid grid-cols-[minmax(0,9.5rem)_auto_auto] items-center gap-x-3 pl-4 sm:grid-cols-[13rem_auto_auto]">
-                <span className="truncate">{s.label}</span>
-                <span className="whitespace-pre tracking-tighter"><C c="user">{'█'.repeat(n)}</C><C c="dim">{'░'.repeat(20 - n)}</C></span>
-                <C c="warn">{String(lv).padStart(3)}%</C>
-              </div>
-            );
-          })}
+          {(g.items || []).filter((s) => s.label).map((s, j) => (
+            <div key={j} className="grid grid-cols-[minmax(0,8rem)_auto_2.75rem] items-center justify-start gap-x-3 pl-4 sm:grid-cols-[13rem_auto_3.25rem] sm:gap-x-4">
+              <span className="truncate">{s.label}</span>
+              <Bar level={Math.max(0, Math.min(100, Number(s.level) || 0))} />
+            </div>
+          ))}
           <div><C c="dim">]</C></div>
         </div>
       ))}
@@ -229,34 +327,27 @@ export default function Terminal({ d }) {
   );
 
   const Social = () => (
+    <div>{socials.map((s, i) => <div key={i} className="grid grid-cols-[7rem_1fr] gap-2"><C c="path" b>{s.label || s.icon}</C><A href={s.url}>{s.url.replace(/^(https?:\/\/|mailto:)/, '')}</A></div>)}</div>
+  );
+
+  const Ls = ({ dir }) => (
+    <div className="flex flex-wrap gap-x-6 gap-y-1">
+      {dir === 'projects'
+        ? projects.map((p) => <Cmd key={p.file} cmd={`cat projects/${p.file}`}>{p.file}</Cmd>)
+        : <>
+          <button type="button" onClick={() => typeRef.current('cd projects')} className="font-bold hover:underline" style={{ color: 'var(--t-path)' }}>projects/</button>
+          {Object.keys(FILES).map((f) => <Cmd key={f} cmd={f === 'resume.pdf' ? 'resume' : `cat ${f}`}>{f}</Cmd>)}
+        </>}
+    </div>
+  );
+
+  const BootLine = ({ text }) => <div><C c="dim">[</C><C c="user" b>  OK  </C><C c="dim">]</C> {text}</div>;
+  const Hint = () => (
     <div>
-      {socials.map((s, i) => <div key={i} className="grid grid-cols-[7rem_1fr] gap-2"><C c="path" b>{s.label || s.icon}</C><A href={s.url}>{s.url.replace(/^(https?:\/\/|mailto:)/, '')}</A></div>)}
+      {d.welcome && <div className="mb-1.5"><C c="fg">{d.welcome}</C></div>}
+      <div><C c="dim">Type </C><Cmd>help</Cmd><C c="dim"> or try </C><Cmd>about</Cmd> <Cmd>projects</Cmd> <Cmd>skills</Cmd> <Cmd>contact</Cmd></div>
     </div>
   );
-
-  const Ls = ({ dir }) => {
-    if (dir === 'projects') return <div className="flex flex-wrap gap-x-6 gap-y-1">{projects.map((p) => <Cmd key={p.file} cmd={`cat projects/${p.file}`}>{p.file}</Cmd>)}</div>;
-    return (
-      <div className="flex flex-wrap gap-x-6 gap-y-1">
-        <button type="button" onClick={() => runRef.current('cd projects')} className="font-bold hover:underline" style={{ color: 'var(--t-path)' }}>projects/</button>
-        {Object.keys(FILES).map((f) => <Cmd key={f} cmd={f === 'resume.pdf' ? 'resume' : `cat ${f}`}>{f}</Cmd>)}
-      </div>
-    );
-  };
-
-  const Boot = () => (
-    <div className="space-y-3">
-      <div style={{ color: 'var(--t-dim)' }}>{d.motd || 'Last login on ttys001'}</div>
-      <div className="animate-fade-up"><Neofetch /></div>
-      <div className="animate-fade-up [animation-delay:.25s]">
-        {d.welcome && <div className="mb-1.5"><C c="fg">{d.welcome}</C></div>}
-        <C c="dim">Type </C><Cmd>help</Cmd><C c="dim"> or try </C><Cmd>about</Cmd> <Cmd>projects</Cmd> <Cmd>skills</Cmd> <Cmd>contact</Cmd>
-      </div>
-    </div>
-  );
-
-  const [entries, setEntries] = useState(() => [{ id: 0, out: <Boot /> }]);
-  const push = (...items) => setEntries((e) => [...e, ...items.map((it) => ({ id: idRef.current++, ...it }))]);
 
   /* ---- contact form inside the terminal ---- */
   const STEPS = [
@@ -269,30 +360,29 @@ export default function Terminal({ d }) {
   const answer = async (value) => {
     const step = STEPS[flow.step];
     const v = value.trim();
-    push({ echo: <><C c="accent">?</C> <C c="fg" b>{step.q}:</C> {step.key === 'confirm' || step.key === 'message' ? v : v || <C c="dim">(skipped)</C>}</> });
+    push({ echo: <><C c="accent">?</C> <C c="fg" b>{step.q}:</C> {step.key === 'subject' && !v ? <C c="dim">(skipped)</C> : v}</> });
     const ok = step.check(v);
     if (ok !== true) { push({ out: <C c="err">✗ {ok}</C> }); return; }
     const data = { ...flow.data, [step.key]: v };
     if (step.key !== 'confirm') { setFlow({ step: flow.step + 1, data }); return; }
     setFlow(null);
     if (/^n/i.test(v)) { push({ out: <C c="dim">Cancelled — nothing was sent.</C> }); return; }
-    const id = idRef.current;
-    push({ out: <C c="dim">Sending…</C> });
+    const [entry] = push({ pending: 'sending message' });
     try {
       const res = await fetch(`${API_URL}/api/public/contact`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: data.name, email: data.email, subject: data.subject || null, message: data.message, website: '' }) });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(body.message || 'Something went wrong');
-      setEntries((e) => e.map((x) => (x.id === id ? { ...x, out: <C c="user">✓ {body.message || 'Message sent!'} I’ll get back to you soon.</C> } : x)));
+      setEntry(entry.id, { pending: null, out: <C c="user">✓ {body.message || 'Message sent!'} I’ll get back to you soon.</C> });
     } catch (err) {
-      setEntries((e) => e.map((x) => (x.id === id ? { ...x, out: <><C c="err">✗ {err.message}</C>{d.email && <> — <C c="dim">you can also email </C><A href={`mailto:${d.email}`}>{d.email}</A></>}</> } : x)));
+      setEntry(entry.id, { pending: null, out: <><C c="err">✗ {err.message}</C>{d.email && <> — <C c="dim">you can also email </C><A href={`mailto:${d.email}`}>{d.email}</A></>}</> });
     }
   };
 
-  /* ---- command runner ---- */
+  /* ---- command runner: exec returns what to print ---- */
   const resolve = (arg = '') => {
     let p = arg.replace(/^~\//, '').replace(/^\.\//, '');
-    if (cwd === '~/projects' && !p.startsWith('projects/') && !FILES[p]) p = `projects/${p}`;
     if (p.startsWith('../')) p = p.slice(3);
+    if (cwd === '~/projects' && !p.startsWith('projects') && !FILES[p]) p = `projects/${p}`;
     return p;
   };
   const openTarget = (arg) => {
@@ -305,88 +395,168 @@ export default function Terminal({ d }) {
   };
 
   const exec = (raw) => {
-    const line = raw.trim();
-    const [cmd0, ...args] = line.split(/\s+/);
+    const [cmd0, ...args] = raw.trim().split(/\s+/);
     const cmd = (cmd0 || '').toLowerCase();
     const arg = args.join(' ');
-    const out = (node) => push({ out: node });
     switch (cmd) {
-      case '': return;
-      case 'help': case 'man': case '?': return out(<Help />);
-      case 'about': case 'whoami': setActiveFile('about.md'); return out(<About />);
-      case 'skills': setActiveFile('skills.json'); return out(<Skills />);
-      case 'projects': setActiveFile('projects/'); return out(<Projects />);
-      case 'experience': case 'work': setActiveFile('experience.log'); return out(<GitLog />);
-      case 'git': return arg.startsWith('log') ? (setActiveFile('experience.log'), out(<GitLog />)) : out(<C c="dim">git: try <Cmd>git log</Cmd></C>);
-      case 'education': setActiveFile('education.log'); return out(<Education />);
-      case 'contact': setActiveFile('contact.sh'); return out(<Contact />);
-      case 'social': case 'socials': return out(<Social />);
-      case 'neofetch': case 'fastfetch': return out(<Neofetch />);
+      case '': return null;
+      case 'help': case 'man': case '?': return <Help />;
+      case 'about': case 'whoami': setActiveFile('about.md'); return <About />;
+      case 'skills': setActiveFile('skills.json'); return <Skills />;
+      case 'projects': setActiveFile('projects/'); return <Projects />;
+      case 'experience': case 'work': setActiveFile('experience.log'); return <GitLog />;
+      case 'git': if (!arg.startsWith('log')) return <C c="dim">git: try <Cmd>git log</Cmd></C>; setActiveFile('experience.log'); return <GitLog />;
+      case 'education': setActiveFile('education.log'); return <Education />;
+      case 'contact': setActiveFile('contact.sh'); return <Contact />;
+      case 'social': case 'socials': return <Social />;
+      case 'neofetch': case 'fastfetch': return <Neofetch />;
       case 'message': case 'mail': case 'hire': case 'hire-me':
         setFlow({ step: 0, data: {} });
-        return out(<C c="dim">Let’s write a message. Press <C c="fg">Ctrl+C</C> to cancel at any time.</C>);
+        return <C c="dim">Let’s write a message. Press <C c="fg">Ctrl+C</C> to cancel at any time.</C>;
       case 'resume': case 'cv':
-        if (!d.resumeUrl) return out(<C c="err">resume: not found</C>);
+        if (!d.resumeUrl) return <C c="err">resume: not found</C>;
         window.open(d.resumeUrl, '_blank', 'noopener');
-        return out(<><C c="user">✓</C> opening <A href={d.resumeUrl}>resume.pdf</A>…</>);
+        return <><C c="user">✓</C> opening <A href={d.resumeUrl}>resume.pdf</A>…</>;
       case 'ls': case 'll': case 'dir': {
         const p = resolve(arg).replace(/\/$/, '');
-        return out(<Ls dir={p === 'projects' || (cwd === '~/projects' && (!arg || p === 'projects/')) ? 'projects' : ''} />);
+        return <Ls dir={p === 'projects' || (cwd === '~/projects' && !arg) ? 'projects' : ''} />;
       }
       case 'cd': {
         const p = arg.replace(/\/$/, '');
-        if (!p || p === '~' || p === '..' || p === '/') { setCwd('~'); return undefined; }
-        if (p === 'projects' || p === '~/projects') { setCwd('~/projects'); return undefined; }
-        return out(<C c="err">cd: no such directory: {arg}</C>);
+        if (!p || p === '~' || p === '..' || p === '/') { setCwd('~'); return null; }
+        if (p === 'projects' || p === '~/projects') { setCwd('~/projects'); return null; }
+        return <C c="err">cd: no such directory: {arg}</C>;
       }
-      case 'pwd': return out(<span>/home/{user}{cwd.slice(1)}</span>);
+      case 'pwd': return <span>/home/{user}{cwd.slice(1)}</span>;
       case 'cat': case 'less': case 'more': case 'bat': {
-        if (!arg) return out(<C c="err">{cmd}: missing file — try <Cmd cmd="ls">ls</Cmd></C>);
+        if (!arg) return <C c="err">{cmd}: missing file — try <Cmd>ls</Cmd></C>;
         const p = resolve(arg);
         if (FILES[p]) return exec(FILES[p]);
         const proj = projects.find((x) => `projects/${x.file}` === p);
-        if (proj) { setActiveFile(p); return out(<Project p={proj} />); }
-        if (p.replace(/\/$/, '') === 'projects') return out(<C c="err">cat: projects: Is a directory</C>);
-        return out(<C c="err">cat: {arg}: No such file or directory</C>);
+        if (proj) { setActiveFile(p); return <Project p={proj} />; }
+        if (p.replace(/\/$/, '') === 'projects') return <C c="err">cat: projects: Is a directory</C>;
+        return <C c="err">cat: {arg}: No such file or directory</C>;
       }
       case 'open': case 'xdg-open': {
-        if (!arg) return out(<C c="err">open: what should I open? e.g. <Cmd cmd="open 1">open 1</Cmd></C>);
+        if (!arg) return <C c="err">open: what should I open? e.g. <Cmd>open 1</Cmd></C>;
         const { url, label } = openTarget(arg);
-        if (!url) return out(<C c="err">open: {arg}: not found</C>);
+        if (!url) return <C c="err">open: {arg}: not found</C>;
         window.open(url, '_blank', 'noopener');
-        return out(<><C c="user">✓</C> opening <A href={url}>{label}</A>…</>);
+        return <><C c="user">✓</C> opening <A href={url}>{label}</A>…</>;
       }
       case 'theme': {
-        if (THEMES[arg]) { setTheme(arg); try { localStorage.setItem('term-theme', arg); } catch { /* storage blocked */ } return out(<><C c="user">✓</C> theme set to {THEMES[arg].label}</>); }
-        return out(<div>{Object.entries(THEMES).map(([k, v]) => <div key={k}><Cmd cmd={`theme ${k}`}>{k}</Cmd> <C c="dim">{v.label}{k === theme ? ' (current)' : ''}</C></div>)}</div>);
+        if (THEMES[arg]) { setTheme(arg); try { localStorage.setItem('term-theme', arg); } catch { /* storage blocked */ } return <><C c="user">✓</C> theme set to {THEMES[arg].label}</>; }
+        return <div>{Object.entries(THEMES).map(([k, v]) => <div key={k}><Cmd cmd={`theme ${k}`}>{k}</Cmd> <C c="dim">{v.label}{k === theme ? ' (current)' : ''}</C></div>)}</div>;
       }
-      case 'history': return out(<div>{past.slice().reverse().map((h, i) => <div key={i}><C c="dim">{String(i + 1).padStart(4)}  </C>{h}</div>)}</div>);
-      case 'date': return out(<span>{new Date().toString()}</span>);
-      case 'echo': return out(<span>{arg}</span>);
-      case 'clear': case 'cls': setEntries([]); return undefined;
-      case 'exit': case 'logout': setWin({ open: false, max: false }); return undefined;
-      case 'sudo': return out(<span>[sudo] password for {user}: <C c="err">nice try 😄</C> — you could <Cmd cmd="hire">hire me</Cmd> instead.</span>);
-      case 'rm': return out(<C c="err">rm: permission denied — please don’t delete my portfolio 🙏</C>);
-      case 'vim': case 'vi': case 'nano': case 'emacs': return out(<C c="dim">{cmd}: this is a read-only portfolio. (and yes, you can exit vim: :q)</C>);
-      case 'ping': return out(<span>PING {arg || host}: 64 bytes — <C c="user">I’m online</C> and replying within 24h. Try <Cmd>message</Cmd>.</span>);
+      case 'history': return <div>{past.slice().reverse().map((h, i) => <div key={i}><C c="dim">{String(i + 1).padStart(4)}  </C>{h}</div>)}</div>;
+      case 'date': return <span>{new Date().toString()}</span>;
+      case 'echo': return <span>{arg}</span>;
+      case 'clear': case 'cls': setEntries([]); return null;
+      case 'exit': case 'logout': setWin({ open: false, max: false }); return null;
+      case 'sudo': return <span>[sudo] password for {user}: <C c="err">nice try 😄</C> — you could <Cmd cmd="hire">hire me</Cmd> instead.</span>;
+      case 'rm': return <C c="err">rm: permission denied — please don’t delete my portfolio 🙏</C>;
+      case 'vim': case 'vi': case 'nano': case 'emacs': return <C c="dim">{cmd}: this is a read-only portfolio. (and yes, you can exit vim: :q)</C>;
+      case 'ping': return <span>PING {arg || host}: 64 bytes — <C c="user">I’m online</C> and replying within 24h. Try <Cmd>message</Cmd>.</span>;
       default: {
-        const guess = [...Object.keys(FILES).map((f) => FILES[f]), 'help', 'projects', 'message', 'social', 'neofetch'].find((c) => c.startsWith(cmd.slice(0, 2)));
-        return out(<span><C c="err">zsh: command not found: {cmd0}</C>{guess && <> — did you mean <Cmd>{guess}</Cmd>?</>}</span>);
+        const guess = [...Object.values(FILES), 'help', 'projects', 'message', 'social', 'neofetch'].find((c) => c.startsWith(cmd.slice(0, 2)));
+        return <span><C c="err">zsh: command not found: {cmd0}</C>{guess && <> — did you mean <Cmd>{guess}</Cmd>?</>}</span>;
       }
     }
   };
 
-  const run = (raw) => {
-    if (!win.open) setWin({ open: true, max: win.max });
+  // Prints the command line, then (after a short spinner for "heavy" commands) its output.
+  const run = (raw, fast = false) => {
+    if (!win.open) setWin((w) => ({ ...w, open: true }));
     if (flow) { setFlow(null); push({ out: <C c="dim">^C</C> }); }
     push({ cmd: raw, cwd });
     if (raw.trim()) setPast((p) => [raw, ...p.filter((x) => x !== raw)].slice(0, 50));
     setCursor(-1);
-    exec(raw);
+    const node = exec(raw);
     inputRef.current?.focus({ preventScroll: true });
+    if (node == null) return;
+    const label = SPIN[raw.trim().split(/\s+/)[0].toLowerCase()];
+    if (!label || fast || reducedMotion()) { push({ out: node }); return; }
+    const [entry] = push({ pending: label });
+    later(() => setEntry(entry.id, { pending: null, out: node }), 380 + Math.round(Math.random() * 320));
   };
   runRef.current = run;
 
+  // Types a command into the prompt one character at a time, then runs it.
+  const typeOut = (cmd) => new Promise((done) => {
+    setTyping(true);
+    setInput('');
+    [...cmd].forEach((_, i) => later(() => setInput(cmd.slice(0, i + 1)), 45 + i * (34 + (i % 3) * 8)));
+    later(() => { setInput(''); setTyping(false); done(); }, 45 + cmd.length * 42 + 220);
+  });
+  const typeAndRun = async (cmd) => {
+    if (typing) return;
+    if (booting) skipBoot();
+    if (reducedMotion()) { runRef.current(cmd); return; }
+    await typeOut(cmd);
+    runRef.current(cmd);
+  };
+  typeRef.current = typeAndRun;
+
+  /* ---- boot ---- */
+  const finalBoot = () => [
+    ...BOOT.map((text) => ({ out: <BootLine text={text} /> })),
+    { out: <div style={{ color: 'var(--t-dim)' }}>{d.motd || 'Last login on ttys001'}</div> },
+    { cmd: 'neofetch', cwd: '~' }, { out: <Neofetch /> }, { out: <Hint /> },
+  ];
+  function skipBoot() {
+    if (!bootAlive.current) return;
+    bootAlive.current = false;
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
+    setTyping(false);
+    setInput('');
+    setEntries(finalBoot().map((it) => ({ id: idRef.current++, ...it })));
+    setBooting(false);
+  }
+
+  useEffect(() => {
+    const hashKey = window.location.hash.slice(1);
+    const afterBoot = () => {
+      setBooting(false);
+      if (SECTION_HASHES[hashKey]) { rootRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); typeRef.current(SECTION_HASHES[hashKey]); }
+    };
+    if (reducedMotion()) {
+      setEntries(finalBoot().map((it) => ({ id: idRef.current++, ...it })));
+      afterBoot();
+      return undefined;
+    }
+    bootAlive.current = true;
+    setEntries([]);
+    (async () => {
+      await sleep(650);
+      for (const text of BOOT) {
+        if (!bootAlive.current) return;
+        push({ out: <BootLine text={text} /> });
+        await sleep(170 + Math.round(Math.random() * 160));
+      }
+      if (!bootAlive.current) return;
+      push({ out: <div style={{ color: 'var(--t-dim)' }}>{d.motd || 'Last login on ttys001'}</div> });
+      await sleep(450);
+      if (!bootAlive.current) return;
+      await typeOut('neofetch');
+      if (!bootAlive.current) return;
+      push({ cmd: 'neofetch', cwd: '~' });
+      const [p] = push({ pending: SPIN.neofetch });
+      await sleep(600);
+      if (!bootAlive.current) return;
+      setEntry(p.id, { pending: null, out: <Neofetch /> });
+      await sleep(900);
+      if (!bootAlive.current) return;
+      push({ out: <Hint /> });
+      bootAlive.current = false;
+      afterBoot();
+    })();
+    const tm = timers.current;
+    return () => { bootAlive.current = false; tm.forEach(clearTimeout); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /* ---- keyboard ---- */
   const complete = () => {
     const parts = input.split(' ');
     if (parts.length === 1) {
@@ -404,6 +574,8 @@ export default function Terminal({ d }) {
   };
 
   const onKey = (e) => {
+    if (booting) { e.preventDefault(); skipBoot(); return; }
+    if (typing) { e.preventDefault(); return; }
     if (e.key === 'Enter') {
       e.preventDefault();
       const v = input;
@@ -433,7 +605,14 @@ export default function Terminal({ d }) {
   };
 
   /* ---- effects ---- */
-  useEffect(() => { if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight; }, [entries, flow]);
+  // Follow the output: long outputs scroll to their command line, short ones to the bottom.
+  useEffect(() => {
+    const box = scrollRef.current;
+    if (!box) return;
+    const last = [...box.querySelectorAll('[data-entry]')].at(-1);
+    const top = last && last.offsetHeight > box.clientHeight * 0.8 ? last.offsetTop - 12 : box.scrollHeight;
+    box.scrollTo({ top, behavior: reducedMotion() ? 'auto' : 'smooth' });
+  }, [entries, flow]);
 
   useEffect(() => {
     try { const saved = localStorage.getItem('term-theme'); if (THEMES[saved]) setTheme(saved); } catch { /* storage blocked */ }
@@ -441,19 +620,21 @@ export default function Terminal({ d }) {
     const tick = () => setClock(new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date()));
     tick();
     const timer = setInterval(tick, 20000);
-    // Header links like /#projects run the matching command.
+    // Header links like /#projects type and run the matching command.
     const onHash = () => {
       const key = window.location.hash.slice(1);
       if (!(key in SECTION_HASHES)) return;
       rootRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      if (SECTION_HASHES[key]) runRef.current(SECTION_HASHES[key]);
+      if (SECTION_HASHES[key]) typeRef.current(SECTION_HASHES[key]);
     };
-    onHash();
     window.addEventListener('hashchange', onHash);
     return () => { clearInterval(timer); window.removeEventListener('hashchange', onHash); };
   }, []);
 
-  const focusInput = () => { if (!window.getSelection()?.toString()) inputRef.current?.focus({ preventScroll: true }); };
+  const onScreenClick = () => {
+    if (booting) { skipBoot(); return; }
+    if (!window.getSelection()?.toString()) inputRef.current?.focus({ preventScroll: true });
+  };
 
   /* ---- render ---- */
   const vars = Object.fromEntries(['fg', 'dim', 'user', 'path', 'accent', 'warn', 'err', 'sel'].map((k) => [`--t-${k}`, t[k]]));
@@ -462,34 +643,45 @@ export default function Terminal({ d }) {
     ? <><C c="user" b>{user}@{host}</C><C c="fg">:</C><C c="path" b>{at}</C><C c="fg">$</C></>
     : <><C c="user" b>{user}@{host}</C> <C c="path" b>{at}</C> <C c="accent">%</C></>);
   const step = flow ? STEPS[flow.step] : null;
+  const pickTheme = (k) => { setTheme(k); try { localStorage.setItem('term-theme', k); } catch { /* storage blocked */ } };
 
   const dockItems = [
-    { icon: TermIcon, label: 'Terminal', onClick: () => setWin({ open: true, max: win.max }), active: win.open },
-    { icon: Folder, label: 'Projects', onClick: () => run('projects') },
-    { icon: Mail, label: 'Message me', onClick: () => run('message') },
+    { icon: TermIcon, label: 'Terminal', onClick: () => setWin((w) => ({ ...w, open: true })), active: win.open },
+    { icon: Folder, label: 'Projects', onClick: () => typeAndRun('projects') },
+    { icon: Mail, label: 'Message me', onClick: () => typeAndRun('message') },
     ...(d.resumeUrl ? [{ icon: FileText, label: 'Résumé', href: d.resumeUrl }] : []),
     ...socials.filter((s) => /github|linkedin/i.test(s.icon)).map((s) => ({ icon: /github/i.test(s.icon) ? Github : Linkedin, label: s.label || s.icon, href: s.url })),
   ];
   const fileIcon = (f) => (f.endsWith('.json') ? FileJson : f.endsWith('.sh') ? FileCode2 : f.endsWith('.log') ? ScrollText : FileText);
 
   return (
-    <div ref={rootRef} className="relative isolate flex min-h-[100svh] scroll-mt-16 flex-col overflow-hidden font-mono" style={{ ...vars, background: t.wall }}>
+    <div ref={rootRef} className="relative isolate flex min-h-[calc(100svh-4.5rem)] scroll-mt-16 flex-col overflow-hidden font-mono transition-[background] duration-700" style={{ ...vars, background: t.wall }}>
+      {/* Wallpaper motion */}
+      {t.rain ? <MatrixRain key="rain" /> : (
+        <div aria-hidden className="pointer-events-none absolute inset-0">
+          {t.blobs.map((c, i) => (
+            <span key={`${theme}-${i}`} className="absolute h-[55vmax] w-[55vmax] rounded-full opacity-50 blur-[110px] transition-colors duration-700"
+              style={{ background: c, left: ['-12%', '55%', '20%'][i], top: ['-18%', '-10%', '55%'][i], animation: `term-drift ${18 + i * 5}s ease-in-out ${i * -4}s infinite` }} />
+          ))}
+        </div>
+      )}
+
       {/* Menubar */}
-      <div className={cn('relative z-20 flex h-8 shrink-0 items-center justify-between px-3 text-[12px] text-white sm:px-4', gnome ? 'bg-black/90' : 'bg-black/25 backdrop-blur-xl')}>
+      <div className={cn('relative z-20 flex h-8 shrink-0 animate-fade-in items-center justify-between px-3 text-[12px] text-white sm:px-4', gnome ? 'bg-black/90' : 'bg-black/25 backdrop-blur-xl')}>
         <div className="flex items-center gap-4">
           {gnome ? <span className="rounded-full bg-white/10 px-2.5 py-0.5 font-semibold">Activities</span> : <><TermIcon className="h-3.5 w-3.5" /><span className="font-bold">Terminal</span></>}
           {!gnome && <span className="hidden gap-4 text-white/80 md:flex"><span>Shell</span><span>Edit</span><span>View</span><span>Window</span><span>Help</span></span>}
         </div>
-        {gnome && <span className="absolute left-1/2 -translate-x-1/2 font-semibold" suppressHydrationWarning>{clock}</span>}
+        {gnome && <span className="absolute left-1/2 -translate-x-1/2 font-semibold">{clock}</span>}
         <div className="flex items-center gap-3">
           <div className="hidden items-center rounded-md bg-white/10 p-0.5 sm:flex" role="radiogroup" aria-label="Terminal theme">
             {Object.entries(THEMES).map(([k, v]) => (
-              <button key={k} type="button" role="radio" aria-checked={theme === k} onClick={() => { setTheme(k); try { localStorage.setItem('term-theme', k); } catch { /* storage blocked */ } }}
+              <button key={k} type="button" role="radio" aria-checked={theme === k} onClick={() => pickTheme(k)}
                 className={cn('rounded px-2 py-0.5 transition', theme === k ? 'bg-white text-black' : 'text-white/75 hover:text-white')}>{v.label}</button>
             ))}
           </div>
           <Wifi className="h-3.5 w-3.5" /><Battery className="h-4 w-4" />
-          {!gnome && <span className="font-medium" suppressHydrationWarning>{clock}</span>}
+          {!gnome && <span className="font-medium">{clock}</span>}
         </div>
       </div>
 
@@ -498,13 +690,13 @@ export default function Terminal({ d }) {
         <div
           className={cn('relative flex w-full flex-col overflow-hidden shadow-[0_40px_120px_-20px_rgb(0_0_0/0.7)] ring-1 transition-all duration-500 ease-out',
             gnome ? 'rounded-xl' : 'rounded-[14px]',
-            win.max ? 'h-[calc(100svh-9.5rem)] max-w-none' : 'h-[min(680px,calc(100svh-10rem))] max-w-5xl',
+            win.max ? 'h-[calc(100svh-13rem)] max-w-none' : 'h-[min(660px,calc(100svh-14.5rem))] max-w-5xl',
             !win.open && 'pointer-events-none translate-y-[30%] scale-75 opacity-0')}
-          style={{ background: t.bg, color: t.fg, '--tw-ring-color': t.border, backdropFilter: 'blur(24px) saturate(160%)', WebkitBackdropFilter: 'blur(24px) saturate(160%)' }}
+          style={{ background: t.bg, color: t.fg, '--tw-ring-color': t.border, backdropFilter: 'blur(24px) saturate(160%)', WebkitBackdropFilter: 'blur(24px) saturate(160%)', animation: 'term-open .8s cubic-bezier(.2,.8,.2,1) .15s backwards' }}
           aria-hidden={!win.open}
         >
           {/* Title bar */}
-          <div className="relative flex h-10 shrink-0 items-center px-3 text-[12.5px]" style={{ background: t.bar, borderBottom: `1px solid ${t.border}` }}
+          <div className="relative flex h-10 shrink-0 items-center px-3 text-[12.5px] transition-colors duration-500" style={{ background: t.bar, borderBottom: `1px solid ${t.border}` }}
             onDoubleClick={() => setWin((w) => ({ ...w, max: !w.max }))}>
             {!gnome && (
               <div className="group flex gap-2">
@@ -516,7 +708,7 @@ export default function Terminal({ d }) {
               </div>
             )}
             <div className="pointer-events-none absolute inset-x-0 text-center font-semibold" style={{ color: t.dim }}>
-              {gnome ? `${user}@${host}: ${cwd}` : <><TermIcon className="mr-1.5 inline h-3.5 w-3.5 align-[-2px]" />{user} — {cwd} — zsh — 120×36</>}
+              {gnome ? `${user}@${host}: ${cwd}` : <><TermIcon className="mr-1.5 inline h-3.5 w-3.5 align-[-2px]" />{user} — {cwd} — {typing ? 'typing…' : 'zsh'} — 120×36</>}
             </div>
             {gnome && (
               <div className="ml-auto flex gap-2">
@@ -531,21 +723,29 @@ export default function Terminal({ d }) {
 
           <div className="flex min-h-0 flex-1">
             {/* File tree */}
-            <aside className="hidden w-52 shrink-0 overflow-y-auto py-3 text-[12.5px] md:block" style={{ background: t.side, borderRight: `1px solid ${t.border}` }}>
+            <aside className="hidden w-52 shrink-0 overflow-y-auto py-3 text-[12.5px] transition-colors duration-500 md:block" style={{ background: t.side, borderRight: `1px solid ${t.border}` }}>
               <div className="px-4 pb-2 text-[10.5px] font-bold uppercase tracking-wider" style={{ color: t.dim }}>~/portfolio</div>
-              <button type="button" onClick={() => { setTreeOpen((o) => !o); run('projects'); }} className={cn('flex w-full items-center gap-1.5 px-3 py-1 text-left transition hover:bg-white/5', activeFile === 'projects/' && 'bg-white/10')}>
-                {treeOpen ? <ChevronDown className="h-3 w-3 opacity-60" /> : <ChevronRight className="h-3 w-3 opacity-60" />}
-                {treeOpen ? <FolderOpen className="h-4 w-4" style={{ color: t.path }} /> : <Folder className="h-4 w-4" style={{ color: t.path }} />}projects
-              </button>
-              {treeOpen && projects.map((p) => (
-                <button key={p.file} type="button" onClick={() => run(`cat projects/${p.file}`)} title={p.title} className={cn('flex w-full items-center gap-1.5 py-1 pl-10 pr-3 text-left transition hover:bg-white/5', activeFile === `projects/${p.file}` && 'bg-white/10')}>
-                  <FileText className="h-3.5 w-3.5 shrink-0 opacity-70" /><span className="truncate">{p.file}</span>
+              <div className={cn('flex items-center transition hover:bg-white/5', activeFile === 'projects/' && 'bg-white/10')}>
+                <button type="button" onClick={() => setTreeOpen((o) => !o)} aria-label={treeOpen ? 'Collapse projects' : 'Expand projects'} aria-expanded={treeOpen} className="py-1 pl-3 pr-1">
+                  {treeOpen ? <ChevronDown className="h-3 w-3 opacity-60" /> : <ChevronRight className="h-3 w-3 opacity-60" />}
                 </button>
-              ))}
+                <button type="button" onClick={() => { setTreeOpen(true); typeAndRun('projects'); }} className="flex flex-1 items-center gap-1.5 py-1 pr-3 text-left">
+                  {treeOpen ? <FolderOpen className="h-4 w-4" style={{ color: t.path }} /> : <Folder className="h-4 w-4" style={{ color: t.path }} />}projects
+                </button>
+              </div>
+              <div className={cn('grid transition-[grid-template-rows] duration-300', treeOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]')}>
+                <div className="overflow-hidden">
+                  {projects.map((p) => (
+                    <button key={p.file} type="button" onClick={() => typeAndRun(`cat projects/${p.file}`)} title={p.title} className={cn('flex w-full items-center gap-1.5 py-1 pl-10 pr-3 text-left transition hover:bg-white/5', activeFile === `projects/${p.file}` && 'bg-white/10')}>
+                      <FileText className="h-3.5 w-3.5 shrink-0 opacity-70" /><span className="truncate">{p.file}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
               {Object.keys(FILES).map((f) => {
                 const Icon = fileIcon(f);
                 return (
-                  <button key={f} type="button" onClick={() => run(f === 'resume.pdf' ? 'resume' : `cat ${f}`)} className={cn('flex w-full items-center gap-1.5 py-1 pl-[1.6rem] pr-3 text-left transition hover:bg-white/5', activeFile === f && 'bg-white/10')}>
+                  <button key={f} type="button" onClick={() => typeAndRun(f === 'resume.pdf' ? 'resume' : `cat ${f}`)} className={cn('flex w-full items-center gap-1.5 py-1 pl-[1.6rem] pr-3 text-left transition hover:bg-white/5', activeFile === f && 'bg-white/10')}>
                     <Icon className="h-3.5 w-3.5 shrink-0" style={{ color: f.endsWith('.pdf') ? t.err : t.warn }} /><span className="truncate">{f}</span>
                   </button>
                 );
@@ -554,36 +754,46 @@ export default function Terminal({ d }) {
 
             {/* Output + prompt */}
             <div className="flex min-w-0 flex-1 flex-col">
-              <div ref={scrollRef} onClick={focusInput} className="min-h-0 flex-1 cursor-text overflow-y-auto overscroll-contain px-4 py-4 text-[12.5px] leading-[1.65] selection:bg-[var(--t-sel)] sm:px-5 sm:text-[13.5px]">
+              <div ref={scrollRef} onClick={onScreenClick} className="relative min-h-0 flex-1 cursor-text overflow-y-auto overscroll-contain px-4 py-4 text-[12.5px] leading-[1.65] selection:bg-[var(--t-sel)] sm:px-5 sm:text-[13.5px]">
                 {entries.map((e) => (
-                  <div key={e.id} className="mb-2.5 break-words">
-                    {e.cmd != null && <div><Prompt at={e.cwd} /> {e.cmd}</div>}
-                    {e.echo && <div>{e.echo}</div>}
-                    {e.out && <div className={e.cmd != null ? 'mt-1' : undefined}>{e.out}</div>}
+                  <div key={e.id} data-entry className={cn('break-words first:mt-0', e.cmd != null ? 'mt-3' : 'mt-1')}>
+                    {e.cmd != null && <div className="animate-fade-in"><Prompt at={e.cwd} /> {e.cmd}</div>}
+                    {e.echo && <div className="animate-fade-in">{e.echo}</div>}
+                    {e.pending && <div className="mt-1"><Spinner label={e.pending} /></div>}
+                    {e.out && <div className={e.cmd != null ? 'mt-1' : undefined}><Reveal>{e.out}</Reveal></div>}
                   </div>
                 ))}
                 <label className="flex items-center gap-2">
                   <span className="shrink-0 whitespace-nowrap">{step ? <><C c="accent">?</C> <C c="fg" b>{step.q}:</C></> : <Prompt />}</span>
                   <span className="relative min-w-0 flex-1">
-                    <input ref={inputRef} value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={onKey} aria-label="Terminal input" autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false}
+                    <input ref={inputRef} value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={onKey} readOnly={typing} aria-label="Terminal input" autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false}
                       className="w-full bg-transparent caret-transparent outline-none" style={{ color: t.fg }} />
-                    <span aria-hidden className="pointer-events-none absolute top-0 h-full whitespace-pre"><span className="invisible">{input}</span><span className="inline-block h-[1.15em] w-[0.6em] translate-y-[0.2em] animate-pulse" style={{ background: t.fg }} /></span>
+                    <span aria-hidden className="pointer-events-none absolute left-0 top-0 h-full whitespace-pre">
+                      <span className="invisible">{input}</span>
+                      <span className="inline-block h-[1.15em] w-[0.6em] translate-y-[0.2em]" style={{ background: t.fg, animation: typing ? 'none' : 'term-blink 1.05s steps(1) infinite' }} />
+                    </span>
                   </span>
                 </label>
+                {booting && <div className="pointer-events-none sticky bottom-0 mt-3 text-right text-[11px]" style={{ color: t.dim }}>press any key to skip ⏎</div>}
               </div>
               {/* Status bar with quick commands */}
-              <div className="flex shrink-0 items-center gap-3 overflow-x-auto px-3 py-2 text-[11.5px] [scrollbar-width:none]" style={{ background: t.bar, borderTop: `1px solid ${t.border}` }}>
-                {['help', 'about', 'skills', 'projects', 'git log', 'contact', 'message'].map((c) => (
-                  <button key={c} type="button" onClick={() => run(c)} className="shrink-0 rounded-md px-2.5 py-1 transition hover:brightness-125" style={{ background: 'var(--t-sel)', color: t.fg }}>{c}</button>
+              <div className="flex shrink-0 items-center gap-2 overflow-x-auto px-3 py-2 text-[11.5px] transition-colors duration-500 [scrollbar-width:none]" style={{ background: t.bar, borderTop: `1px solid ${t.border}` }}>
+                {['help', 'about', 'skills', 'projects', 'git log', 'contact', 'message'].map((c, i) => (
+                  <button key={c} type="button" onClick={() => typeAndRun(c)} disabled={typing}
+                    className="shrink-0 rounded-md px-2.5 py-1 transition hover:-translate-y-0.5 hover:brightness-125 disabled:opacity-50"
+                    style={{ background: 'var(--t-sel)', color: t.fg, animation: `term-line .4s ease-out ${0.9 + i * 0.07}s backwards` }}>{c}</button>
                 ))}
-                <span className="ml-auto hidden shrink-0 sm:inline" style={{ color: t.dim }}>zsh · utf-8 · {THEMES[theme].label}</span>
+                <span className="ml-auto hidden shrink-0 items-center gap-1.5 sm:flex" style={{ color: t.dim }}>
+                  <span className={cn('h-1.5 w-1.5 rounded-full', typing || entries.some((x) => x.pending) ? 'animate-pulse' : '')} style={{ background: typing || entries.some((x) => x.pending) ? t.warn : t.user }} />
+                  zsh · utf-8 · {THEMES[theme].label}
+                </span>
               </div>
             </div>
           </div>
         </div>
 
         {!win.open && (
-          <button type="button" onClick={() => setWin({ open: true, max: false })} className="absolute inset-0 m-auto flex h-28 w-28 flex-col items-center justify-center gap-2 rounded-2xl text-sm text-white transition hover:bg-white/10">
+          <button type="button" onClick={() => setWin({ open: true, max: false })} className="absolute inset-0 m-auto flex h-28 w-28 animate-fade-in flex-col items-center justify-center gap-2 rounded-2xl text-sm text-white transition hover:bg-white/10">
             <span className="grid h-16 w-16 place-items-center rounded-2xl bg-black/70 shadow-xl ring-1 ring-white/20"><TermIcon className="h-8 w-8" /></span>Terminal
           </button>
         )}
@@ -591,10 +801,11 @@ export default function Terminal({ d }) {
 
       {/* Dock */}
       <nav aria-label="Dock" className={cn('absolute z-20 flex gap-2 p-2 backdrop-blur-2xl',
-        gnome ? 'bottom-4 left-1/2 -translate-x-1/2 rounded-2xl bg-black/60 md:bottom-auto md:left-3 md:top-1/2 md:translate-x-0 md:-translate-y-1/2 md:flex-col' : 'bottom-4 left-1/2 -translate-x-1/2 rounded-2xl border border-white/20 bg-white/15')}>
+        gnome ? 'bottom-4 left-1/2 -translate-x-1/2 rounded-2xl bg-black/60 md:bottom-auto md:left-3 md:top-1/2 md:translate-x-0 md:-translate-y-1/2 md:flex-col' : 'bottom-4 left-1/2 -translate-x-1/2 rounded-2xl border border-white/20 bg-white/15')}
+        style={{ animation: 'term-open .7s cubic-bezier(.2,.8,.2,1) .5s backwards' }}>
         {dockItems.map((it) => {
           const Icon = it.icon;
-          const cls = 'group relative grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-b from-white/25 to-white/5 text-white shadow-lg ring-1 ring-white/20 transition duration-200 hover:-translate-y-1.5 hover:scale-110';
+          const cls = 'group relative grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-b from-white/25 to-white/5 text-white shadow-lg ring-1 ring-white/20 transition duration-200 hover:-translate-y-2 hover:scale-[1.18]';
           const tip = <><span className="pointer-events-none absolute -top-9 left-1/2 hidden -translate-x-1/2 whitespace-nowrap rounded-md bg-black/80 px-2 py-1 text-[11px] text-white group-hover:block">{it.label}</span>{it.active && <span className="absolute -bottom-1.5 h-1 w-1 rounded-full bg-white" />}</>;
           return it.href
             ? <a key={it.label} href={it.href} target={ext(it.href) ? '_blank' : undefined} rel="noreferrer" aria-label={it.label} className={cls}><Icon className="h-6 w-6" />{tip}</a>

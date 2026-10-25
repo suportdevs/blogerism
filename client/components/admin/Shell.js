@@ -11,6 +11,8 @@ import {
 import { useAuth } from './AuthProvider';
 import { useSiteTheme } from './SiteTheme';
 import { EDITION } from '@/lib/edition';
+import { useAdminBrand } from '@/lib/adminBrand';
+import AdminLogo from './AdminLogo';
 import { Avatar, Dropdown, DropdownItem } from './ui';
 import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
@@ -58,6 +60,7 @@ export function toggleAdminTheme() {
 }
 
 function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen, unread, pending }) {
+  const brand = useAdminBrand();
   const pathname = usePathname();
   const { can } = useAuth();
   const { theme, usesSeries } = useSiteTheme();
@@ -77,10 +80,10 @@ function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen, unread, p
         {/* glow */}
         <div className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full bg-brand-500/25 blur-[90px]" />
         <div className={cn('relative flex h-16 shrink-0 items-center gap-3 px-5', collapsed && 'lg:justify-center lg:px-0')}>
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand-400 via-brand-500 to-fuchsia-500 font-black text-white shadow-brand-glow">{EDITION.brand[0]}</span>
+          <AdminLogo brand={brand} className="h-9 w-9" />
           <div className={cn('leading-tight', collapsed && 'lg:hidden')}>
-            <div className="truncate font-extrabold tracking-tight text-white">{EDITION.brand}</div>
-            <div className="text-[11px] font-medium text-ink-500">{theme ? `${theme.name} theme` : 'Content platform'}</div>
+            <div className="truncate font-extrabold tracking-tight text-white">{brand.name}</div>
+            <div className="text-[11px] font-medium text-ink-500">{brand.subtitle || (theme ? `${theme.name} theme` : 'Content platform')}</div>
           </div>
           <button onClick={() => setMobileOpen(false)} className="ml-auto rounded-lg p-1.5 hover:bg-white/5 lg:hidden"><X className="h-5 w-5" /></button>
         </div>

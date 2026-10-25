@@ -64,6 +64,11 @@ const seriesCard = {
   year: true, maturity: true, genres: true, featured: true, subscribers: true,
 };
 
+// Admin panel branding for the login screen and the admin shell (read before anyone signs in).
+router.get('/admin-brand', asyncHandler(async (_req, res) => {
+  res.json((await getSettings()).admin);
+}));
+
 router.get('/bootstrap', asyncHandler(async (req, res) => {
   const [settings, menus] = await Promise.all([
     getSettings(),

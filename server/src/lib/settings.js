@@ -113,6 +113,21 @@ const DEFAULT_SETTINGS = {
     autoReplySubject: 'We received your {request}',
     autoReplyText: 'Hi {name},\n\nThank you for contacting {site}. We have received your {request} and will get back to you shortly.\n\nIf it is urgent, call us on {phone}.\n\n— {site}',
   },
+  // Admin panel branding: sidebar, login screen and browser tab. Empty values fall back to the product defaults.
+  admin: {
+    name: '',
+    logo: '',
+    favicon: '',
+    subtitle: '',
+    loginBadge: 'Version 1.0',
+    loginTitle: 'Craft your website,',
+    loginHighlight: 'block by block.',
+    loginText: 'Visual page builder, theme customizer, media library and team permissions — all in one beautiful dashboard.',
+    loginImage: '',
+    welcomeTitle: 'Welcome back 👋',
+    welcomeText: 'Sign in to manage your website.',
+    footerText: '',
+  },
   // Reader engagement on posts and series.
   engagement: {
     comments: true,
