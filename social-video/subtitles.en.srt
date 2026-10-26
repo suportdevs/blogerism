@@ -1,0 +1,139 @@
+1
+00:00:00,000 --> 00:00:04,808
+Meet Themewright, a full stack content
+management system and website builder. Its
+
+2
+00:00:04,808 --> 00:00:09,615
+design addresses a familiar problem: rebuilding
+the same content tools for every
+
+3
+00:00:09,615 --> 00:00:10,417
+client
+website.
+
+4
+00:00:11,267 --> 00:00:16,777
+The frontend uses Next.js fourteen, React
+eighteen, and Tailwind CSS. Visitors see
+
+5
+00:00:16,777 --> 00:00:22,287
+server-rendered pages, while the admin dashboard
+manages content, media, and design, with
+
+6
+00:00:22,287 --> 00:00:24,583
+TipTap for rich
+text editing.
+
+7
+00:00:25,433 --> 00:00:30,458
+Choose a theme, arrange page blocks,
+and preview different screen sizes before
+
+8
+00:00:30,458 --> 00:00:35,483
+publishing. Theme workspaces preserve each theme
+family's content when you switch designs.
+
+9
+00:00:36,333 --> 00:00:43,407
+Node.js and Express expose REST APIs.
+Prisma connects to PostgreSQL. JWT authentication,
+
+10
+00:00:43,407 --> 00:00:50,481
+hashed passwords, and role permissions control
+administrative access. The database is PostgreSQL,
+
+11
+00:00:50,481 --> 00:00:52,250
+rather than
+MongoDB.
+
+12
+00:00:53,100 --> 00:00:58,238
+An editor saves content through an
+authenticated request. Express checks access, and
+
+13
+00:00:58,238 --> 00:01:03,376
+Prisma writes to the database. Next.js
+revalidates its cache and renders website
+
+14
+00:01:03,376 --> 00:01:05,517
+content through the
+public API.
+
+15
+00:01:06,367 --> 00:01:12,903
+Themes support business sites, portfolios, news
+portals, video libraries, and podcasts. Content
+
+16
+00:01:12,903 --> 00:01:19,439
+formats include articles, galleries, video, and
+audio, with shows, playlists, and podcast
+
+17
+00:01:19,439 --> 00:01:19,983
+series.
+
+
+18
+00:01:20,833 --> 00:01:26,979
+Operations include messages, booking requests, and
+newsletters. SEO includes metadata, structured data,
+
+19
+00:01:26,979 --> 00:01:33,126
+sitemaps, and feeds. Multilingual tools offer
+optional Claude translation with a configured
+
+20
+00:01:33,126 --> 00:01:34,150
+API
+key.
+
+21
+00:01:35,000 --> 00:01:40,493
+Revision history, trash recovery, redirects, and
+activity logs support maintenance. Content backups
+
+22
+00:01:40,493 --> 00:01:45,986
+preserve records; uploaded files need a
+separate backup. Team roles define who
+
+23
+00:01:45,986 --> 00:01:47,817
+can manage
+each area.
+
+24
+00:01:48,667 --> 00:01:54,031
+The standout feature is client export.
+Package the active theme, source code,
+
+25
+00:01:54,031 --> 00:01:59,395
+content, and referenced media as a
+standalone project, including generated Docker, PM2,
+
+26
+00:01:59,395 --> 00:02:01,183
+and Nginx
+deployment files.
+
+27
+00:02:02,033 --> 00:02:07,375
+Themewright combines visual editing, structured publishing,
+and client ownership in one reusable
+
+28
+00:02:07,375 --> 00:02:12,717
+foundation. Build different websites without rebuilding
+the same management system every time.

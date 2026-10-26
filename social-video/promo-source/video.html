@@ -1,0 +1,444 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Blogerism Video</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Hind+Siliguri:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #07070d; --fg: #f4f4fb; --mute: #a1a1c2; --dim: #6b6b8f;
+    --a1: #7c6cff; --a2: #22d3ee; --a3: #f472b6; --ok: #34d399;
+    --card: rgba(255,255,255,.055); --line: rgba(255,255,255,.12);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1350px; overflow: hidden; background: var(--bg); }
+  body { font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif; color: var(--fg); position: relative; -webkit-font-smoothing: antialiased; }
+  .mono { font-family: 'JetBrains Mono', Consolas, monospace; }
+  .grad { background: linear-gradient(92deg, var(--a1), var(--a2) 60%, var(--a3)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+  /* backdrop */
+  #bg { position: absolute; inset: 0; overflow: hidden; }
+  .blob { position: absolute; border-radius: 50%; filter: blur(110px); opacity: .55; }
+  #b1 { width: 760px; height: 760px; background: #4c3bdb; left: -260px; top: -200px; }
+  #b2 { width: 680px; height: 680px; background: #0e7490; right: -260px; bottom: -160px; }
+  #b3 { width: 420px; height: 420px; background: #9d174d; right: 80px; top: 380px; opacity: .25; }
+  #grid { position: absolute; inset: 0; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 60px 60px; opacity: .22; mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%); }
+
+  .scene { position: absolute; inset: 0; opacity: 0; }
+  .kicker { position: absolute; left: 72px; top: 118px; font-size: 22px; letter-spacing: .22em; color: var(--a2); font-weight: 700; }
+  .kicker b { color: var(--fg); opacity: .45; font-weight: 500; margin-right: 14px; }
+  .h { position: absolute; left: 72px; right: 72px; top: 160px; font-size: 78px; line-height: 1.04; font-weight: 800; letter-spacing: -.035em; }
+
+  /* browser frame */
+  .browser { position: absolute; left: 60px; width: 960px; top: 428px; border-radius: 22px; overflow: hidden; background: #fff; box-shadow: 0 40px 120px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.14); }
+  .bar { height: 40px; background: #16161f; display: flex; align-items: center; gap: 9px; padding: 0 18px; }
+  .bar i { width: 12px; height: 12px; border-radius: 50%; background: #ff5f57; display: block; }
+  .bar i:nth-child(2) { background: #febc2e; } .bar i:nth-child(3) { background: #28c840; }
+  .bar span { margin-left: 16px; flex: 1; height: 24px; border-radius: 8px; background: #262634; color: #9a9ab8; font-size: 14px; line-height: 24px; padding-left: 14px; font-family: 'JetBrains Mono', monospace; }
+  .shot { width: 960px; height: 600px; overflow: hidden; position: relative; background: #fff; }
+  .shot img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; object-position: top left; transform-origin: 30% 20%; }
+
+  .pills { position: absolute; left: 60px; right: 60px; top: 1112px; display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+  .pill { padding: 14px 24px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); font-size: 27px; font-weight: 600; backdrop-filter: blur(10px); white-space: nowrap; }
+  .pill em { font-style: normal; color: var(--a2); margin-right: 8px; }
+
+  /* persistent brand + progress */
+  #mark { position: absolute; left: 72px; top: 52px; display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 24px; letter-spacing: -.01em; opacity: 0; }
+  #mark .logo { width: 36px; height: 36px; border-radius: 10px; }
+  #prog { position: absolute; left: 0; bottom: 0; height: 6px; width: 1080px; background: linear-gradient(90deg, var(--a1), var(--a2)); transform-origin: left; transform: scaleX(0); }
+  .logo { background: linear-gradient(135deg, #818cf8, #6366f1 50%, #d946ef); display: grid; place-items: center; }
+  .logo .L { color: #fff; font-weight: 800; line-height: 1; display: block; }
+  #mark .L { font-size: 21px; }
+  #s2 .L { font-size: 112px; }
+  #s10 .L { font-size: 86px; }
+
+  /* S1 hook */
+  #s1 .mosaic { position: absolute; left: -200px; right: -200px; top: -300px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; transform: rotate(-8deg); opacity: .5; }
+  #s1 .mosaic img { width: 100%; border-radius: 16px; display: block; }
+  #s1 .veil { position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(7,7,13,.55), rgba(7,7,13,.96) 70%); }
+  #s1 .t { position: absolute; left: 72px; right: 72px; font-weight: 800; letter-spacing: -.04em; text-align: center; }
+  #s1 .t1 { top: 560px; font-size: 92px; line-height: 1.05; }
+  #s1 .t2 { top: 560px; font-size: 96px; line-height: 1.05; }
+  .w { display: inline-block; }
+
+  /* S2 brand */
+  #s2 .logo { position: absolute; left: 450px; top: 410px; width: 180px; height: 180px; border-radius: 44px; box-shadow: 0 30px 90px rgba(124,108,255,.55); }
+  #s2 .name { position: absolute; left: 0; right: 0; top: 650px; text-align: center; font-size: 128px; font-weight: 800; letter-spacing: -.05em; }
+  #s2 .sub { position: absolute; left: 0; right: 0; top: 822px; text-align: center; font-size: 38px; color: var(--mute); font-weight: 500; }
+  #s2 .stack { position: absolute; left: 80px; right: 80px; top: 960px; display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+  #s2 .stack .pill { font-family: 'JetBrains Mono', monospace; font-size: 25px; }
+
+  /* S3 themes */
+  #s3 .browser .shot img { object-position: top center; }
+  #s3 .tlabel { position: absolute; left: 0; right: 0; top: 1112px; text-align: center; }
+  #s3 .tl { position: absolute; left: 0; right: 0; opacity: 0; }
+  #s3 .tl .n { font-size: 50px; font-weight: 800; letter-spacing: -.02em; }
+  #s3 .tl .k { font-size: 26px; color: var(--a2); letter-spacing: .2em; font-weight: 700; margin-top: 4px; }
+  #s3 .counter { position: absolute; right: 72px; top: 118px; font-size: 22px; color: var(--mute); }
+
+  /* phone */
+  .phone { position: absolute; width: 250px; height: 520px; border-radius: 40px; background: #111; padding: 10px; box-shadow: 0 30px 80px rgba(0,0,0,.7), 0 0 0 2px rgba(255,255,255,.18); }
+  .phone img { width: 100%; height: 100%; border-radius: 31px; object-fit: cover; object-position: top; display: block; }
+
+  /* S6 languages */
+  #s6 .langs { position: absolute; right: 90px; top: 830px; width: 420px; height: 150px; }
+  #s6 .lang { position: absolute; right: 0; top: 0; padding: 22px 36px; border-radius: 26px; background: linear-gradient(135deg, var(--a1), #4f46e5); font-size: 64px; font-weight: 700; box-shadow: 0 24px 70px rgba(79,70,229,.6); opacity: 0; white-space: nowrap; }
+  .bn { font-family: 'Hind Siliguri', 'Nirmala UI', sans-serif; }
+
+  /* S7 architecture */
+  #s7 .layer { position: absolute; left: 72px; right: 72px; height: 216px; border-radius: 28px; background: var(--card); border: 1px solid var(--line); padding: 30px 36px; backdrop-filter: blur(12px); }
+  #s7 .layer .lk { font-size: 20px; letter-spacing: .22em; font-weight: 700; }
+  #s7 .layer .lt { font-size: 46px; font-weight: 800; letter-spacing: -.02em; margin: 6px 0 16px; }
+  #s7 .layer .chips { display: flex; gap: 10px; flex-wrap: wrap; }
+  #s7 .layer .chips span { font-size: 21px; padding: 7px 14px; border-radius: 10px; background: rgba(255,255,255,.07); color: #d6d6ee; font-family: 'JetBrains Mono', monospace; }
+  #s7 .layer .big { position: absolute; right: 36px; top: 28px; text-align: right; }
+  #s7 .layer .big b { display: block; font-size: 58px; font-weight: 800; line-height: 1; }
+  #s7 .layer .big small { font-size: 19px; color: var(--mute); letter-spacing: .08em; }
+  #s7 .link { position: absolute; left: 538px; width: 4px; height: 52px; background: linear-gradient(var(--a1), var(--a2)); border-radius: 4px; transform-origin: top; }
+  #s7 .pkt { position: absolute; left: 532px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 0 22px var(--a2), 0 0 6px #fff; opacity: 0; }
+  #s7 .extra { position: absolute; left: 72px; right: 72px; top: 1210px; text-align: center; font-size: 24px; color: var(--mute); }
+  #s7 .extra b { color: var(--fg); font-weight: 600; }
+
+  /* S8 export */
+  #s8 .term { position: absolute; left: 140px; right: 140px; top: 958px; border-radius: 18px; background: #0d0d16; border: 1px solid var(--line); padding: 22px 28px; font-size: 26px; box-shadow: 0 30px 90px rgba(0,0,0,.7); }
+  #s8 .term .p { color: var(--ok); }
+  #s8 .term .typed { display: inline-block; overflow: hidden; white-space: nowrap; vertical-align: bottom; width: 0; }
+  #s8 .term .res { color: var(--mute); margin-top: 10px; opacity: 0; }
+  #s8 .term .res b { color: var(--ok); }
+  #s8 .pills { top: 1168px; }
+  #s8 .pill { font-size: 24px; padding: 12px 20px; }
+
+  /* S9 why */
+  #s9 .q { position: absolute; left: 72px; right: 72px; font-weight: 800; letter-spacing: -.035em; }
+  #s9 .lab { font-size: 24px; letter-spacing: .22em; color: var(--a3); font-weight: 700; margin-bottom: 18px; }
+  #s9 .q1 { top: 150px; font-size: 60px; line-height: 1.1; color: #c9c9e3; }
+  #s9 .q1 .strike { position: relative; display: inline-block; }
+  #s9 .q1 .strike::after { content: ''; position: absolute; left: 0; right: 0; top: 54%; height: 6px; background: var(--a3); transform: scaleX(var(--s, 0)); transform-origin: left; border-radius: 3px; }
+  #s9 .q2 { top: 470px; font-size: 104px; line-height: 1; }
+  #s9 .q2 .lab { color: var(--ok); }
+  #s9 .stats { position: absolute; left: 72px; right: 72px; top: 820px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  #s9 .stat { border-radius: 24px; background: var(--card); border: 1px solid var(--line); padding: 26px 30px; }
+  #s9 .stat b { font-size: 72px; font-weight: 800; letter-spacing: -.03em; display: block; line-height: 1; }
+  #s9 .stat span { font-size: 25px; color: var(--mute); }
+
+  /* S10 outro */
+  #s10 .logo { position: absolute; left: 470px; top: 290px; width: 140px; height: 140px; border-radius: 36px; box-shadow: 0 30px 90px rgba(124,108,255,.55); }
+  #s10 .name { position: absolute; left: 0; right: 0; top: 470px; text-align: center; font-size: 112px; font-weight: 800; letter-spacing: -.05em; }
+  #s10 .tag { position: absolute; left: 0; right: 0; top: 625px; text-align: center; font-size: 44px; font-weight: 700; color: var(--mute); }
+  #s10 .st { position: absolute; left: 0; right: 0; top: 735px; text-align: center; font-size: 26px; color: var(--dim); }
+  #s10 .cta { position: absolute; left: 150px; right: 150px; top: 900px; text-align: center; padding: 34px 30px; border-radius: 30px; background: linear-gradient(135deg, rgba(124,108,255,.25), rgba(34,211,238,.18)); border: 1px solid rgba(255,255,255,.2); font-size: 38px; font-weight: 700; line-height: 1.3; }
+</style>
+</head>
+<body>
+<div id="bg"><div class="blob" id="b1"></div><div class="blob" id="b2"></div><div class="blob" id="b3"></div><div id="grid"></div></div>
+
+<!-- S1 hook -->
+<section class="scene" id="s1">
+  <div class="mosaic">
+    <img src="img/theme-saffron.jpg"><img src="img/theme-pulse.jpg"><img src="img/theme-haven.jpg">
+    <img src="img/theme-folio.jpg"><img src="img/site-home.jpg"><img src="img/theme-aurelia.jpg">
+    <img src="img/theme-kinetic.jpg"><img src="img/theme-forge.jpg"><img src="img/theme-vitalis.jpg">
+    <img src="img/theme-wanderly.jpg"><img src="img/theme-lens.jpg"><img src="img/theme-evergreen.jpg">
+    <img src="img/admin-dashboard.jpg"><img src="img/theme-aurelia.jpg"><img src="img/theme-pulse.jpg">
+    <img src="img/theme-haven.jpg"><img src="img/admin-builder.jpg"><img src="img/theme-saffron.jpg">
+  </div>
+  <div class="veil"></div>
+  <div class="t t1" data-words>Every client wants a&nbsp;different website.</div>
+  <div class="t t2"><span class="w">One</span> <span class="w">CMS</span> <span class="w">that</span> <span class="w">becomes</span> <span class="w grad">all of them.</span></div>
+</section>
+
+<!-- S2 brand -->
+<section class="scene" id="s2">
+  <div class="logo"><span class="L">B</span></div>
+  <div class="name">Blogerism</div>
+  <div class="sub">Full-stack CMS &amp; website builder</div>
+  <div class="stack">
+    <span class="pill">Next.js 14</span><span class="pill">React 18</span><span class="pill">Tailwind</span><span class="pill">Node.js</span><span class="pill">Express</span><span class="pill">Prisma</span><span class="pill">PostgreSQL</span>
+  </div>
+</section>
+
+<!-- S3 themes -->
+<section class="scene" id="s3">
+  <div class="kicker mono"><b>01</b>THEMES</div>
+  <div class="counter mono" id="tcount">01 / 12</div>
+  <div class="h">19 themes.<br><span class="grad">80 ready designs.</span></div>
+  <div class="browser"><div class="bar"><i></i><i></i><i></i><span id="turl">localhost:3000</span></div><div class="shot" id="tshots"></div></div>
+  <div class="tlabel" id="tlabels"></div>
+</section>
+
+<!-- S4 builder -->
+<section class="scene" id="s4">
+  <div class="kicker mono"><b>02</b>PAGE BUILDER</div>
+  <div class="h">Drag. Drop.<br><span class="grad">Publish.</span></div>
+  <div class="browser"><div class="bar"><i></i><i></i><i></i><span>/admin/pages/home</span></div><div class="shot"><img src="img/admin-builder.jpg"></div></div>
+  <div class="phone" style="left:790px;top:610px"><img src="img/site-mobile.jpg"></div>
+  <div class="pills"><span class="pill"><em>98</em>block types</span><span class="pill">Live preview</span><span class="pill">Desktop · Tablet · Mobile</span><span class="pill">Undo &amp; revisions</span></div>
+</section>
+
+<!-- S5 admin -->
+<section class="scene" id="s5">
+  <div class="kicker mono"><b>03</b>ADMIN PANEL</div>
+  <div class="h">An admin your<br><span class="grad">clients enjoy.</span></div>
+  <div class="browser"><div class="bar"><i></i><i></i><i></i><span>/admin</span></div><div class="shot"><img src="img/admin-dashboard.jpg"></div></div>
+  <div class="pills"><span class="pill">Roles &amp; permissions</span><span class="pill">⌘K command palette</span><span class="pill">Dark mode</span><span class="pill">White-label branding</span></div>
+</section>
+
+<!-- S6 i18n -->
+<section class="scene" id="s6">
+  <div class="kicker mono"><b>04</b>MULTILINGUAL</div>
+  <div class="h">Speaks your<br><span class="grad">audience's language.</span></div>
+  <div class="browser"><div class="bar"><i></i><i></i><i></i><span>/admin/translations</span></div><div class="shot"><img src="img/admin-translations.jpg"></div></div>
+  <div class="langs">
+    <div class="lang bn">বাংলা</div><div class="lang">English</div><div class="lang" style="font-family:'Nirmala UI',sans-serif">हिन्दी</div><div class="lang" style="font-family:'Segoe UI',sans-serif">العربية</div>
+  </div>
+  <div class="pills"><span class="pill"><em>24</em>languages + RTL</span><span class="pill">AI translate with Claude</span><span class="pill">hreflang &amp; sitemaps</span></div>
+</section>
+
+<!-- S7 architecture -->
+<section class="scene" id="s7">
+  <div class="kicker mono"><b>05</b>UNDER THE HOOD</div>
+  <div class="h" style="font-size:72px">Clean, layered<br><span class="grad">architecture.</span></div>
+  <div class="layer" style="top:390px">
+    <div class="lk mono" style="color:var(--a2)">FRONTEND</div><div class="lt">Next.js 14 App Router</div>
+    <div class="chips"><span>SSR site</span><span>Admin panel</span><span>Tailwind</span><span>TipTap</span><span>Recharts</span></div>
+    <div class="big"><b>29</b><small>ADMIN SCREENS</small></div>
+  </div>
+  <div class="link" style="top:618px"></div><div class="pkt" id="pk1" style="top:618px"></div>
+  <div class="layer" style="top:682px">
+    <div class="lk mono" style="color:var(--a1)">BACKEND</div><div class="lt">Express REST API</div>
+    <div class="chips"><span>JWT auth</span><span>RBAC</span><span>Zod</span><span>Helmet</span><span>Rate limit</span></div>
+    <div class="big"><b>120+</b><small>ENDPOINTS</small></div>
+  </div>
+  <div class="link" style="top:910px"></div><div class="pkt" id="pk2" style="top:910px"></div>
+  <div class="layer" style="top:974px">
+    <div class="lk mono" style="color:var(--a3)">DATA</div><div class="lt">Prisma + PostgreSQL 16</div>
+    <div class="chips"><span>Workspaces</span><span>Revisions</span><span>Backups</span></div>
+    <div class="big"><b>23</b><small>MODELS</small></div>
+  </div>
+  <div class="extra">+ <b>Nodemailer SMTP</b> · <b>Claude API</b> · <b>Docker</b> · <b>SEO, RSS &amp; sitemaps</b></div>
+</section>
+
+<!-- S8 export -->
+<section class="scene" id="s8">
+  <div class="kicker mono"><b>06</b>CLIENT HANDOVER</div>
+  <div class="h">One click.<br><span class="grad">A client-ready project.</span></div>
+  <div class="browser"><div class="bar"><i></i><i></i><i></i><span>/admin/export</span></div><div class="shot"><img src="img/admin-export.jpg"></div></div>
+  <div class="term mono"><span class="p">$</span> <span class="typed">docker compose up -d --build</span><div class="res"><b>✓</b> PostgreSQL · API · website are running</div></div>
+  <div class="pills"><span class="pill">Full source code</span><span class="pill">Content snapshot</span><span class="pill">Docker · PM2 · Nginx</span><span class="pill">Fresh secrets</span></div>
+</section>
+
+<!-- S9 why -->
+<section class="scene" id="s9">
+  <div class="q q1"><div class="lab mono">THE PROBLEM</div>Agencies <span class="strike">rebuild the same CMS</span> for every client.</div>
+  <div class="q q2"><div class="lab mono">THE IDEA</div>Build once.<br><span class="grad">Deliver many.</span></div>
+  <div class="stats">
+    <div class="stat"><b data-count="29" data-suffix="K+">0</b><span>lines of code</span></div>
+    <div class="stat"><b data-count="19">0</b><span>site themes</span></div>
+    <div class="stat"><b data-count="98">0</b><span>page blocks</span></div>
+    <div class="stat"><b data-count="120" data-suffix="+">0</b><span>API endpoints</span></div>
+  </div>
+</section>
+
+<!-- S10 outro -->
+<section class="scene" id="s10">
+  <div class="logo"><span class="L">B</span></div>
+  <div class="name">Blogerism</div>
+  <div class="tag">Build once. Deliver many.</div>
+  <div class="st mono">Next.js · Express · Prisma · PostgreSQL</div>
+  <div class="cta">Which feature should I demo next?<br><span class="grad">Tell me in the comments 👇</span></div>
+</section>
+
+<div id="mark"><div class="logo"><span class="L">B</span></div>Blogerism</div>
+<div id="prog"></div>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const OUT = 'cubic-bezier(.16,1,.3,1)';
+const TOTAL = 60;
+const hooks = [];
+
+// Every animation lives on one timeline; window.seek(t) scrubs them all, so frames are exact.
+// First animation on an element fills 'both'; later ones fill 'forwards' so they never override earlier state.
+function anim(el, t0, dur, kf, { ease = OUT, fill = 'both' } = {}) {
+  el.animate(kf, { delay: t0 * 1000, duration: dur * 1000, fill, easing: ease });
+}
+function scene(sel, t0, t1) {
+  const el = $(sel);
+  anim(el, t0, .4, [{ opacity: 0 }, { opacity: 1 }], { ease: 'ease-out' });
+  anim(el, t1 - .4, .4, [{ opacity: 1 }, { opacity: 0 }], { ease: 'ease-in', fill: 'forwards' });
+  return el;
+}
+function rise(el, t, { y = 50, dur = .8, blur = 10 } = {}) {
+  anim(el, t, dur, [{ opacity: 0, transform: `translateY(${y}px)`, filter: `blur(${blur}px)` }, { opacity: 1, transform: 'none', filter: 'blur(0)' }]);
+}
+function pop(el, t) {
+  anim(el, t, .6, [{ opacity: 0, transform: 'scale(.7)' }, { opacity: 1, transform: 'scale(1)' }], { ease: 'cubic-bezier(.34,1.56,.64,1)' });
+}
+function kenburns(img, t0, dur, to = 1.12) {
+  anim(img, t0, dur, [{ transform: 'scale(1)' }, { transform: `scale(${to})` }], { ease: 'linear' });
+}
+function stagger(els, t, step, fn = rise) { els.forEach((e, i) => fn(e, t + i * step)); }
+function splitWords(el) {
+  el.innerHTML = el.innerHTML.split(' ').map((w) => `<span class="w">${w}</span>`).join(' ');
+  return $$('.w', el);
+}
+
+// backdrop drift
+anim($('#b1'), 0, TOTAL, [{ transform: 'translate(0,0)' }, { transform: 'translate(320px,520px)' }], { ease: 'linear' });
+anim($('#b2'), 0, TOTAL, [{ transform: 'translate(0,0)' }, { transform: 'translate(-300px,-640px)' }], { ease: 'linear' });
+anim($('#b3'), 0, TOTAL, [{ transform: 'translate(0,0) scale(1)' }, { transform: 'translate(-500px,300px) scale(1.4)' }], { ease: 'linear' });
+anim($('#prog'), 0, TOTAL, [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { ease: 'linear' });
+anim($('#mark'), 8.8, .6, [{ opacity: 0, transform: 'translateY(-10px)' }, { opacity: .9, transform: 'none' }]);
+anim($('#mark'), 54.6, .4, [{ opacity: .9 }, { opacity: 0 }], { fill: 'forwards' });
+
+// S1 hook 0 – 4.4
+scene('#s1', 0, 4.4);
+anim($('#s1 .mosaic'), 0, 4.4, [{ transform: 'rotate(-8deg) translateY(0) scale(1.05)' }, { transform: 'rotate(-8deg) translateY(-260px) scale(1)' }], { ease: 'linear' });
+const w1 = splitWords($('#s1 .t1'));
+stagger(w1, .15, .09);
+anim($('#s1 .t1'), 1.95, .35, [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(-40px)' }], { fill: 'forwards' });
+stagger($$('#s1 .t2 .w'), 2.2, .1);
+
+// S2 brand 4.4 – 8.8
+scene('#s2', 4.4, 8.8);
+pop($('#s2 .logo'), 4.5);
+anim($('#s2 .logo .L'), 4.5, 1.2, [{ transform: 'rotate(-90deg) scale(.4)' }, { transform: 'none' }]);
+rise($('#s2 .name'), 4.75, { y: 40 });
+rise($('#s2 .sub'), 5.05, { y: 30 });
+stagger($$('#s2 .stack .pill'), 5.5, .12, pop);
+
+// S3 themes 8.8 – 17.2
+scene('#s3', 8.8, 17.2);
+rise($('#s3 .kicker'), 8.9, { y: 20 });
+rise($('#s3 .h'), 9.0);
+rise($('#s3 .browser'), 9.2, { y: 80 });
+const themes = [
+  ['site-home', 'Vidora', 'VIDEO PLATFORM', 'vidora.demo'],
+  ['theme-pulse', 'Pulse', 'SAAS & STARTUP', 'pulse.demo'],
+  ['theme-saffron', 'Saffron', 'RESTAURANT', 'saffron.demo'],
+  ['theme-haven', 'Haven', 'REAL ESTATE', 'haven.demo'],
+  ['theme-folio', 'Folio', 'PERSONAL PORTFOLIO', 'folio.demo'],
+  ['theme-forge', 'Forge', 'GYM & FITNESS', 'forge.demo'],
+  ['theme-aurelia', 'Aurelia', 'HOTEL & SPA', 'aurelia.demo'],
+  ['theme-vitalis', 'Vitalis', 'MEDICAL CLINIC', 'vitalis.demo'],
+  ['theme-kinetic', 'Kinetic', 'CREATIVE AGENCY', 'kinetic.demo'],
+  ['theme-wanderly', 'Wanderly', 'TRAVEL & TOURS', 'wanderly.demo'],
+  ['theme-lens', 'Lens', 'PHOTOGRAPHY', 'lens.demo'],
+  ['theme-evergreen', 'Evergreen', 'NONPROFIT', 'evergreen.demo'],
+];
+const T3 = 9.35, STEP = .64;
+themes.forEach(([img, name, kind], i) => {
+  const im = document.createElement('img');
+  im.src = `img/${img}.jpg`;
+  $('#tshots').appendChild(im);
+  const t = T3 + i * STEP;
+  if (i === 0) anim(im, 0, .01, [{ opacity: 1 }, { opacity: 1 }]);
+  else anim(im, t, .3, [{ opacity: 0, transform: 'translateX(60px) scale(1.04)' }, { opacity: 1, transform: 'none' }]);
+  const lab = document.createElement('div');
+  lab.className = 'tl';
+  lab.innerHTML = `<div class="n">${name}</div><div class="k mono">${kind}</div>`;
+  $('#tlabels').appendChild(lab);
+  anim(lab, t, .25, [{ opacity: 0, transform: 'translateY(20px)' }, { opacity: 1, transform: 'none' }]);
+  if (i < themes.length - 1) anim(lab, t + STEP - .12, .12, [{ opacity: 1 }, { opacity: 0 }], { fill: 'forwards' });
+});
+hooks.push((t) => {
+  const i = Math.max(0, Math.min(themes.length - 1, Math.floor((t - T3) / STEP)));
+  $('#tcount').textContent = `${String(i + 1).padStart(2, '0')} / 12`;
+  $('#turl').textContent = themes[i][3];
+});
+
+// S4 builder 17.2 – 23.6
+scene('#s4', 17.2, 23.6);
+rise($('#s4 .kicker'), 17.3, { y: 20 });
+rise($('#s4 .h'), 17.4);
+rise($('#s4 .browser'), 17.6, { y: 80 });
+kenburns($('#s4 .shot img'), 17.6, 6, 1.18);
+anim($('#s4 .phone'), 18.6, .9, [{ opacity: 0, transform: 'translate(120px,40px) rotate(8deg)' }, { opacity: 1, transform: 'rotate(3deg)' }]);
+stagger($$('#s4 .pill'), 18.9, .2, pop);
+
+// S5 admin 23.6 – 29.6
+scene('#s5', 23.6, 29.6);
+rise($('#s5 .kicker'), 23.7, { y: 20 });
+rise($('#s5 .h'), 23.8);
+rise($('#s5 .browser'), 24.0, { y: 80 });
+kenburns($('#s5 .shot img'), 24.0, 5.6, 1.15);
+stagger($$('#s5 .pill'), 24.9, .2, pop);
+
+// S6 i18n 29.6 – 35.2
+scene('#s6', 29.6, 35.2);
+rise($('#s6 .kicker'), 29.7, { y: 20 });
+rise($('#s6 .h'), 29.8);
+rise($('#s6 .browser'), 30.0, { y: 80 });
+kenburns($('#s6 .shot img'), 30.0, 5.2, 1.1);
+$$('#s6 .lang').forEach((l, i) => {
+  const t = 30.7 + i * 1.0;
+  anim(l, t, .4, [{ opacity: 0, transform: 'translateY(40px) scale(.9)' }, { opacity: 1, transform: 'none' }], { ease: 'cubic-bezier(.34,1.56,.64,1)' });
+  if (i < 3) anim(l, t + .85, .2, [{ opacity: 1 }, { opacity: 0, transform: 'translateY(-30px)' }], { fill: 'forwards' });
+});
+stagger($$('#s6 .pill'), 31.0, .25, pop);
+
+// S7 architecture 35.2 – 43.2
+scene('#s7', 35.2, 43.2);
+rise($('#s7 .kicker'), 35.3, { y: 20 });
+rise($('#s7 .h'), 35.4);
+const layers = $$('#s7 .layer');
+layers.forEach((l, i) => {
+  anim(l, 35.8 + i * .7, .8, [{ opacity: 0, transform: 'translateX(-80px)' }, { opacity: 1, transform: 'none' }]);
+  stagger($$('.chips span', l), 36.2 + i * .7, .06, (e, t) => anim(e, t, .4, [{ opacity: 0 }, { opacity: 1 }]));
+});
+$$('#s7 .link').forEach((l, i) => anim(l, 36.3 + i * .7, .4, [{ transform: 'scaleY(0)' }, { transform: 'scaleY(1)' }]));
+['#pk1', '#pk2'].forEach((id, i) => {
+  for (let k = 0; k < 4; k++) {
+    const t = 37.6 + i * .35 + k * 1.3;
+    const kf = [{ opacity: 0, transform: 'translateY(-4px)' }, { opacity: 1, offset: .2 }, { opacity: 1, offset: .8 }, { opacity: 0, transform: 'translateY(44px)' }];
+    anim($(id), t, .7, kf, { ease: 'linear', fill: k === 0 ? 'both' : 'forwards' });
+  }
+});
+rise($('#s7 .extra'), 38.4, { y: 20 });
+
+// S8 export 43.2 – 49.6
+scene('#s8', 43.2, 49.6);
+rise($('#s8 .kicker'), 43.3, { y: 20 });
+rise($('#s8 .h'), 43.4);
+rise($('#s8 .browser'), 43.6, { y: 80 });
+kenburns($('#s8 .shot img'), 43.6, 6, 1.12);
+rise($('#s8 .term'), 44.6, { y: 40 });
+anim($('#s8 .typed'), 45.0, 1.4, [{ width: '0ch' }, { width: '28ch' }], { ease: 'steps(28, end)' });
+anim($('#s8 .res'), 46.6, .4, [{ opacity: 0 }, { opacity: 1 }]);
+stagger($$('#s8 .pill'), 47.0, .18, pop);
+
+// S9 why 49.6 – 55
+scene('#s9', 49.6, 55);
+rise($('#s9 .q1'), 49.7);
+hooks.push((t) => { $('#s9 .q1 .strike').style.setProperty('--s', Math.max(0, Math.min(1, (t - 50.7) / .5))); });
+anim($('#s9 .q1'), 51.2, .5, [{ opacity: 1 }, { opacity: .45 }], { fill: 'forwards' });
+rise($('#s9 .q2'), 51.3, { y: 60 });
+stagger($$('#s9 .stat'), 52.2, .15, pop);
+hooks.push((t) => {
+  $$('#s9 [data-count]').forEach((el, i) => {
+    const p = Math.max(0, Math.min(1, (t - 52.3 - i * .15) / 1.3));
+    const e = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(+el.dataset.count * e) + (p > 0 ? (el.dataset.suffix || '') : '');
+  });
+});
+
+// S10 outro 55 – 60
+scene('#s10', 55, 60.4);
+pop($('#s10 .logo'), 55.1);
+rise($('#s10 .name'), 55.3, { y: 40 });
+rise($('#s10 .tag'), 55.6, { y: 30 });
+rise($('#s10 .st'), 55.9, { y: 20 });
+rise($('#s10 .cta'), 56.4, { y: 40 });
+
+document.getAnimations().forEach((a) => a.pause());
+window.seek = (t) => {
+  document.getAnimations().forEach((a) => { a.currentTime = t * 1000; });
+  hooks.forEach((h) => h(t));
+};
+window.TOTAL = TOTAL;
+window.seek(0);
+</script>
+</body>
+</html>

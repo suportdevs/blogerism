@@ -1,0 +1,212 @@
+﻿[
+  {
+    "tag": "THE IDEA",
+    "title": "One foundation.\nMany websites.",
+    "note": "THEMEWRIGHT / FULL STACK CMS",
+    "cards": [
+      [
+        "The problem",
+        "Rebuilding content tools for every client."
+      ],
+      [
+        "The approach",
+        "Reusable design, content and publishing."
+      ],
+      [
+        "The outcome",
+        "Customize a site. Deliver the full project."
+      ]
+    ],
+    "en": "Meet Themewright, a full stack content management system and website builder. Its design addresses a familiar problem: rebuilding the same content tools for every client website.",
+    "bn": "Themewright একটি full stack CMS ও website builder। প্রতিটি client website-এর জন্য একই content tools বারবার তৈরির সমস্যা সমাধানের লক্ষ্য নিয়ে এর নকশা।"
+  },
+  {
+    "tag": "01 / FRONTEND",
+    "title": "A website.\nAnd its control room.",
+    "note": "NEXT.JS 14 + REACT 18 + TAILWIND",
+    "cards": [
+      [
+        "Public website",
+        "Server-rendered pages and responsive layouts."
+      ],
+      [
+        "Admin dashboard",
+        "Manage content, design, media and your team."
+      ],
+      [
+        "Editing tools",
+        "TipTap rich text and reusable components."
+      ]
+    ],
+    "en": "The frontend uses Next.js fourteen, React eighteen, and Tailwind CSS. Visitors see server-rendered pages, while the admin dashboard manages content, media, and design, with TipTap for rich text editing.",
+    "bn": "Frontend-এ Next.js 14, React 18 ও Tailwind CSS। Public server-rendered pages এবং content, media ও design পরিচালনার admin dashboard আছে। TipTap দিয়ে rich text edit করা যায়।"
+  },
+  {
+    "tag": "02 / PAGE BUILDER",
+    "title": "Compose.\nPreview. Publish.",
+    "note": "A VISUAL WORKFLOW",
+    "cards": [
+      [
+        "Choose a theme",
+        "Business, news, video or portfolio designs."
+      ],
+      [
+        "Build your pages",
+        "Arrange blocks, edit styles and add media."
+      ],
+      [
+        "Preview and publish",
+        "Desktop, tablet and mobile previews."
+      ]
+    ],
+    "en": "Choose a theme, arrange page blocks, and preview different screen sizes before publishing. Theme workspaces preserve each theme family's content when you switch designs.",
+    "bn": "Theme বেছে blocks সাজান ও বিভিন্ন screen size-এ preview করে publish করুন। Theme বদলালে প্রতিটি theme family-এর content workspace সংরক্ষিত থাকে।"
+  },
+  {
+    "tag": "03 / BACKEND",
+    "title": "Structured data.\nControlled access.",
+    "note": "NODE.JS + EXPRESS + PRISMA + POSTGRESQL",
+    "cards": [
+      [
+        "Express REST API",
+        "Public endpoints and protected admin routes."
+      ],
+      [
+        "Prisma + PostgreSQL",
+        "Structured content, users and settings."
+      ],
+      [
+        "Access control",
+        "JWT, bcrypt and role permissions."
+      ]
+    ],
+    "en": "Node.js and Express expose REST APIs. Prisma connects to PostgreSQL. JWT authentication, hashed passwords, and role permissions control administrative access. The database is PostgreSQL, rather than MongoDB.",
+    "bn": "Node.js ও Express REST API দেয়; Prisma দিয়ে PostgreSQL-এ data রাখা হয়। JWT, hashed passwords ও role permissions admin access নিয়ন্ত্রণ করে।"
+  },
+  {
+    "tag": "04 / THE FULL FLOW",
+    "title": "From edit\nto live content.",
+    "note": "ADMIN > API > DATABASE > PUBLIC WEBSITE",
+    "cards": [
+      [
+        "1  Editor saves",
+        "Authenticated request reaches Express."
+      ],
+      [
+        "2  Data is stored",
+        "Prisma writes data; cache is revalidated."
+      ],
+      [
+        "3  Website renders",
+        "Next.js reads content through the public API."
+      ]
+    ],
+    "en": "An editor saves content through an authenticated request. Express checks access, and Prisma writes to the database. Next.js revalidates its cache and renders website content through the public API.",
+    "bn": "Editor authenticated request দিয়ে save করেন। Express access যাচাই করে; Prisma database-এ লেখে। Next.js cache revalidate করে public API থেকে website render করে।"
+  },
+  {
+    "tag": "05 / USE CASES",
+    "title": "Business sites.\nMedia platforms.",
+    "note": "ONE CMS / DIFFERENT EXPERIENCES",
+    "cards": [
+      [
+        "Business and portfolios",
+        "Restaurants, clinics, agencies and brands."
+      ],
+      [
+        "News and video",
+        "Articles, video pages and show episodes."
+      ],
+      [
+        "Audio publishing",
+        "Podcast series and a persistent mini-player."
+      ]
+    ],
+    "en": "Themes support business sites, portfolios, news portals, video libraries, and podcasts. Content formats include articles, galleries, video, and audio, with shows, playlists, and podcast series.",
+    "bn": "Business site, portfolio, news portal, video library ও podcast তৈরি করা যায়। Article, gallery, video, audio, show, playlist ও podcast series আছে।"
+  },
+  {
+    "tag": "06 / OPERATIONS",
+    "title": "Beyond\npublishing.",
+    "note": "CONTENT + ENGAGEMENT + DISCOVERY",
+    "cards": [
+      [
+        "Manage conversations",
+        "Messages, booking requests and newsletters."
+      ],
+      [
+        "Improve discovery",
+        "SEO, structured data, sitemaps and feeds."
+      ],
+      [
+        "Reach more readers",
+        "Multilingual tools and optional AI translation."
+      ]
+    ],
+    "en": "Operations include messages, booking requests, and newsletters. SEO includes metadata, structured data, sitemaps, and feeds. Multilingual tools offer optional Claude translation with a configured API key.",
+    "bn": "Messages, booking requests ও newsletter পরিচালনা করা যায়। SEO-তে metadata, structured data, sitemap ও feed আছে। API key configure করলে Claude translation ব্যবহার করা যায়।"
+  },
+  {
+    "tag": "07 / CONTENT CONTROL",
+    "title": "Edit with\na way back.",
+    "note": "REVISIONS / TRASH / BACKUPS / REDIRECTS",
+    "cards": [
+      [
+        "Recover content",
+        "Revision history and trash restore."
+      ],
+      [
+        "Maintain the website",
+        "Content backups, redirects and activity logs."
+      ],
+      [
+        "Manage the team",
+        "Permissions for each administrative area."
+      ]
+    ],
+    "en": "Revision history, trash recovery, redirects, and activity logs support maintenance. Content backups preserve records; uploaded files need a separate backup. Team roles define who can manage each area.",
+    "bn": "Revision, trash restore, redirects ও logs maintenance-এ সহায়তা করে। Content backup-এর পাশাপাশি uploaded files আলাদা backup নিতে হয়। Team roles permissions নিয়ন্ত্রণ করে।"
+  },
+  {
+    "tag": "08 / CLIENT EXPORT",
+    "title": "Build once.\nDeliver independently.",
+    "note": "STANDALONE CLIENT PROJECT",
+    "cards": [
+      [
+        "Export the active theme",
+        "Source, content snapshot and used media."
+      ],
+      [
+        "Deployment files",
+        "Generated Docker, PM2 and Nginx configs."
+      ],
+      [
+        "Client ownership",
+        "An independent project with editable source."
+      ]
+    ],
+    "en": "The standout feature is client export. Package the active theme, source code, content, and referenced media as a standalone project, including generated Docker, PM2, and Nginx deployment files.",
+    "bn": "বিশেষ feature হলো client export। Active theme, source, content ও ব্যবহৃত media-সহ standalone project পাওয়া যায়; সঙ্গে generated Docker, PM2 ও Nginx config থাকে।"
+  },
+  {
+    "tag": "THE TAKEAWAY",
+    "title": "Less repetition.\nMore ownership.",
+    "note": "THEMEWRIGHT / PROJECT SHOWCASE",
+    "cards": [
+      [
+        "For developers",
+        "A reusable foundation for client websites."
+      ],
+      [
+        "For content teams",
+        "Visual editing and structured publishing."
+      ],
+      [
+        "For clients",
+        "Their website. Their source code."
+      ]
+    ],
+    "en": "Themewright combines visual editing, structured publishing, and client ownership in one reusable foundation. Build different websites without rebuilding the same management system every time.",
+    "bn": "Themewright reusable foundation-এ visual editing, structured publishing ও client ownership একসঙ্গে আনে। বারবার একই management system তৈরি না করে বিভিন্ন website বানানো যায়।"
+  }
+]

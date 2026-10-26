@@ -11,7 +11,8 @@ const { insertTree, resetSequences } = require('./snapshot');
  */
 
 const BACKUP_DIR = path.join(__dirname, '..', '..', 'backups');
-const KIND = 'themewright-backup';
+const KIND = 'blogerism-backup';
+const LEGACY_KINDS = ['themewright-backup']; // backups made before the rename still restore
 const VERSION = 1;
 const NAME_RE = /^[\w.-]+\.json$/;
 
@@ -70,7 +71,7 @@ async function createBackup(prefix = 'backup') {
 }
 
 function validate(backup) {
-  if (backup?.kind !== KIND || !backup.data?.content) throw Object.assign(new Error('This file is not a Themewright backup'), { status: 400 });
+  if (![KIND, ...LEGACY_KINDS].includes(backup?.kind) || !backup.data?.content) throw Object.assign(new Error('This file is not a Blogerism backup'), { status: 400 });
   if (backup.version !== VERSION) throw Object.assign(new Error(`Unsupported backup version ${backup.version}`), { status: 400 });
 }
 

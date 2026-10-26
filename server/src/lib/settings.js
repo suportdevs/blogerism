@@ -5,7 +5,7 @@ const prisma = require('./prisma');
 const DEFAULT_SETTINGS = {
   theme: { active: 'nova' },
   general: {
-    siteName: 'Themewright',
+    siteName: 'Blogerism',
     tagline: 'Build beautiful websites, faster.',
     logo: '',
     logoDark: '',
@@ -37,15 +37,15 @@ const DEFAULT_SETTINGS = {
     headerSticky: true,
     headerCta: { enabled: true, label: 'Get started', url: '/contact' },
     footerStyle: 'columns',
-    footerText: 'Crafted with care using Themewright.',
+    footerText: 'Crafted with care using Blogerism.',
     blogLayout: 'grid',
     showAuthor: true,
     showReadingTime: true,
-    announcement: { enabled: true, text: 'Themewright 1.0 is here — fully customizable, blazing fast.', linkLabel: 'Read more', url: '/blog' },
+    announcement: { enabled: true, text: 'Blogerism 1.0 is here — fully customizable, blazing fast.', linkLabel: 'Read more', url: '/blog' },
     backToTop: true,
   },
   seo: {
-    metaTitle: 'Themewright — Modern content management',
+    metaTitle: 'Blogerism — Modern content management',
     titleSeparator: '|',
     metaDescription: 'A modern, fully customizable CMS built with Express, Next.js and PostgreSQL.',
     metaKeywords: 'cms, nextjs, express, postgresql',

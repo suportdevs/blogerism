@@ -27,12 +27,12 @@ const SURFACE = { background: 'surface' };
 const words = (list) => list.map((name) => ({ name, image: '', url: '' }));
 const rows = (group, list) => list.map(([feature, ...values]) => ({ group, feature, values }));
 
-/* ================================== Themewright ================================== */
+/* ================================== Blogerism ================================== */
 const nova = [
   sec('nova-intro', 'Page intro', 'Gradient hero to open any page',
-    S('hero', { variant: 'centered', eyebrow: 'About Themewright', title: 'We build tools for people who build the web', subtitle: 'A small, senior team obsessed with making content management feel effortless.', primaryLabel: 'Meet the team', primaryUrl: '#team', secondaryLabel: 'Careers', secondaryUrl: '#careers', image: '' }, { background: 'gradient', paddingY: 'xl' })),
+    S('hero', { variant: 'centered', eyebrow: 'About Blogerism', title: 'We build tools for people who build the web', subtitle: 'A small, senior team obsessed with making content management feel effortless.', primaryLabel: 'Meet the team', primaryUrl: '#team', secondaryLabel: 'Careers', secondaryUrl: '#careers', image: '' }, { background: 'gradient', paddingY: 'xl' })),
   sec('nova-tabs', 'Product tabs', 'Auto-playing feature tour with screenshots',
-    S('featureTabs', { eyebrow: 'Inside Themewright', title: 'Everything your content team needs', tabs: [
+    S('featureTabs', { eyebrow: 'Inside Blogerism', title: 'Everything your content team needs', tabs: [
       { icon: 'LayoutGrid', label: 'Page builder', title: 'Drag, drop, publish', text: 'Compose pages from 60+ blocks with a live preview on desktop, tablet and phone.', bullets: ['Undo / redo history', 'Reusable sections', 'Per-block styling'], image: pic('nova-tab-builder', 1200, 900) },
       { icon: 'Image', label: 'Media', title: 'A media library that stays tidy', text: 'Folders, alt text and instant search keep thousands of assets organised.', bullets: ['Drag-and-drop uploads', 'Folders & search'], image: pic('nova-tab-media', 1200, 900) },
       { icon: 'Search', label: 'SEO', title: 'Rank without a plugin', text: 'Titles, descriptions, social images, sitemap and RSS — built in.', bullets: ['Live Google preview', 'Automatic sitemap'], image: pic('nova-tab-seo', 1200, 900) },
@@ -45,29 +45,29 @@ const nova = [
       { icon: 'Users', title: 'Invite your team', text: 'Give editors and authors their own logins.' },
       { icon: 'Rocket', title: 'Go live', text: 'Publish — or export a production-ready project.' },
     ] })),
-  sec('nova-compare', 'Themewright vs. the rest', 'Comparison table with a highlighted column',
-    S('comparison', { eyebrow: 'Compare', title: 'Why teams switch to Themewright', columns: ['Themewright', 'Classic CMS', 'Site builder'], highlight: 1, highlightLabel: 'Best value', rows: [
+  sec('nova-compare', 'Blogerism vs. the rest', 'Comparison table with a highlighted column',
+    S('comparison', { eyebrow: 'Compare', title: 'Why teams switch to Blogerism', columns: ['Blogerism', 'Classic CMS', 'Site builder'], highlight: 1, highlightLabel: 'Best value', rows: [
       ...rows('Editing', [['Visual page builder', 'yes', 'Plugin', 'yes'], ['Rich text editor', 'yes', 'yes', 'Basic'], ['Scheduled publishing', 'yes', 'yes', 'no']]),
       ...rows('Platform', [['Own your code & data', 'yes', 'yes', 'no'], ['Export full project', 'yes', 'no', 'no'], ['Built-in SEO', 'yes', 'Plugin', 'Basic']]),
       ...rows('Cost', [['Monthly fee', '$0', '$0 + plugins', '$29+']]),
     ], buttons: [{ label: 'Get started', url: '/contact' }] })),
-  sec('nova-accordion', 'Why Themewright', 'Accordion that swaps a large image',
-    S('accordionImage', { eyebrow: 'Why Themewright', title: 'Designed around how teams really work', items: [
+  sec('nova-accordion', 'Why Blogerism', 'Accordion that swaps a large image',
+    S('accordionImage', { eyebrow: 'Why Blogerism', title: 'Designed around how teams really work', items: [
       { title: 'Fast by default', text: 'Server-rendered pages, optimised images and a tiny JavaScript footprint.', image: pic('nova-why-1', 1200, 1000) },
       { title: 'Endlessly customisable', text: 'Colours, fonts, layouts and blocks — every pixel is yours to tune.', image: pic('nova-why-2', 1200, 1000) },
       { title: 'Secure and reliable', text: 'Role-based access, hashed passwords, rate limiting and audit logs.', image: pic('nova-why-3', 1200, 1000) },
       { title: 'Developer friendly', text: 'A clean REST API, PostgreSQL and a codebase you will enjoy reading.', image: pic('nova-why-4', 1200, 1000) },
     ] })),
   sec('nova-video', 'Product tour video', 'Video lightbox with counting stats',
-    S('videoLightbox', { eyebrow: 'Product tour', title: 'See Themewright in two minutes', text: 'From a blank page to a published site — watch the whole flow.', poster: pic('nova-tour', 1600, 900), videoUrl: yt(FILM.bunny), layout: 'split', duration: '2:14', stats: [{ value: '2,000+', label: 'Teams' }, { value: '99.9%', label: 'Uptime' }, { value: '4.9/5', label: 'Rating' }] }, { background: 'gradient' })),
+    S('videoLightbox', { eyebrow: 'Product tour', title: 'See Blogerism in two minutes', text: 'From a blank page to a published site — watch the whole flow.', poster: pic('nova-tour', 1600, 900), videoUrl: yt(FILM.bunny), layout: 'split', duration: '2:14', stats: [{ value: '2,000+', label: 'Teams' }, { value: '99.9%', label: 'Uptime' }, { value: '4.9/5', label: 'Rating' }] }, { background: 'gradient' })),
   sec('nova-team', 'Team', 'Cards with sliding bios and socials',
-    S('team', { eyebrow: 'Our people', title: 'The team behind Themewright', subtitle: 'Designers, engineers and writers who care about the details.' }, { anchor: 'team' })),
+    S('team', { eyebrow: 'Our people', title: 'The team behind Blogerism', subtitle: 'Designers, engineers and writers who care about the details.' }, { anchor: 'team' })),
   sec('nova-logos', 'Customer logos', 'Infinite logo marquee',
     S('logoWall', { title: 'Trusted by 2,000+ teams worldwide', logos: words(['Lumen', 'Stackwise', 'Northwind', 'Orbit', 'Quanta', 'Helix', 'Polar', 'Vertex']) }, { paddingY: 'md' })),
   sec('nova-careers', 'Careers', 'Filterable job openings',
     S('jobs', { eyebrow: 'Careers', title: 'Build the future of publishing', subtitle: 'Remote-first, async-friendly and generous with learning budgets.', applyEmail: 'careers@nova.dev' }, { anchor: 'careers' })),
   sec('nova-launch', 'Launch countdown', 'Glass countdown cards for a release',
-    S('countdown', { eyebrow: 'Themewright 3.0', title: 'The biggest release yet is almost here', text: 'AI writing assistant, multilingual content and a brand-new theme engine.', date: '2027-03-01T10:00', variant: 'cards', buttonLabel: 'Join the waitlist', buttonUrl: '/contact' }, { background: 'gradient', paddingY: 'xl' })),
+    S('countdown', { eyebrow: 'Blogerism 3.0', title: 'The biggest release yet is almost here', text: 'AI writing assistant, multilingual content and a brand-new theme engine.', date: '2027-03-01T10:00', variant: 'cards', buttonLabel: 'Join the waitlist', buttonUrl: '/contact' }, { background: 'gradient', paddingY: 'xl' })),
   sec('nova-gallery', 'Use-case carousel', 'Swipeable cards with overlay captions',
     S('cardCarousel', { eyebrow: 'Use cases', title: 'One CMS, many kinds of websites', cardStyle: 'overlay', items: [
       ['Marketing sites', 'Landing pages that convert'], ['Blogs & magazines', 'Long-form stories'], ['Documentation', 'Searchable knowledge bases'], ['Portfolios', 'Show your best work'], ['News portals', 'Breaking news, fast'], ['Restaurants', 'Menus & reservations'],

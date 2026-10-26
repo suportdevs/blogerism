@@ -1,0 +1,149 @@
+1
+00:00:00,000 --> 00:00:04,529
+Themewright একটি full stack CMS
+ও website builder। প্রতিটি client
+
+2
+00:00:04,529 --> 00:00:09,058
+website-এর জন্য একই content tools
+বারবার তৈরির সমস্যা সমাধানের লক্ষ্য
+
+3
+00:00:09,058 --> 00:00:10,417
+নিয়ে এর
+নকশা।
+
+4
+00:00:11,267 --> 00:00:16,199
+Frontend-এ Next.js 14, React 18
+ও Tailwind CSS। Public server-rendered
+
+5
+00:00:16,199 --> 00:00:21,131
+pages এবং content, media ও
+design পরিচালনার admin dashboard আছে।
+
+6
+00:00:21,131 --> 00:00:24,583
+TipTap দিয়ে rich text
+edit করা যায়।
+
+7
+00:00:25,433 --> 00:00:30,219
+Theme বেছে blocks সাজান ও
+বিভিন্ন screen size-এ preview করে
+
+8
+00:00:30,219 --> 00:00:35,005
+publish করুন। Theme বদলালে প্রতিটি
+theme family-এর content workspace সংরক্ষিত
+
+9
+00:00:35,005 --> 00:00:35,483
+থাকে।
+
+
+10
+00:00:36,333 --> 00:00:43,568
+Node.js ও Express REST API
+দেয়; Prisma দিয়ে PostgreSQL-এ data
+
+11
+00:00:43,568 --> 00:00:50,803
+রাখা হয়। JWT, hashed passwords
+ও role permissions admin access
+
+12
+00:00:50,803 --> 00:00:52,250
+নিয়ন্ত্রণ
+করে।
+
+13
+00:00:53,100 --> 00:00:58,499
+Editor authenticated request দিয়ে save
+করেন। Express access যাচাই করে;
+
+14
+00:00:58,499 --> 00:01:03,897
+Prisma database-এ লেখে। Next.js cache
+revalidate করে public API থেকে
+
+15
+00:01:03,897 --> 00:01:05,517
+website render
+করে।
+
+16
+00:01:06,367 --> 00:01:12,556
+Business site, portfolio, news portal,
+video library ও podcast তৈরি
+
+17
+00:01:12,556 --> 00:01:18,745
+করা যায়। Article, gallery, video,
+audio, show, playlist ও podcast
+
+18
+00:01:18,745 --> 00:01:19,983
+series
+আছে।
+
+19
+00:01:20,833 --> 00:01:26,160
+Messages, booking requests ও newsletter
+পরিচালনা করা যায়। SEO-তে metadata,
+
+20
+00:01:26,160 --> 00:01:31,487
+structured data, sitemap ও feed
+আছে। API key configure করলে
+
+21
+00:01:31,487 --> 00:01:34,150
+Claude translation ব্যবহার
+করা যায়।
+
+22
+00:01:35,000 --> 00:01:40,572
+Revision, trash restore, redirects ও
+logs maintenance-এ সহায়তা করে। Content
+
+23
+00:01:40,572 --> 00:01:46,145
+backup-এর পাশাপাশি uploaded files আলাদা
+backup নিতে হয়। Team roles
+
+24
+00:01:46,145 --> 00:01:47,817
+permissions নিয়ন্ত্রণ
+করে।
+
+25
+00:01:48,667 --> 00:01:53,882
+বিশেষ feature হলো client export।
+Active theme, source, content ও
+
+26
+00:01:53,882 --> 00:01:59,097
+ব্যবহৃত media-সহ standalone project পাওয়া
+যায়; সঙ্গে generated Docker, PM2
+
+27
+00:01:59,097 --> 00:02:01,183
+ও Nginx
+config থাকে।
+
+28
+00:02:02,033 --> 00:02:06,678
+Themewright reusable foundation-এ visual editing,
+structured publishing ও client ownership
+
+29
+00:02:06,678 --> 00:02:11,323
+একসঙ্গে আনে। বারবার একই management
+system তৈরি না করে বিভিন্ন
+
+30
+00:02:11,323 --> 00:02:12,717
+website বানানো
+যায়।

@@ -35,13 +35,13 @@ function variant(base, overrides) {
   };
 }
 
-/* ------------------------------ Themewright Luxe ------------------------------ */
+/* ------------------------------ Blogerism Luxe ------------------------------ */
 const novaLuxe = variant(nova, {
   id: 'nova-luxe',
-  name: 'Themewright Luxe',
+  name: 'Blogerism Luxe',
   description: 'A quiet-luxury studio website: framed full-screen hero, serif statements, offset-frame stories, quote carousel and a magazine journal.',
   layout: { article: 'luxe', listing: 'luxe' },
-  general: { siteName: 'Themewright Atelier', tagline: 'A digital atelier for considered brands' },
+  general: { siteName: 'Blogerism Atelier', tagline: 'A digital atelier for considered brands' },
   appearance: luxeAppearance({
     preset: 'nova-luxe', primaryColor: '#a8834a', accentColor: '#1c1a16', backgroundColor: '#f7f3ec', surfaceColor: '#efe8dc', textColor: '#1c1a16',
     darkBackgroundColor: '#0d0c0a', darkSurfaceColor: '#16140f', darkTextColor: '#ede6da', headingFont: 'Cormorant Garamond', bodyFont: 'Jost',
@@ -52,10 +52,10 @@ const novaLuxe = variant(nova, {
     header: { name: 'Main menu', items: [{ label: 'Home', url: '/', children: [] }, { label: 'Journal', url: '/blog', children: [] }, { label: 'About', url: '/about', children: [] }, { label: 'FAQ', url: '/faq', children: [] }, { label: 'Contact', url: '/contact', children: [] }] },
   },
   home: () => ({
-    slug: 'nova-luxe-home', title: 'Home', home: true, template: 'full-width', seoTitle: 'Themewright Atelier — a digital atelier',
+    slug: 'nova-luxe-home', title: 'Home', home: true, template: 'full-width', seoTitle: 'Blogerism Atelier — a digital atelier',
     blocks: [
       B('luxeHero', { image: un('1600585154340-be6161a56a0c', 2200), overline: 'Est. 2019 · Digital atelier', title: 'Crafting digital', italic: 'experiences', subtitle: 'We design and build websites for brands that value craft, clarity and timeless design.', buttonLabel: 'Discover our work', buttonUrl: '#story', height: 'full', align: 'center', overlay: 35 }, HERO),
-      B('luxeStatement', { overline: 'Our philosophy', text: 'The finest digital experiences are quiet, considered and made to last — every detail designed with intention, nothing added without reason.', signature: 'The Themewright studio' }, { paddingY: 'xl', anchor: 'story' }),
+      B('luxeStatement', { overline: 'Our philosophy', text: 'The finest digital experiences are quiet, considered and made to last — every detail designed with intention, nothing added without reason.', signature: 'The Blogerism studio' }, { paddingY: 'xl', anchor: 'story' }),
       B('luxeSplit', { number: '01', overline: 'Strategy', title: 'Considered from the very first sketch', text: 'Every engagement begins with listening. We study your brand, your audience and your ambitions before a single pixel is placed.\n\nThe result is a clear direction that guides every decision that follows.', image: un('1497366216548-37526070297c', 1200), imagePosition: 'left', buttonLabel: 'Our approach', buttonUrl: '/about' }, { paddingY: 'xl', width: 'wide' }),
       B('luxeSplit', { number: '02', overline: 'Craft', title: 'Built with uncompromising care', text: 'Typography set with precision. Interactions tuned by hand. Performance treated as a feature.\n\nWe build websites that feel as good as they look — on every screen.', image: un('1618221195710-dd6b41faaea6', 1200), imagePosition: 'right', buttonLabel: 'Read the journal', buttonUrl: '/blog' }, { paddingY: 'xl', width: 'wide' }),
       B('stats', { items: [{ value: '7', label: 'Years of practice' }, { value: '120+', label: 'Brands served' }, { value: '18', label: 'Design awards' }, { value: '98%', label: 'Return clients' }] }, { background: 'surface', paddingY: 'lg' }),

@@ -20,18 +20,18 @@ const TITLES = [
 
 module.exports = {
   id: 'nova',
-  name: 'Themewright',
+  name: 'Blogerism',
   category: 'Business & blog',
   description: 'A polished company website with a landing page, pricing, testimonials and a modern blog.',
   features: { formats: ['STANDARD', 'GALLERY'], series: [], blocks: ['Headers', 'Interactive', 'Content', 'Media', 'Dynamic', 'Conversion', 'Layout'] },
   layout: { header: 'default', article: 'blog', listing: 'cards' },
-  general: { siteName: 'Themewright', tagline: 'Build beautiful websites, faster.' },
+  general: { siteName: 'Blogerism', tagline: 'Build beautiful websites, faster.' },
   appearance: {
     preset: 'aurora', primaryColor: '#6d5dfc', accentColor: '#16c79a', backgroundColor: '#ffffff', surfaceColor: '#f6f7fb', textColor: '#0f172a',
     darkBackgroundColor: '#0b0d17', darkSurfaceColor: '#141729', darkTextColor: '#e7e9f3', headingFont: 'Plus Jakarta Sans', bodyFont: 'Inter',
     radius: 16, colorMode: 'system', headerStyle: 'glass', footerStyle: 'columns', blogLayout: 'grid',
     headerCta: { enabled: true, label: 'Get started', url: '/contact' },
-    announcement: { enabled: true, text: 'Themewright 1.0 is here — fully customizable, blazing fast.', linkLabel: 'Read more', url: '/blog' },
+    announcement: { enabled: true, text: 'Blogerism 1.0 is here — fully customizable, blazing fast.', linkLabel: 'Read more', url: '/blog' },
   },
   menus: {
     header: {
@@ -47,11 +47,11 @@ module.exports = {
           ]),
           m('Learn', '#', [
             m('Tutorials', '/category/tutorials', [], { icon: 'BookOpen', description: 'Step-by-step guides' }),
-            m('Engineering', '/category/engineering', [], { icon: 'Code2', description: 'How Themewright is built' }),
+            m('Engineering', '/category/engineering', [], { icon: 'Code2', description: 'How Blogerism is built' }),
             m('FAQ', '/faq', [], { icon: 'Lightbulb', description: 'Answers to common questions' }),
           ]),
           m('Company', '#', [
-            m('About us', '/about', [], { icon: 'Users', description: 'The team behind Themewright' }),
+            m('About us', '/about', [], { icon: 'Users', description: 'The team behind Blogerism' }),
             m('Careers', '/about', [], { icon: 'Briefcase', description: 'Join a remote-first team', badge: 'Hiring' }),
             m('Contact', '/contact', [], { icon: 'Mail', description: 'We reply within a day' }),
           ]),
@@ -71,9 +71,9 @@ module.exports = {
   },
   pages: () => [
     {
-      slug: 'nova-home', title: 'Home', home: true, template: 'landing', seoTitle: 'Themewright — Build websites your team will love',
+      slug: 'nova-home', title: 'Home', home: true, template: 'landing', seoTitle: 'Blogerism — Build websites your team will love',
       blocks: [
-        B('hero', { variant: 'split', eyebrow: 'Introducing Themewright', title: 'Build websites your team will actually love to manage', subtitle: 'A modern, fully customizable content platform powered by Express, Next.js and PostgreSQL. Design visually, publish instantly, scale effortlessly.', primaryLabel: 'Start building', primaryUrl: '/contact', secondaryLabel: 'Read the blog', secondaryUrl: '/blog', image: pic('nova-hero', 1200, 900) }, { background: 'gradient', paddingY: 'lg', animate: true }),
+        B('hero', { variant: 'split', eyebrow: 'Introducing Blogerism', title: 'Build websites your team will actually love to manage', subtitle: 'A modern, fully customizable content platform powered by Express, Next.js and PostgreSQL. Design visually, publish instantly, scale effortlessly.', primaryLabel: 'Start building', primaryUrl: '/contact', secondaryLabel: 'Read the blog', secondaryUrl: '/blog', image: pic('nova-hero', 1200, 900) }, { background: 'gradient', paddingY: 'lg', animate: true }),
         B('logos', { title: 'Trusted by fast-moving teams', items: ['Lumen', 'Stackwise', 'Bloom', 'Northwind', 'Acme', 'Vertex'] }, { paddingY: 'sm' }),
         B('features', { eyebrow: 'Everything included', title: 'All the power, none of the bloat', subtitle: 'Every feature you need to run a professional website — beautifully integrated.', columns: 3, items: [
           { icon: 'LayoutGrid', title: 'Visual page builder', text: 'Compose pages from flexible, reusable blocks with live preview.' },
@@ -93,11 +93,11 @@ module.exports = {
           { name: 'Enterprise', price: 'Custom', period: '', description: 'For large organizations', features: ['Unlimited websites', 'SSO & audit logs', 'Dedicated manager'], buttonLabel: 'Contact sales', buttonUrl: '/contact', highlighted: false },
         ] }, { background: 'surface', paddingY: 'lg' }),
         B('faq', { eyebrow: 'FAQ', title: 'Questions? Answers.' }, { paddingY: 'lg' }),
-        B('cta', { title: 'Ready to build something beautiful?', text: 'Join thousands of teams publishing faster with Themewright.', primaryLabel: 'Get started free', primaryUrl: '/contact', secondaryLabel: 'Talk to us', secondaryUrl: '/contact' }, { paddingY: 'lg' }),
+        B('cta', { title: 'Ready to build something beautiful?', text: 'Join thousands of teams publishing faster with Blogerism.', primaryLabel: 'Get started free', primaryUrl: '/contact', secondaryLabel: 'Talk to us', secondaryUrl: '/contact' }, { paddingY: 'lg' }),
         B('newsletter', { title: 'Stay in the loop', text: 'Product updates and articles, once a month. No spam.' }, { background: 'surface' }),
       ],
     },
-    commonPages.about('Themewright', 'We are a small team on a mission to make publishing on the web delightful.'),
+    commonPages.about('Blogerism', 'We are a small team on a mission to make publishing on the web delightful.'),
     commonPages.privacy(),
   ],
 
@@ -122,7 +122,7 @@ module.exports = {
       });
     }
     await seedFaqs(prisma, [
-      ['Is Themewright free to use?', 'Yes. Themewright is open source and free for personal and commercial projects.'],
+      ['Is Blogerism free to use?', 'Yes. Blogerism is open source and free for personal and commercial projects.'],
       ['Can I customize the design?', 'Absolutely. Pick a theme, then change colors, fonts, radius, header and footer styles from the Theme Customizer — no code required.'],
       ['Does it support SEO?', 'Every post and page has its own meta title, description and social image, plus a generated sitemap and robots.txt.'],
       ['How do I build pages?', 'Use the visual block builder: drag in heroes, feature grids, testimonials, pricing tables and more, then publish.'],

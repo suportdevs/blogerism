@@ -1,0 +1,12 @@
+{
+  "video": "Themewright-social.mp4",
+  "width": 1080,
+  "height": 1350,
+  "fps": 30,
+  "durationSeconds": 133.5666666666667,
+  "sizeMB": 4.079370498657227,
+  "voice": "Microsoft Zira Desktop: synthetic English narration",
+  "visuals": "Illustrated code-based overview, not live app footage",
+  "subtitleTiming": "Short bilingual cues estimated proportionally within each narrated scene",
+  "scenes": 10
+}

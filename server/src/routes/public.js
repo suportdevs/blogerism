@@ -338,7 +338,7 @@ router.get('/github/:user', asyncHandler(async (req, res) => {
   const key = user.toLowerCase();
   let entry = githubCache.get(key);
   if (!entry || Date.now() - entry.at > 60 * 60 * 1000) {
-    const headers = { 'User-Agent': 'Themewright-CMS', Accept: 'application/vnd.github+json', ...(process.env.GITHUB_TOKEN ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` } : {}) };
+    const headers = { 'User-Agent': 'Blogerism-CMS', Accept: 'application/vnd.github+json', ...(process.env.GITHUB_TOKEN ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` } : {}) };
     const [p, r] = await Promise.all([
       fetch(`https://api.github.com/users/${user}`, { headers }),
       fetch(`https://api.github.com/users/${user}/repos?per_page=100&type=owner&sort=pushed`, { headers }),

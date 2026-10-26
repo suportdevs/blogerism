@@ -1,4 +1,4 @@
-# Themewright
+# Blogerism
 
 A modern, fully customizable content management system inspired by Botble CMS.
 
@@ -70,7 +70,7 @@ The site is one kind of website at a time, chosen under **Admin â†’ Appeara
 
 | Theme | Kind of site | Header / layout | Content formats |
 | --- | --- | --- | --- |
-| **Themewright** (default) | Business & blog | Glass header, landing page, card blog | Articles, galleries |
+| **Blogerism** (default) | Business & blog | Glass header, landing page, card blog | Articles, galleries |
 | **Herald** | News portal | Newspaper masthead + section nav, breaking ticker, newspaper article page | Articles, galleries, videos |
 | **Vidora** | Video sharing | Search-first header + sidebar, recommended grid, playlists | Videos, playlists |
 | **Marquee** | Streaming service | Dark cinematic header, billboard, Top 10, poster rows | Videos, shows with seasons |
@@ -93,7 +93,7 @@ The site is one kind of website at a time, chosen under **Admin â†’ Appeara
 
 **Client-ready business themes.** The last ten themes above are complete, independent client sites (own demo content, pages, menus, sections and page designs). They add four header layouts (`corporate`, `floating`, `bold`, `sidebar`), a *Statement* footer (`footerStyle: 'big'`) and a **Business** block category: split hero, search hero, kinetic-type hero, trust bar, service cards, listings (properties/rooms/tours/courses), case studies, schedule, donation, appointment booking and CTA banner.
 
-**Luxe versions.** Themewright, Herald, Vidora, Marquee, Waveform and Folio each have a *Luxe* version â€” the same theme and the same content with a different design language: a framed full-screen hero, luxe header with a full-screen numbered menu, serif typography, gold hairlines, magazine article and archive layouts, and luxury blocks (statement, framed split, editorial list with cursor-following images, magazine feature, quote carousel, parallax CTA). Switching Classic â†” Luxe never touches content; each version remembers its own customised design.
+**Luxe versions.** Blogerism, Herald, Vidora, Marquee, Waveform and Folio each have a *Luxe* version â€” the same theme and the same content with a different design language: a framed full-screen hero, luxe header with a full-screen numbered menu, serif typography, gold hairlines, magazine article and archive layouts, and luxury blocks (statement, framed split, editorial list with cursor-following images, magazine feature, quote carousel, parallax CTA). Switching Classic â†” Luxe never touches content; each version remembers its own customised design.
 
 **Homepage demos.** Herald, Vidora, Marquee, Folio and Forge each come with 10 extra homepage demos â€” client-ready designs with their own header style, colours, fonts and homepage built from different blocks. All of them share the theme's content (posts, series, pages), so switching demos never touches content. Pick a demo from the theme card's **Design** dropdown on the Themes page.
 
@@ -131,7 +131,7 @@ In **Admin â†’ Menus**, drag an item by its handle to reorder it, and drag 
 - **Mega menu**: switch it on for a top-level item. Its level-2 items become columns (use `#` as the URL for a plain heading), level-3 items become the links inside them, and an optional promo image shows as a feature card.
 - **Mobile**: menus become a three-level accordion.
 
-This works in every theme's header. The Themewright and Herald default menus include examples, which are applied when you set up the theme or import its demo.
+This works in every theme's header. The Blogerism and Herald default menus include examples, which are applied when you set up the theme or import its demo.
 
 ### Reader engagement
 
